@@ -1,37 +1,175 @@
 % !TEX root = ../sommaire.tex
 
-\chapter{Les macarons c'est bon}
+\chapter{Fondements théoriques}
 
-\input{abstract}
+\section{Théorie des graphes}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Définitions formelles}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Les macarons}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{definition}[Macaron]
-  Les macarons c'est de petits gâteaux à base de meringue qui sont très bons.
-  \label{def:macaron}
-\end{definition}
+Un graphe $G = (V, E)$ est défini par un ensemble de nœuds $V = \{v_1, \ldots, v_N\}$ et un ensemble d'arêtes $E \subseteq V \times V$. Dans cette thèse, nous travaillons avec des graphes non-orientés où $(v_i, v_j) \in E \Leftrightarrow (v_j, v_i) \in E$.
 
-\begin{proposition}
-  Les macarons c'est bon.
-\end{proposition}
+Un \textbf{graphe géométrique} est un graphe dont les nœuds sont associés à des coordonnées spatiales $\mathbf{x}_i \in \mathbb{R}^d$, où $d$ est la dimension de l'espace (typiquement $d=3$ pour les organoïdes).
 
-\begin{proof}
-  Montrons que macarons $\Leftrightarrow$ bon
-  
-  \begin{myproof}[macaron $\Rightarrow$ bon]
-    Preuve directe par définition \ref{def:macaron} (\nameref{def:macaron}).
-  \end{myproof}
-  \begin{myproof}[macaron $\Leftarrow$ bon]
-    Preuve un peu plus tricky mais bon croyez nous quand on vous dit que c'est bon.
-  \end{myproof}
-  Donc les macarons sont bons.
-\end{proof}
+\subsection{Représentations matricielles}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusion}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Plusieurs représentations matricielles d'un graphe sont utiles :
+\begin{itemize}
+    \item \textbf{Matrice d'adjacence} : $\mathbf{A} \in \{0,1\}^{N \times N}$ où $A_{ij} = 1$ si $(v_i, v_j) \in E$
+    \item \textbf{Matrice de degré} : $\mathbf{D} = \text{diag}(d_1, \ldots, d_N)$ où $d_i = \sum_j A_{ij}$
+    \item \textbf{Matrice Laplacienne} : $\mathbf{L} = \mathbf{D} - \mathbf{A}$
+    \item \textbf{Laplacien normalisé} : $\mathbf{L}_{\text{norm}} = \mathbf{D}^{-1/2}\mathbf{L}\mathbf{D}^{-1/2}$
+\end{itemize}
+
+\subsection{Métriques topologiques}
+
+Les métriques suivantes caractérisent la structure d'un graphe :
+\begin{itemize}
+    \item \textbf{Degré} : Nombre de voisins d'un nœud
+    \item \textbf{Centralité} : Importance d'un nœud (betweenness, closeness, eigenvector)
+    \item \textbf{Coefficient de clustering} : Mesure de regroupement local
+    \item \textbf{Diamètre} : Plus grande distance géodésique
+\end{itemize}
+
+\subsection{Graphes géométriques vs abstraits}
+
+Les graphes géométriques possèdent des propriétés spécifiques liées aux coordonnées spatiales de leurs nœuds. Contrairement aux graphes abstraits (réseaux sociaux, molécules), les graphes géométriques respectent des contraintes spatiales et admettent des transformations géométriques naturelles (translations, rotations).
+
+\section{Graph Neural Networks : principes}
+
+\subsection{Motivations et nécessité d'architectures spécialisées}
+
+Les données structurées sous forme de graphes ne peuvent être traitées directement par des réseaux de neurones classiques (MLP, CNN) qui supposent une structure euclidienne régulière. Les GNNs sont conçus pour opérer sur des structures non-euclidiennes et de taille variable.
+
+\subsection{Paradigme du message passing neural network (MPNN)}
+
+Le paradigme MPNN formalise la plupart des architectures GNN via deux opérations itératives :
+\begin{enumerate}
+    \item \textbf{Agrégation de messages} : $\mathbf{m}_i^{(k)} = \text{AGG}(\{\mathbf{h}_j^{(k-1)} : j \in \mathcal{N}(i)\})$
+    \item \textbf{Mise à jour} : $\mathbf{h}_i^{(k)} = \text{UPDATE}(\mathbf{h}_i^{(k-1)}, \mathbf{m}_i^{(k)})$
+\end{enumerate}
+où $\mathbf{h}_i^{(k)}$ représente l'état du nœud $i$ à la couche $k$, et $\mathcal{N}(i)$ son voisinage.
+
+\subsection{Couches de convolution sur graphes}
+
+Les couches de convolution sur graphes généralisent la convolution euclidienne aux graphes. Elles permettent d'extraire des features locales en agrégeant l'information du voisinage de chaque nœud.
+
+\subsection{Pooling et agrégation globale}
+
+Pour obtenir une représentation au niveau du graphe entier (nécessaire pour la classification de graphes), des opérations de pooling sont appliquées :
+\begin{itemize}
+    \item \textbf{Global pooling} : max, mean, sum sur tous les nœuds
+    \item \textbf{Hierarchical pooling} : DiffPool, TopK pooling
+    \item \textbf{Set-based pooling} : Set2Set, attention-based
+\end{itemize}
+
+\section{Architectures GNN standards}
+
+\subsection{Approches spectrales vs spatiales}
+
+Les GNNs se divisent en deux familles :
+\begin{itemize}
+    \item \textbf{Approches spectrales} : Basées sur la décomposition spectrale du Laplacien, définissent la convolution via la transformée de Fourier sur graphes
+    \item \textbf{Approches spatiales} : Opèrent directement dans le domaine spatial en agrégeant les features des voisins
+\end{itemize}
+
+\subsection{Graph Convolutional Networks (GCN)}
+
+Le modèle GCN définit une couche de convolution comme :
+\[
+\mathbf{H}^{(k+1)} = \sigma(\tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}\mathbf{H}^{(k)}\mathbf{W}^{(k)})
+\]
+où $\tilde{\mathbf{A}} = \mathbf{A} + \mathbf{I}$ inclut les auto-connexions.
+
+\subsection{Graph Attention Networks (GAT)}
+
+GAT introduit un mécanisme d'attention pour pondérer différemment les contributions des voisins :
+\[
+\mathbf{h}_i^{(k+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} \mathbf{W}^{(k)}\mathbf{h}_j^{(k)}\right)
+\]
+où $\alpha_{ij}$ sont des coefficients d'attention appris.
+
+\subsection{GraphSAGE, GIN, et variantes modernes}
+
+D'autres architectures notables incluent :
+\begin{itemize}
+    \item \textbf{GraphSAGE} : Sampling et agrégation du voisinage pour scalabilité
+    \item \textbf{GIN} : Graph Isomorphism Network, expressivité maximale au sens du WL-test
+    \item \textbf{PNA} : Principal Neighbourhood Aggregation, agrégateurs multiples
+\end{itemize}
+
+\section{GNNs géométriques : extensions E(3)-équivariantes}
+
+\subsection{Symétries géométriques : translations, rotations, réflexions}
+
+Les graphes géométriques admettent des transformations du groupe euclidien $E(3)$ (translations, rotations, réflexions). Une méthode d'analyse robuste devrait produire des prédictions cohérentes sous ces transformations.
+
+\subsection{Invariance vs équivariance : définitions et implications}
+
+Soit $T$ une transformation géométrique et $f$ une fonction :
+\begin{itemize}
+    \item $f$ est \textbf{invariante} si $f(T(\mathbf{x})) = f(\mathbf{x})$ (pour classification de graphes)
+    \item $f$ est \textbf{équivariante} si $f(T(\mathbf{x})) = T(f(\mathbf{x}))$ (pour prédiction de nœuds)
+\end{itemize}
+
+\subsection{Equivariant Graph Neural Networks (EGNN)}
+
+Les EGNN maintiennent l'équivariance E(3) en construisant des messages invariants basés sur les distances et en mettant à jour les coordonnées de manière équivariante :
+\[
+\mathbf{m}_{ij} = \phi_e(\mathbf{h}_i, \mathbf{h}_j, \|\mathbf{x}_i - \mathbf{x}_j\|^2, a_{ij})
+\]
+
+\subsection{SchNet, DimeNet et architectures pour données 3D}
+
+Développées initialement pour la chimie quantique, ces architectures exploitent les coordonnées 3D :
+\begin{itemize}
+    \item \textbf{SchNet} : Convolutions continues basées sur les distances inter-atomiques
+    \item \textbf{DimeNet} : Intègre les angles de liaison en plus des distances
+    \item \textbf{PaiNN} : Polarizable Atom Interaction Networks avec features tensorielles
+\end{itemize}
+
+\subsection{Applications en chimie, biologie structurale, physique}
+
+Ces architectures ont démontré leur efficacité pour prédire des propriétés moléculaires, la structure de protéines, et simuler des systèmes physiques. Leur adaptation aux données biologiques cellulaires constitue une direction de recherche prometteuse.
+
+\section{Expressivité et limitations théoriques}
+
+\subsection{Weisfeiler-Lehman test et pouvoir de discrimination}
+
+Le test de Weisfeiler-Lehman (WL-test) caractérise la capacité d'un GNN à distinguer des graphes non-isomorphes. Les GNNs standards ont une expressivité limitée au 1-WL test, ne pouvant distinguer certains graphes que les humains distinguent facilement.
+
+\subsection{Over-smoothing et profondeur des réseaux}
+
+Avec un nombre de couches trop élevé, les représentations de nœuds convergent vers des valeurs identiques (over-smoothing), perdant l'information de structure locale. Ce phénomène limite la profondeur efficace des GNNs.
+
+\subsection{Over-squashing et propagation d'information}
+
+L'information doit traverser des goulets d'étranglement topologiques pour se propager à travers le graphe, causant une perte d'information (over-squashing). Ce problème est particulièrement critique pour les graphes de grand diamètre.
+
+\section{Statistiques spatiales pour données ponctuelles}
+
+\subsection{Processus ponctuels : définitions et propriétés}
+
+Un processus ponctuel est un modèle probabiliste pour la distribution spatiale de points. Le processus de Poisson homogène constitue le modèle de référence de distribution aléatoire, caractérisé par l'indépendance complète des positions.
+
+\subsection{Fonctions de Ripley (K, F, G) sur surfaces courbes}
+
+Les fonctions de Ripley permettent de caractériser l'organisation spatiale :
+\begin{itemize}
+    \item \textbf{Fonction K} : Mesure le nombre moyen de voisins dans un rayon $r$
+    \item \textbf{Fonction F} : Distribution des distances au plus proche voisin
+    \item \textbf{Fonction G} : Distribution des distances entre points quelconques
+\end{itemize}
+
+Ces fonctions ont été étendues aux surfaces courbes, pertinent pour les organoïdes sphériques.
+
+\subsection{Tests d'agrégation et de régularité spatiale}
+
+En comparant les fonctions observées aux enveloppes de confiance sous hypothèse de Poisson, on teste statistiquement :
+\begin{itemize}
+    \item \textbf{Agrégation} : Tendance au clustering (K observé > K Poisson)
+    \item \textbf{Régularité} : Répulsion entre points (K observé < K Poisson)
+\end{itemize}
+
+\subsection{Applications en biologie cellulaire}
+
+Les statistiques spatiales sont utilisées pour caractériser l'organisation de récepteurs membranaires, de protéines dans le noyau, ou de cellules dans des tissus. Leur application aux organoïdes 3D est une extension naturelle pour valider nos données synthétiques.

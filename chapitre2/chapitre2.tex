@@ -1,28 +1,103 @@
 % !TEX root = ../sommaire.tex
 
-\chapter{La Pâtisserie}
+\chapter{État de l'art}
 
-\input{abstract}
+\section{Organoïdes : biologie et applications}
 
-\input{patstory}
+\subsection{Définitions et types d'organoïdes}
 
-\section{La pâtisserie dans le monde}
+Les organoïdes sont des structures tridimensionnelles auto-organisées cultivées \textit{in vitro} à partir de cellules souches ou de tissus primaires. Différents types d'organoïdes ont été développés, reproduisant la structure et la fonction d'organes variés : organoïdes intestinaux, cérébraux, rénaux, hépatiques, pulmonaires, pancréatiques, etc. Chaque type présente des caractéristiques morphologiques et cellulaires spécifiques.
 
+\subsection{Mécanismes de formation et auto-organisation}
 
-\subsection{Pâtisserie suédoise}
-Les suédois font \emph{fika} pour le plaisir de tous.
+La formation d'organoïdes repose sur les capacités d'auto-organisation cellulaire. En présence d'une matrice extracellulaire appropriée et de facteurs de croissance spécifiques, les cellules se différencient, prolifèrent et s'organisent spontanément selon des principes morphogénétiques similaires à ceux du développement embryonnaire.
 
-\subsection{Pâtisserie orientale}
-Toutes ces pâtisseries très sucrées à la pistache qui sont très très bonnes.
+\subsection{Applications : recherche fondamentale, drug screening, médecine personnalisée}
 
-\subsection{Pâtisserie anglaise}
-Non c'est une blague :) \cite{F2011}
+Les organoïdes trouvent des applications multiples en recherche biomédicale :
+\begin{itemize}
+    \item \textbf{Modélisation du développement} : Étude des processus morphogénétiques et de différenciation
+    \item \textbf{Modélisation de maladies} : Reproduction \textit{in vitro} de pathologies génétiques ou infectieuses
+    \item \textbf{Criblage pharmacologique} : Test à haut débit de l'efficacité et de la toxicité de composés
+    \item \textbf{Médecine personnalisée} : Prédiction de réponse thérapeutique à partir d'organoïdes dérivés de patients
+    \item \textbf{Médecine régénérative} : Source potentielle de tissus pour transplantation
+\end{itemize}
 
-\subsection{Conclusion}
+\subsection{Biomarqueurs et phénotypes d'intérêt}
 
-\section{Synthèse}
+L'identification de phénotypes dans les organoïdes repose sur divers biomarqueurs : marqueurs de prolifération (Ki67), de mort cellulaire (caspase-3), de différenciation (marqueurs lignage-spécifiques), et de fonctionnalité. La caractérisation quantitative de ces phénotypes est cruciale pour exploiter pleinement le potentiel des organoïdes.
 
+\section{Analyse d'images biomédicales 3D}
 
-\subsection{La place du macaron dans le monde}
+\subsection{Modalités d'imagerie}
 
-\subsection{Analyse}
+Plusieurs modalités d'imagerie permettent d'observer les organoïdes en trois dimensions :
+\begin{itemize}
+    \item \textbf{Microscopie confocale} : Haute résolution, mais acquisition lente et photoblanchiment
+    \item \textbf{Light-sheet microscopy} : Imagerie rapide de grands volumes avec faible phototoxicité
+    \item \textbf{Microscopie multiphoton} : Imagerie en profondeur avec réduction des dommages cellulaires
+    \item \textbf{Microscopie à expansion} : Augmentation physique de la taille des échantillons pour améliorer la résolution
+\end{itemize}
+
+\subsection{Défis spécifiques : résolution, bruit, artefacts}
+
+L'imagerie 3D d'organoïdes présente des défis techniques importants : résolution spatiale limitée en profondeur, diffusion de la lumière, hétérogénéité d'illumination, bruit de fond, aberrations optiques. Ces artefacts compliquent l'analyse automatisée et nécessitent des stratégies de prétraitement sophistiquées.
+
+\subsection{Contraintes computationnelles}
+
+Un organoïde imagé en haute résolution peut générer des volumes de données dépassant 2 Go par échantillon. Le traitement de telles images nécessite des ressources computationnelles importantes et des stratégies d'optimisation mémoire, limitant l'application de certaines approches de deep learning.
+
+\section{Méthodes d'analyse existantes}
+
+\subsection{Analyse manuelle : avantages et limites}
+
+L'analyse manuelle par des experts reste la référence (\textit{gold standard}) pour l'évaluation d'organoïdes. Elle permet une interprétation riche en contexte biologique mais souffre de limitations majeures : temps d'analyse élevé (plusieurs minutes par organoïde), subjectivité, variabilité inter- et intra-observateur, impossibilité de passage à l'échelle pour des études à haut débit.
+
+\subsection{Segmentation cellulaire}
+
+La segmentation automatique des cellules constitue une étape critique du pipeline d'analyse. Plusieurs approches ont été proposées :
+\begin{itemize}
+    \item \textbf{Méthodes géométriques} : Détection de formes ellipsoïdales, limitée aux morphologies simples
+    \item \textbf{Watershed} : Segmentation par bassins versants, sensible au sur-segmentation
+    \item \textbf{Stardist} : Détection par prédiction de distances radiales, efficace pour noyaux convexes
+    \item \textbf{Cellpose} : Architecture de deep learning avec champs de gradients, état de l'art actuel
+\end{itemize}
+
+\subsection{Approches par vision par ordinateur}
+
+Les approches classiques de vision par ordinateur appliquées aux organoïdes incluent :
+\begin{itemize}
+    \item \textbf{Descripteurs de texture} : Matrices de co-occurrence (Haralick), Local Binary Patterns, filtres de Gabor. Ces descripteurs manuellement conçus manquent de flexibilité et nécessitent une expertise domaine.
+    \item \textbf{CNN 2D} : Analyse slice-by-slice, perte d'information 3D et cohérence spatiale
+    \item \textbf{CNN 3D} : Limitations mémoire importantes, nécessitent downsampling massif, sensibles aux variations d'acquisition (luminosité, contraste)
+\end{itemize}
+
+\subsection{Méthodes basées graphes en histopathologie}
+
+Quelques travaux ont exploré l'utilisation de graphes pour l'analyse de tissus en histopathologie 2D, représentant les cellules comme des nœuds. Ces approches ont montré des résultats prometteurs pour la classification de cancers, mais leur extension aux organoïdes 3D n'a pas été explorée.
+
+\section{Positionnement de la thèse}
+
+\subsection{Lacunes identifiées dans la littérature}
+
+À notre connaissance, aucune méthode automatisée n'exploite pleinement la structure relationnelle 3D des organoïdes via des Graph Neural Networks géométriques. Les approches existantes traitent les organoïdes comme des images, sans modéliser explicitement le réseau d'interactions cellulaires qui gouverne leur comportement.
+
+\subsection{Originalité de l'approche proposée}
+
+Notre approche se distingue par :
+\begin{itemize}
+    \item La représentation des organoïdes comme graphes géométriques 3D
+    \item L'utilisation de GNNs équivariants adaptés aux symétries spatiales
+    \item La génération de données synthétiques basée sur la théorie des processus ponctuels
+    \item Un pipeline de bout en bout intégrant segmentation, graphe, et classification
+\end{itemize}
+
+\subsection{Verrous scientifiques et techniques adressés}
+
+Cette thèse adresse plusieurs verrous :
+\begin{enumerate}
+    \item \textbf{Représentation adaptée} : Comment encoder efficacement la structure 3D relationnelle des organoïdes ?
+    \item \textbf{Rareté des données} : Comment entraîner des modèles robustes malgré le manque d'annotations ?
+    \item \textbf{Interprétabilité} : Comment rendre les prédictions exploitables par les biologistes ?
+    \item \textbf{Généralisation} : Comment assurer la robustesse aux variations expérimentales ?
+\end{enumerate}

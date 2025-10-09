@@ -77,15 +77,16 @@
 %                      with a 'date' data type.
 
 
+\Title        {Apprentissage profond pour l'analyse des organoïdes : modélisation par graphes des architectures cellulaires 3D}
 
-\Title        {Pourquoi les macarons de Ladurée sont-ils si bons ?}
+\Author       {Alexandre Martin}
 
-\Author       {Pierre Hermé}
+\Copyright    {Copyright \copyright\ 2025 Alexandre Martin}
 
-\Copyright    {Copyright \copyright\ 2023 "Votre Nom"}
+\Keywords     {Apprentissage profond\sep
+               Organoïdes\sep
+               Graphes\sep
+               Biologie cellulaire\sep
+               Deep Learning}
 
-\Keywords     {Pâtisserie\sep
-               Macaron\sep
-               Ladurée}
-
-\Subject      {Les macarons c'est bon par nature, c'est le propre même du macaron que d'être bon.}
+\Subject      {Cette thèse présente des méthodes d'apprentissage profond pour l'analyse automatisée d'organoïdes en 3D, utilisant des représentations par graphes pour modéliser les architectures cellulaires complexes.}

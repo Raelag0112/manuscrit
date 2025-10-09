@@ -1,172 +1,284 @@
 % !TEX root = ../sommaire.tex
 
-\chapter*{}
+\chapter{Fondamentaux du Deep Learning}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Équation}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Histoire et évolutions majeures}
 
-  $$
-  \begin{array}{l c l}
-    Z = \min c\cdotp x & & Z_{LR}(\lambda) = \min c\cdotp x + \lambda^T\cdotp(b_h - A_hx)\\
-    \mbox{s.t. }
-      \left\{
-        \begin{array}{l}
-          A_hx \geq b_h\\
-          A_ex \geq b_e\\
-          x \in \{0, 1\}
-        \end{array}
-      \right.
-    & \longrightarrow
-    & \mbox{s.t. }
-      \left\{
-        \begin{array}{l}
-          A_ex \geq b_e\\
-          x \in \{0, 1\}
-        \end{array}
-      \right.
-  \end{array}
-  $$
-  
-  
-\begin{figure}
-  \caption{Figure vide}
-\end{figure}
+Le deep learning a connu plusieurs révolutions : les perceptrons multicouches (années 1980), les réseaux convolutifs (LeNet, 1998), la renaissance avec AlexNet (2012), l'essor des architectures profondes (ResNet, 2015), et récemment les Transformers (2017) et modèles de fondation.
 
+\section{Architectures classiques}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Cosinus}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Perceptrons multicouches (MLP)}
+Architecture fully-connected de base, limitée aux données tabulaires ou vectorielles.
 
-\def\b#1{\textcolor{bleu}{#1}}
-\def\v#1{\textcolor{violet}{#1}}
-\def\r#1{\textcolor{pink}{#1}}
-\def\o#1{\textcolor{orange}{#1}}
-\def\g#1{\textcolor{vert}{#1}}
+\subsection{Réseaux de neurones convolutifs (CNN)}
+Exploitent la structure grille régulière des images via convolutions et pooling.
 
-\begin{figure}
-  \begin{tikzpicture}
-    \draw[->, black!50] (0, -1.5) -- (0, 1.5);
-    \draw[->, black!50] (-1.5, 0) -- (1.5, 0);
-    \begin{scope}[thick, bleu]
-      \clip (0, 0) rectangle (1.5, 1.5);
-      \draw (0, 0) circle (1);
-      \draw (0.5, 0.5) node {1};
-    \end{scope}
-    \begin{scope}[thick, pink]
-      \clip (0, 0) rectangle (-1.5, 1.5);
-      \draw (0, 0) circle (1);
-      \draw (-0.5, 0.5) node {2};
-    \end{scope}
-    \begin{scope}[thick, violet]
-      \clip (0, 0) rectangle (-1.5, -1.5);
-      \draw (0, 0) circle (1);
-      \draw (-0.5, -0.5) node {3};
-    \end{scope}
-    \begin{scope}[thick, orange]
-      \clip (0, 0) rectangle (1.5, -1.5);
-      \draw (0, 0) circle (1);
-      \draw (0.5, -0.5) node {4};
-    \end{scope}
-  \end{tikzpicture}
-  \begin{tikzpicture}[xscale = 1.25]
-    \draw[->, black!50] (0, -1.5) -- (0, 1.5);
-    \draw[->, black!50] (-0.5, 0) -- (8.5, 0);
-    \draw[dotted] (1, -1.5) -- (1, 1.5);
-    \draw[dotted] (2, -1.5) -- (2, 1.5);
-    \draw[dotted] (3, -1.5) -- (3, 1.5);
-    \draw[dotted] (4, -1.5) -- (4, 1.5);
-    \draw[dotted] (5, -1.5) -- (5, 1.5);
-    \draw[dotted] (6, -1.5) -- (6, 1.5);
-    \draw[dotted] (7, -1.5) -- (7, 1.5);
-    \begin{scope}[thick, bleu]
-      \clip (0, 1.5) rectangle (1, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (0.5, 0) node {1};
-    \end{scope}
-    \begin{scope}[thick, pink]
-      \clip (1, 1.5) rectangle (2, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (1.5, 0) node {2};
-    \end{scope}
-    \begin{scope}[thick, violet]
-      \clip (2, 1.5) rectangle (3, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (2.5, 0) node {3};
-    \end{scope}
-    \begin{scope}[thick, orange]
-      \clip (3, 1.5) rectangle (4, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (3.5, 0) node {4};
-    \end{scope}
-    
-    \begin{scope}[xshift = 4cm]
-    \begin{scope}[thick, bleu]
-      \clip (0, 1.5) rectangle (1, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (0.5, 0) node {1};
-    \end{scope}
-    \begin{scope}[thick, pink]
-      \clip (1, 1.5) rectangle (2, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (1.5, 0) node {2};
-    \end{scope}
-    \begin{scope}[thick, violet]
-      \clip (2, 1.5) rectangle (3, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (2.5, 0) node {3};
-    \end{scope}
-    \begin{scope}[thick, orange]
-      \clip (3, 1.5) rectangle (4, -1.5);
-      \draw (0, 1) cos (1, 0) sin (2, -1) cos (3, 0) sin (4, 1);
-      \draw (3.5, 0) node {4};
-    \end{scope}
-    \end{scope}
-  \end{tikzpicture}
-  \caption{Cosinus}
-\end{figure}
-  
-  
-  $\cos([x^-, x^+]) = [-1, 1]$ si $x^+ - x^- \geq 2\pi$
-  
-  sinon
-  
-  $\begin{array}{c | c | l}
-  x^- \mod 2\pi \in & x^+ \mod 2\pi \in & \cos([x^-, x^+])\\\hline
-  1 & 1 & \left\{\begin{array}{ll}\b{[\cos(x^+), \cos(x^-)]} & \mbox{si } x^- \mod 2\pi \leq x^+ \mod 2\pi\\\o{[-1, 1]} & \mbox{sinon}\end{array}\right.\\
-  1 & 2 & \b{[\cos(x^+), \cos(x^-)]}\\
-  1 & 3 & \r{[-1, \cos(x^-)]}\\
-  1 & 4 & \r{[-1, \max(\cos(x^-), \cos(x^+))]}\\[5pt]
-  
-  2 & 1 & \o{[-1, 1]}\\
-  2 & 2 & \left\{\begin{array}{ll}\b{[\cos(x^+), \cos(x^-)]} & \mbox{si } x^- \mod 2\pi \leq x^+ \mod 2\pi\\\o{[-1, 1]} & \mbox{sinon}\end{array}\right.\\
-  2 & 3 & \r{[-1, \max(\cos(x^-), \cos(x^+))]}\\
-  2 & 4 & \r{[-1, \cos(x^+)]}\\[5pt]
-  
-  3 & 1 & \v{[\cos(x^-), 1]}\\
-  3 & 2 & \v{[\min(\cos(x^-), \cos(x^+)), 1]}\\
-  3 & 3 & \left\{\begin{array}{ll}\g{[\cos(x^-), \cos(x^+)]} & \mbox{si } x^- \mod 2\pi \leq x^+ \mod 2\pi\\\o{[-1, 1]} & \mbox{sinon}\end{array}\right.\\
-  3 & 4 & \g{[\cos(x^-), \cos(x^+)]}\\[5pt]
-  
-  4 & 1 & \v{[\min(\cos(x^-), \cos(x^+)), 1]}\\
-  4 & 2 & \v{[\cos(x^+), 1]}\\
-  4 & 3 & \o{[-1, 1]}\\
-  4 & 4 & \left\{\begin{array}{ll}\g{[\cos(x^-), \cos(x^+)]} & \mbox{si } x^- \mod 2\pi \leq x^+ \mod 2\pi\\\o{[-1, 1]} & \mbox{sinon}\end{array}\right.\\
-  \end{array}$
+\subsection{Réseaux de neurones récurrents (RNN, LSTM, GRU)}
+Traitent des séquences en maintenant une mémoire des états passés.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Section C}
+\subsection{Transformers}
+Architecture basée attention, devenue dominante pour traitement du langage et vision.
 
-\begin{definition}[test definition]
-  Ceci est une définition
-\end{definition}
+\section{Techniques d'optimisation}
 
-\begin{example}[test exemple]
-  Ceci est un exemple
-\end{example}
+\subsection{Algorithmes d'optimisation}
+\begin{itemize}
+    \item SGD (Stochastic Gradient Descent)
+    \item Momentum
+    \item Adam, AdamW
+    \item Learning rate scheduling (step decay, cosine annealing)
+\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bonnes pratiques}
+\begin{itemize}
+    \item Initialisation des poids (Xavier, He)
+    \item Batch normalization
+    \item Gradient clipping
+\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusion}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Régularisation}
+
+\subsection{Dropout}
+Désactivation aléatoire de neurones pendant l'entraînement pour éviter le sur-apprentissage.
+
+\subsection{Data augmentation}
+Augmentation artificielle du dataset par transformations (rotations, translations, déformations, variations photométriques).
+
+\subsection{Early stopping}
+Arrêt de l'entraînement lorsque la performance sur validation cesse de s'améliorer.
+
+\section{Bonnes pratiques d'entraînement}
+
+\begin{itemize}
+    \item Validation croisée pour estimation robuste des performances
+    \item Monitoring de métriques multiples (loss, accuracy, F1)
+    \item Visualisation des embeddings (t-SNE, UMAP)
+    \item Sauvegarde de checkpoints réguliers
+    \item Documentation exhaustive des hyperparamètres
+\end{itemize}
+
+\chapter{Compléments sur les graphes et GNNs}
+
+\section{Types de graphes exotiques}
+
+\subsection{Hypergraphes}
+Généralisation où une arête peut connecter plus de deux nœuds.
+
+\subsection{Graphes dynamiques}
+Graphes dont la topologie évolue dans le temps.
+
+\subsection{Graphes hétérogènes}
+Plusieurs types de nœuds et d'arêtes coexistent.
+
+\section{Geometric Deep Learning : formalisme unifié}
+
+Le Geometric Deep Learning propose un cadre théorique unifié pour le deep learning sur domaines non-euclidiens (graphes, variétés, groupes) basé sur les symétries et invariances.
+
+\section{Topological Data Learning}
+
+\subsection{Persistent homology}
+Caractérise la topologie de données via naissance/mort de features topologiques à différentes échelles.
+
+\subsection{Applications aux graphes}
+Les descripteurs topologiques (nombres de Betti, diagrammes de persistance) peuvent enrichir les features de graphes.
+
+\section{Expressivité théorique : au-delà du WL-test}
+
+\subsection{Hiérarchie WL}
+Extensions du WL-test (2-WL, k-WL) pour expressivité accrue.
+
+\subsection{Higher-order GNNs}
+Architectures opérant sur k-tuples de nœuds pour dépasser les limitations du 1-WL.
+
+\section{Message passing généralisé}
+
+Extensions du MPNN incluant :
+\begin{itemize}
+    \item Messages sur arêtes (edge updates)
+    \item Attention multi-têtes
+    \item Agrégation de voisinage d'ordre supérieur
+\end{itemize}
+
+\chapter{Théorie des processus ponctuels}
+
+\section{Processus de Poisson : propriétés et simulation}
+
+\subsection{Définition}
+Un processus de Poisson sur un domaine $D$ d'intensité $\lambda$ génère un nombre aléatoire de points suivant une loi de Poisson de paramètre $\lambda |D|$, avec positions indépendantes et uniformes.
+
+\subsection{Propriétés}
+\begin{itemize}
+    \item Indépendance complète des positions
+    \item Superposition de processus de Poisson $\rightarrow$ Poisson
+    \item Espérance du nombre de points dans une région proportionnelle à son aire/volume
+\end{itemize}
+
+\subsection{Simulation}
+\begin{enumerate}
+    \item Tirer $N \sim \text{Poisson}(\lambda |D|)$
+    \item Placer $N$ points uniformément dans $D$
+\end{enumerate}
+
+\section{Processus de Cox et processus log-gaussiens}
+
+Les processus de Cox généralisent Poisson avec une intensité $\Lambda$ elle-même aléatoire. Les processus log-gaussiens modélisent $\log \Lambda$ par un champ gaussien, permettant d'incorporer de la corrélation spatiale.
+
+\section{Processus de Gibbs et modèles énergétiques}
+
+Les processus de Gibbs définissent une distribution via une énergie :
+\[
+P(\mathbf{x}) \propto \exp(-U(\mathbf{x}))
+\]
+Exemples : processus de Strauss (répulsion), processus de Matérn (clustering).
+
+\section{Estimation statistique et inférence}
+
+\subsection{Maximum de vraisemblance}
+Difficile pour processus complexes, nécessite calcul de constante de normalisation.
+
+\subsection{Méthodes basées simulation}
+ABC (Approximate Bayesian Computation) permet l'inférence sans vraisemblance explicite.
+
+\section{Processus ponctuels sur variétés}
+
+\subsection{Extension aux sphères}
+Pour un processus sur la sphère $\mathbb{S}^2$, les fonctions K, F, G sont adaptées en tenant compte de la géométrie sphérique (distances géodésiques).
+
+\subsection{Processus sur surfaces courbes}
+Généralisation aux variétés riemanniennes quelconques, pertinent pour modéliser des organes de formes complexes.
+
+\chapter{Détails d'implémentation}
+
+\section{Technologies et bibliothèques}
+
+\subsection{Environnement logiciel}
+\begin{itemize}
+    \item Python 3.9
+    \item PyTorch 2.0
+    \item PyTorch Geometric pour GNNs
+    \item scikit-image, scikit-learn
+    \item NumPy, SciPy pour calculs numériques
+\end{itemize}
+
+\subsection{Outils de segmentation}
+\begin{itemize}
+    \item Cellpose pour segmentation cellulaire
+    \item scikit-image pour opérations morphologiques
+\end{itemize}
+
+\subsection{Visualisation et analyse}
+\begin{itemize}
+    \item Matplotlib, Seaborn pour figures
+    \item Plotly pour visualisations 3D interactives
+    \item TensorBoard pour monitoring d'entraînement
+\end{itemize}
+
+\section{Architecture logicielle du pipeline}
+
+Le pipeline est organisé en modules modulaires :
+\begin{itemize}
+    \item \texttt{preprocessing/} : Normalisation et débruitage
+    \item \texttt{segmentation/} : Interface unifiée pour méthodes de segmentation
+    \item \texttt{graph\_construction/} : Construction de graphes avec stratégies multiples
+    \item \texttt{models/} : Architectures GNN implémentées
+    \item \texttt{training/} : Boucles d'entraînement et évaluation
+    \item \texttt{synthetic/} : Génération de données synthétiques
+    \item \texttt{utils/} : Fonctions utilitaires
+\end{itemize}
+
+\section{Gestion des ressources computationnelles}
+
+\subsection{Hardware utilisé}
+Entraînements menés sur [GPU : Tesla V100 / A100 / autre] avec [RAM] de mémoire.
+
+\subsection{Optimisations}
+\begin{itemize}
+    \item Batch processing adaptatif selon taille de graphes
+    \item Gradient accumulation pour larges batches virtuels
+    \item Mixed precision training (FP16)
+    \item Checkpointing pour économiser mémoire
+\end{itemize}
+
+\section{Documentation des hyperparamètres}
+
+Tous les hyperparamètres utilisés sont documentés dans des fichiers de configuration YAML versionnés avec le code.
+
+\section{Reproductibilité}
+
+Pour assurer la reproductibilité complète :
+\begin{itemize}
+    \item Seeds aléatoires fixés (Python, NumPy, PyTorch)
+    \item Environnements conda/pip avec versions exactes
+    \item Scripts d'entraînement et d'évaluation documentés
+    \item Poids des modèles entraînés disponibles
+\end{itemize}
+
+\chapter{Données et benchmarks}
+
+\section{Description détaillée des datasets}
+
+\subsection{Dataset synthétique}
+\begin{itemize}
+    \item 5000 organoïdes générés
+    \item 5 classes équilibrées (1000 par classe)
+    \item 50-500 cellules par organoïde
+    \item Paramètres des processus documentés
+\end{itemize}
+
+\subsection{Dataset réel}
+[À compléter avec description détaillée de vos données :
+\begin{itemize}
+    \item Source biologique
+    \item Conditions de culture
+    \item Protocole d'imagerie
+    \item Nombre d'échantillons
+    \item Classes et leur distribution
+\end{itemize}
+]
+
+\section{Protocoles d'annotation}
+
+[Décrire le processus d'annotation :
+\begin{itemize}
+    \item Nombre d'annotateurs
+    \item Critères de classification
+    \item Gestion des désaccords
+    \item Inter-rater reliability
+\end{itemize}
+]
+
+\section{Statistiques descriptives complètes}
+
+Tableaux et figures présentant :
+\begin{itemize}
+    \item Distributions de tailles d'organoïdes
+    \item Nombre de cellules par organoïde
+    \item Distributions de features morphologiques
+    \item Statistiques spatiales (K, F, G)
+\end{itemize}
+
+\section{Accès aux données et code}
+
+\subsection{Dépôt de code}
+Code disponible sur GitHub : [URL à compléter]
+\begin{itemize}
+    \item Licence : MIT / Apache 2.0
+    \item Documentation complète
+    \item Exemples d'utilisation
+    \item Tests unitaires
+\end{itemize}
+
+\subsection{Données}
+\begin{itemize}
+    \item Dataset synthétique : disponible sous DOI [à compléter]
+    \item Dataset réel : [disponibilité selon restrictions éthiques/confidentialité]
+    \item Modèles pré-entraînés : disponibles sur Hugging Face / Zenodo
+\end{itemize}
+
+\subsection{Environnement reproductible}
+\begin{itemize}
+    \item Container Docker avec environnement complet
+    \item Notebooks Jupyter démonstratifs
+    \item Scripts de reproduction des figures principales
+\end{itemize}

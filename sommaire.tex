@@ -16,6 +16,8 @@
 
 \input{titreEtInfos}
 
+% Désactiver la quatrième de couverture
+\renewcommand{\fourthcover}{}
 
 \begin{document}
   \pagenumbering{roman}
@@ -38,18 +40,25 @@
 
   \mainmatter
 
-  \input{introduction/introduction}
-  \input{notations}
-
-  \Part{État de l'art}
+  % Chapitre 1 : Introduction générale
+  \import{chapitre1/}{chapitre1}
+  
+  % Chapitre 2 : État de l'art
   \import{chapitre2/}{chapitre2}
+  
+  % Chapitre 3 : Fondements théoriques
   \import{chapitre3/}{chapitre3}
-
-  \Part{Contributions}
+  
+  % Chapitre 4 : Méthodologie et pipeline
   \import{chapitre4/}{chapitre4}
+  
+  % Chapitre 5 : Expérimentations et résultats
   \import{chapitre5/}{chapitre5}
-
+  
+  % Chapitre 6 : Conclusion et perspectives
   \input{conclusion/conclusion}
+  
+  \input{notations}
 
   \backmatter
 

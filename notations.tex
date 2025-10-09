@@ -1,24 +1,98 @@
 % !TEX root = sommaire.tex
 \Chapter{Notations}
 
-\section*{P\^atisserie}
+\section*{Graphes}
 
-\begin{tabular}{p{2cm} p{11.5cm}}
+\begin{tabular}{p{2.5cm} p{11cm}}
   \hline
-  $\mathcal{D}$ & l'ensemble des donuts\\
-  $\mathcal{M}$ & l'ensemble des macarons\\
-  $d_i$ & le donut $i$\\
-  $m_i$ & le macaron $i$\\
+  $G = (V, E)$ & Graphe avec ensemble de nœuds $V$ et arêtes $E$\\
+  $N$ & Nombre de nœuds dans le graphe\\
+  $v_i$ & Nœud $i$ du graphe\\
+  $\mathcal{N}(i)$ & Voisinage du nœud $i$\\
+  $\mathbf{A}$ & Matrice d'adjacence\\
+  $\mathbf{D}$ & Matrice de degré\\
+  $\mathbf{L}$ & Matrice Laplacienne\\
+  $d_i$ & Degré du nœud $i$\\
   \hline
 \end{tabular}
 
-\section*{Viennoiserie}
+\section*{Features et représentations}
 
-\begin{tabular}{p{2cm} p{11.5cm}}
+\begin{tabular}{p{2.5cm} p{11cm}}
   \hline
-  $\mathcal{V}$ & l'ensemble des viennoiseries\\
-  $\mathcal{C}$ & l'ensemble des croissants\\
-  $v_i$ & la viennoiserie $i$\\
-  $c_i$ & le croissant $i$\\
+  $\mathbf{x}_i$ & Coordonnées 3D du nœud $i$, $\mathbf{x}_i \in \mathbb{R}^3$\\
+  $\mathbf{f}_i$ & Vecteur de features du nœud $i$\\
+  $\mathbf{h}_i^{(k)}$ & Représentation latente du nœud $i$ à la couche $k$\\
+  $\mathbf{H}$ & Matrice de features de tous les nœuds\\
+  $d$ & Dimension de l'espace (typiquement $d=3$)\\
+  $D_h$ & Dimension de l'espace latent\\
+  \hline
+\end{tabular}
+
+\section*{GNN et apprentissage}
+
+\begin{tabular}{p{2.5cm} p{11cm}}
+  \hline
+  $\phi_e$ & Fonction de message (edge function)\\
+  $\phi_h$ & Fonction de mise à jour (update function)\\
+  $\text{AGG}$ & Fonction d'agrégation (sum, mean, max)\\
+  $\sigma$ & Fonction d'activation non-linéaire\\
+  $\mathbf{W}$ & Matrice de poids à apprendre\\
+  $\alpha_{ij}$ & Coefficient d'attention entre nœuds $i$ et $j$\\
+  $\mathcal{L}$ & Fonction de perte\\
+  \hline
+\end{tabular}
+
+\section*{Organoïdes et cellules}
+
+\begin{tabular}{p{2.5cm} p{11cm}}
+  \hline
+  $\mathcal{O}$ & Ensemble des organoïdes\\
+  $O_i$ & Organoïde $i$\\
+  $C$ & Nombre de cellules dans un organoïde\\
+  $c_i$ & Cellule $i$\\
+  $V_i$ & Volume de la cellule $i$\\
+  $S_i$ & Sphéricité de la cellule $i$\\
+  $I_i^k$ & Intensité du canal fluorescent $k$ pour la cellule $i$\\
+  \hline
+\end{tabular}
+
+\section*{Processus ponctuels}
+
+\begin{tabular}{p{2.5cm} p{11cm}}
+  \hline
+  $\lambda$ & Intensité d'un processus de Poisson\\
+  $\lambda(\mathbf{x})$ & Fonction d'intensité (cas inhomogène)\\
+  $K(r)$ & Fonction K de Ripley au rayon $r$\\
+  $F(r)$ & Fonction F (distance plus proche voisin)\\
+  $G(r)$ & Fonction G (distance entre points)\\
+  $\mathbb{S}^2$ & Sphère unitaire en dimension 3\\
+  \hline
+\end{tabular}
+
+\section*{Statistiques et évaluation}
+
+\begin{tabular}{p{2.5cm} p{11cm}}
+  \hline
+  $y$ & Label vrai (ground truth)\\
+  $\hat{y}$ & Label prédit\\
+  $C$ & Nombre de classes\\
+  $\text{Acc}$ & Accuracy (taux de bonnes classifications)\\
+  $\text{Prec}$ & Précision\\
+  $\text{Rec}$ & Rappel (recall, sensibilité)\\
+  $F_1$ & F1-score (moyenne harmonique précision/rappel)\\
+  $\kappa$ & Coefficient de Cohen (accord inter-annotateurs)\\
+  \hline
+\end{tabular}
+
+\section*{Transformations géométriques}
+
+\begin{tabular}{p{2.5cm} p{11cm}}
+  \hline
+  $T$ & Transformation géométrique\\
+  $E(3)$ & Groupe euclidien (translations, rotations, réflexions)\\
+  $SO(3)$ & Groupe des rotations 3D\\
+  $\mathbf{R}$ & Matrice de rotation\\
+  $\mathbf{t}$ & Vecteur de translation\\
   \hline
 \end{tabular}
