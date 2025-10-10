@@ -8,7 +8,7 @@
 
 Les organoïdes, ces structures tridimensionnelles cultivées \textit{in vitro} qui miment la complexité architecturale et fonctionnelle des organes humains, représentent une avancée majeure en biologie cellulaire et en médecine régénérative. Contrairement aux cultures cellulaires bidimensionnelles traditionnelles où les cellules sont forcées de croître sur des surfaces planes artificielles, les organoïdes reproduisent l'organisation spatiale tridimensionnelle, les interactions cellulaires complexes, les gradients biochimiques et l'architecture tissulaire caractéristiques des tissus \textit{in vivo}.
 
-Depuis leur première description pour l'intestin en 2009 par l'équipe de Hans Clevers, les organoïdes ont été développés pour de nombreux organes : cerveau, rein, foie, poumon, pancréas, rétine, et bien d'autres. Ces mini-organes auto-organisés, typiquement de quelques centaines de micromètres à quelques millimètres de diamètre, peuvent être générés à partir de cellules souches embryonnaires (ESC), de cellules souches pluripotentes induites (iPSC), ou de cellules souches adultes résidentes dans les tissus.
+Depuis leur première description pour l'intestin en 2009 par l'équipe de Hans Clevers~\cite{Sato2009}, les organoïdes ont été développés pour de nombreux organes : cerveau, rein, foie, poumon, pancréas, rétine, et bien d'autres. Ces mini-organes auto-organisés, typiquement de quelques centaines de micromètres à quelques millimètres de diamètre, peuvent être générés à partir de cellules souches embryonnaires (ESC), de cellules souches pluripotentes induites (iPSC), ou de cellules souches adultes résidentes dans les tissus.
 
 La capacité des organoïdes à récapituler les processus développementaux, à maintenir l'hétérogénéité cellulaire des tissus natifs, et à répondre aux stimuli de manière physiologiquement pertinente en fait des modèles \textit{in vitro} sans précédent. Ils comblent le fossé entre les cultures cellulaires 2D simplistes et les modèles animaux complexes et coûteux, offrant un compromis optimal entre contrôle expérimental, pertinence biologique et accessibilité.
 
@@ -18,13 +18,13 @@ Les applications des organoïdes s'étendent de la recherche fondamentale au dé
 
 \subsubsection{Modélisation de maladies}
 
-En oncologie, les organoïdes tumoraux dérivés directement de biopsies de patients (patient-derived organoids, PDOs) permettent de recréer \textit{in vitro} l'hétérogénéité tumorale et le microenvironnement tumoral. Ces modèles fidèles peuvent être utilisés pour tester \textit{ex vivo} l'efficacité de traitements personnalisés avant leur administration au patient, guidant ainsi les décisions thérapeutiques. Des biobanques d'organoïdes tumoraux sont actuellement constituées pour représenter la diversité génétique et phénotypique des cancers.
+En oncologie, les organoïdes tumoraux dérivés directement de biopsies de patients (patient-derived organoids, PDOs)~\cite{Drost2019} permettent de recréer \textit{in vitro} l'hétérogénéité tumorale et le microenvironnement tumoral. Ces modèles fidèles peuvent être utilisés pour tester \textit{ex vivo} l'efficacité de traitements personnalisés avant leur administration au patient, guidant ainsi les décisions thérapeutiques. Des biobanques d'organoïdes tumoraux sont actuellement constituées pour représenter la diversité génétique et phénotypique des cancers.
 
 Dans le domaine des maladies génétiques, les organoïdes générés à partir de cellules iPSC de patients portant des mutations spécifiques (mucoviscidose, maladie de Huntington, syndromes neurodégénératifs) offrent des modèles cellulaires isogéniques permettant d'étudier les mécanismes pathologiques et de tester des approches thérapeutiques, y compris l'édition génomique par CRISPR-Cas9.
 
 \subsubsection{Criblage pharmacologique et développement de médicaments}
 
-Le criblage à haut débit de composés pharmaceutiques sur organoïdes promet d'accélérer considérablement la découverte de nouveaux médicaments. Contrairement aux lignées cellulaires immortalisées utilisées traditionnellement, les organoïdes offrent un contexte physiologique plus pertinent pour évaluer l'efficacité et la toxicité des composés. Des plateformes automatisées permettent désormais de cultiver, traiter et imager des centaines d'organoïdes en parallèle, générant des volumes de données massifs nécessitant des outils d'analyse automatisée.
+Le criblage à haut débit de composés pharmaceutiques sur organoïdes~\cite{Clevers2016,Takebe2017} promet d'accélérer considérablement la découverte de nouveaux médicaments. Contrairement aux lignées cellulaires immortalisées utilisées traditionnellement, les organoïdes offrent un contexte physiologique plus pertinent pour évaluer l'efficacité et la toxicité des composés. Des plateformes automatisées permettent désormais de cultiver, traiter et imager des centaines d'organoïdes en parallèle, générant des volumes de données massifs nécessitant des outils d'analyse automatisée.
 
 Les organoïdes trouvent également application dans la stratification de patients pour les essais cliniques. En testant des cohortes d'organoïdes représentant différents sous-groupes de patients, il devient possible d'identifier a priori les populations les plus susceptibles de répondre à un traitement spécifique, réduisant ainsi les coûts et augmentant les chances de succès des essais.
 
@@ -147,7 +147,7 @@ Ces limitations rendent l'analyse manuelle inadaptée aux études à haut débit
 
 \subsubsection{Réseaux de neurones convolutifs 3D : puissance et limitations}
 
-Les réseaux de neurones convolutifs (CNN) ont révolutionné l'analyse d'images 2D en vision par ordinateur et en imagerie biomédicale. Leur extension naturelle aux volumes 3D (CNN 3D) semble appropriée pour l'analyse d'organoïdes. Cependant, plusieurs limitations majeures freinent leur adoption :
+Les réseaux de neurones convolutifs (CNN) ont révolutionné l'analyse d'images 2D en vision par ordinateur et en imagerie biomédicale~\cite{LeCun2015,Krizhevsky2012}. Leur extension naturelle aux volumes 3D (CNN 3D) semble appropriée pour l'analyse d'organoïdes. Cependant, plusieurs limitations majeures freinent leur adoption :
 
 \textbf{Contraintes computationnelles prohibitives :}
 \begin{itemize}
@@ -218,7 +218,7 @@ Cette représentation présente plusieurs avantages majeurs :
 
 \subsubsection{Graph Neural Networks : deep learning sur structures non-euclidiennes}
 
-Les Graph Neural Networks (GNNs) constituent l'outil de deep learning adapté aux données structurées sous forme de graphes. En généralisant les opérations de convolution et de pooling aux graphes, les GNNs peuvent :
+Les Graph Neural Networks (GNNs)~\cite{Wu2021,Zhou2020,Battaglia2018} constituent l'outil de deep learning adapté aux données structurées sous forme de graphes. En généralisant les opérations de convolution et de pooling aux graphes, les GNNs peuvent :
 \begin{itemize}
     \item Apprendre automatiquement des représentations à partir de données
     \item Capturer des patterns structurels complexes et multi-échelles
@@ -289,7 +289,7 @@ Pour pallier le manque crucial de données annotées, nous proposons une approch
 
 \subsubsection{Processus ponctuels pour simulation réaliste}
 
-En simulant différents processus stochastiques de distribution spatiale de points sur des géométries sphériques, nous générons des arrangements cellulaires aux propriétés statistiques contrôlées et connues :
+En simulant différents processus stochastiques de distribution spatiale de points~\cite{Illian2008,Diggle2013} sur des géométries sphériques, nous générons des arrangements cellulaires aux propriétés statistiques contrôlées et connues :
 
 \begin{itemize}
     \item \textbf{Processus de Poisson homogène} : Distribution aléatoire complète, référence de hasard
@@ -318,7 +318,7 @@ Les organoïdes synthétiques, avec leurs labels parfaits et leur génération i
     \item \textbf{Exploration} : Génération de scénarios rares ou extrêmes difficiles à obtenir expérimentalement
 \end{itemize}
 
-Cette approche de transfer learning du synthétique au réel constitue une contribution méthodologique originale, permettant d'entraîner des modèles performants malgré la rareté des données réelles annotées.
+Cette approche de transfer learning~\cite{Pan2010,Weiss2016} du synthétique au réel constitue une contribution méthodologique originale, permettant d'entraîner des modèles performants malgré la rareté des données réelles annotées.
 
 \subsection{Outils open-source pour la communauté}
 

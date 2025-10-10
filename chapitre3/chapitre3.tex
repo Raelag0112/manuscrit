@@ -242,7 +242,7 @@ Les GNNs satisfont ces propriétés par construction.
 
 \subsection{Paradigme du Message Passing Neural Network}
 
-Le framework unifié des Message Passing Neural Networks (MPNN) formalise la plupart des architectures GNN.
+Le framework unifié des Message Passing Neural Networks (MPNN)~\cite{Gilmer2017} formalise la plupart des architectures GNN.
 
 \subsubsection{Schéma général}
 
@@ -408,7 +408,7 @@ Le choix de pooling impacte significativement les performances pour la classific
 
 \subsubsection{Motivation et dérivation}
 
-Kipf et Welling (2017) ont proposé une simplification des convolutions spectrales aboutissant à une opération spatiale efficace.
+Kipf et Welling~\cite{Kipf2017} ont proposé une simplification des convolutions spectrales aboutissant à une opération spatiale efficace.
 
 \textbf{Convolution GCN :}
 Une couche GCN est définie par :
@@ -447,7 +447,7 @@ Chaque nœud effectue une moyenne pondérée normalisée des features de ses voi
 
 \subsubsection{Mécanisme d'attention}
 
-GAT (Veličković et al., 2018) introduit un mécanisme d'attention pour pondérer différemment les contributions des voisins.
+GAT~\cite{Velickovic2018} introduit un mécanisme d'attention pour pondérer différemment les contributions des voisins.
 
 \textbf{Calcul des coefficients d'attention :}
 \[
@@ -487,7 +487,7 @@ où $M$ est le nombre de têtes, $\|$ dénote la concaténation.
 
 \subsubsection{Motivation : scalabilité}
 
-Pour les très grands graphes (millions de nœuds), calculer l'agrégation sur tous les voisins devient prohibitif. GraphSAGE (Hamilton et al., 2017) propose un sampling du voisinage.
+Pour les très grands graphes (millions de nœuds), calculer l'agrégation sur tous les voisins devient prohibitif. GraphSAGE~\cite{Hamilton2017} propose un sampling du voisinage.
 
 \subsubsection{Agrégateurs}
 
@@ -514,7 +514,7 @@ Contrairement à GCN (transductive, nécessite l'ensemble du graphe à l'entraî
 
 \subsubsection{Expressivité maximale}
 
-Xu et al. (2019) ont montré que la plupart des GNNs sont au mieux aussi puissants que le 1-WL test pour distinguer des graphes. GIN atteint cette borne supérieure.
+Xu et al.~\cite{Xu2019} ont montré que la plupart des GNNs sont au mieux aussi puissants que le 1-WL test pour distinguer des graphes. GIN atteint cette borne supérieure.
 
 \textbf{Agrégation GIN :}
 \[
@@ -531,15 +531,15 @@ GIN est prouvé être aussi expressif que le WL-test : si deux graphes sont dist
 
 \subsubsection{Principal Neighbourhood Aggregation (PNA)}
 
-PNA (Corso et al., 2020) combine plusieurs agrégateurs (mean, max, sum, std) et plusieurs scalers (identité, amplification, atténuation) pour améliorer l'expressivité.
+PNA~\cite{Corso2020} combine plusieurs agrégateurs (mean, max, sum, std) et plusieurs scalers (identité, amplification, atténuation) pour améliorer l'expressivité.
 
 \subsubsection{Graph Transformer Networks}
 
-Application du mécanisme d'attention des Transformers aux graphes, avec attention globale ou restreinte au voisinage.
+Application du mécanisme d'attention des Transformers~\cite{Vaswani2017} aux graphes, avec attention globale ou restreinte au voisinage.
 
 \subsubsection{Jumping Knowledge Networks}
 
-Combinent les représentations de toutes les couches pour chaque nœud, atténuant le problème d'over-smoothing.
+Combinent les représentations de toutes les couches pour chaque nœud~\cite{Xu2018}, atténuant le problème d'over-smoothing.
 
 \section{GNNs géométriques : architectures E(n)-équivariantes}
 
@@ -615,7 +615,7 @@ Pour la classification d'organoïdes, nous voulons :
 
 \subsubsection{Architecture}
 
-EGNN (Satorras et al., 2021) maintient l'équivariance $E(n)$ via une construction élégante.
+EGNN~\cite{Satorras2021} maintient l'équivariance $E(n)$ via une construction élégante.
 
 \textbf{Messages invariants :}
 Les messages sont construits en utilisant uniquement des quantités invariantes (distances) :
@@ -659,7 +659,7 @@ Cette propriété est garantie par construction, sans besoin d'augmentation.
 
 \subsubsection{SchNet}
 
-Développé pour la chimie quantique, SchNet utilise des convolutions continues basées sur les distances inter-atomiques.
+Développé pour la chimie quantique, SchNet~\cite{Schutt2017,Schutt2018} utilise des convolutions continues basées sur les distances inter-atomiques.
 
 \textbf{Interaction block :}
 \[
@@ -670,7 +670,7 @@ où $g$ est une fonction d'expansion radiale (RBF - Radial Basis Functions), $r_
 
 \subsubsection{DimeNet}
 
-DimeNet étend SchNet en intégrant les angles de liaison en plus des distances, capturant la géométrie locale plus finement.
+DimeNet~\cite{Klicpera2020,Gasteiger2020} étend SchNet en intégrant les angles de liaison en plus des distances, capturant la géométrie locale plus finement.
 
 \textbf{Directional Message Passing :}
 Utilise les triplets de nœuds $(i,j,k)$ pour capturer les angles $\angle ijk$, encodés via des harmoniques sphériques.
@@ -777,7 +777,7 @@ Pour GCN, les représentations convergent vers l'espace propre dominant du Lapla
 
 \subsubsection{Problème de goulets d'étranglement}
 
-L'information doit traverser des goulets d'étranglement topologiques (nœuds de faible degré, coupes minimales) pour se propager. Cela cause une compression/perte d'information (Alon et Yahav, 2021).
+L'information doit traverser des goulets d'étranglement topologiques (nœuds de faible degré, coupes minimales) pour se propager. Cela cause une compression/perte d'information~\cite{Alon2021}.
 
 \textbf{Exemple :}
 Dans un graphe en "haltère" (deux clusters denses connectés par un nœud pont), l'information des deux clusters doit passer par le nœud pont, créant un bottleneck.
@@ -796,7 +796,7 @@ Des travaux récents lient l'over-squashing à la courbure discrète des graphes
 
 \section{Statistiques spatiales pour données ponctuelles}
 
-Les processus ponctuels spatiaux modélisent la distribution aléatoire de points dans l'espace. Ils sont fondamentaux pour notre génération de données synthétiques.
+Les processus ponctuels spatiaux modélisent la distribution aléatoire de points dans l'espace~\cite{Illian2008,Diggle2013,Baddeley2015}. Ils sont fondamentaux pour notre génération de données synthétiques.
 
 \subsection{Processus de Poisson : fondation}
 
@@ -885,7 +885,7 @@ Modélise l'exclusion stérique entre cellules, régularité spatiale observée 
 
 \subsection{Fonctions de Ripley}
 
-Les fonctions de Ripley caractérisent l'organisation spatiale d'un processus ponctuel.
+Les fonctions de Ripley~\cite{Ripley1977} caractérisent l'organisation spatiale d'un processus ponctuel.
 
 \subsubsection{Fonction K de Ripley}
 

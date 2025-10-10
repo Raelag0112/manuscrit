@@ -1,0 +1,62 @@
+# Default configuration for organoid analysis
+
+# Data
+data:
+  root_dir: "data/"
+  synthetic_dir: "data/synthetic/"
+  real_dir: "data/real/"
+  batch_size: 32
+  num_workers: 4
+  
+# Model
+model:
+  type: "gcn"  # gcn, gat, graphsage, gin, egnn
+  in_channels: 10
+  hidden_channels: 128
+  num_layers: 3
+  num_classes: 3
+  dropout: 0.5
+  
+# Training
+training:
+  epochs: 200
+  lr: 0.001
+  weight_decay: 0.0001
+  scheduler: "plateau"  # plateau, cosine, none
+  patience: 20
+  early_stopping: true
+  
+# System
+system:
+  device: "cuda"  # cuda or cpu
+  seed: 42
+  log_interval: 10
+  save_interval: 10
+  
+# Segmentation
+segmentation:
+  model_type: "cyto2"
+  diameter: 20
+  flow_threshold: 0.4
+  cellprob_threshold: 0.0
+  
+# Graph construction
+graph:
+  edge_method: "knn"  # knn, radius, delaunay, combined
+  k_neighbors: 8
+  radius: 50.0
+  include_self_loops: false
+  
+# Synthetic generation
+synthetic:
+  num_train: 3000
+  num_val: 500
+  num_test: 500
+  num_cells_min: 100
+  num_cells_max: 500
+  feature_dim: 10
+  processes:
+    - "poisson"
+    - "matern"
+    - "strauss"
+

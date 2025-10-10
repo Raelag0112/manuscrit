@@ -306,7 +306,7 @@ Prédit un champ de gradients où chaque pixel "pointe" vers le centre de sa cel
 
 \subsection{Choix et paramétrage optimal}
 
-\textbf{Méthode retenue} : Cellpose 3D
+\textbf{Méthode retenue} : Cellpose~\cite{Stringer2021} 3D
 
 \textbf{Paramètres optimaux} :
 \begin{itemize}
@@ -593,7 +593,7 @@ La génération de données synthétiques constitue une contribution méthodolog
 \subsubsection{Limites des approches classiques}
 
 \textbf{Augmentation de données standard :}
-Les techniques d'augmentation classiques (rotations, flips, élasticité, déformations, variations photométriques) génèrent des variations d'échantillons existants mais ne créent pas de nouvelles structures fondamentalement différentes. Elles ne permettent pas d'explorer l'espace complet des phénotypes possibles.
+Les techniques d'augmentation classiques~\cite{Shorten2019} (rotations, flips, élasticité, déformations, variations photométriques) génèrent des variations d'échantillons existants mais ne créent pas de nouvelles structures fondamentalement différentes. Elles ne permettent pas d'explorer l'espace complet des phénotypes possibles.
 
 \textbf{GANs et modèles génératifs d'images :}
 Les GANs peuvent générer des images d'organoïdes synthétiques. Cependant :
@@ -1071,10 +1071,10 @@ Dimension cachée et nombre de couches sont les plus impactants. Learning rate e
 \textbf{Langages et frameworks :}
 \begin{itemize}
     \item Python 3.9
-    \item PyTorch 2.0 pour deep learning
-    \item PyTorch Geometric (PyG) 2.3 pour GNNs
+    \item PyTorch~\cite{Paszke2019} 2.0 pour deep learning
+    \item PyTorch Geometric~\cite{Fey2019} (PyG) 2.3 pour GNNs
     \item NumPy, SciPy pour calculs scientifiques
-    \item scikit-image pour traitement d'image
+    \item scikit-image~\cite{VanDerWalt2014} pour traitement d'image
     \item scikit-learn pour ML classique et métriques
 \end{itemize}
 

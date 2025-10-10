@@ -1,0 +1,51 @@
+# Deep Learning
+torch>=2.0.0
+torch-geometric>=2.3.0
+torch-scatter>=2.1.0
+torch-sparse>=0.6.0
+torch-cluster>=1.6.0
+
+# Image Processing & Segmentation
+cellpose>=2.2.0
+scikit-image>=0.20.0
+opencv-python>=4.7.0
+imageio>=2.25.0
+tifffile>=2023.0.0
+
+# Scientific Computing
+numpy>=1.24.0
+scipy>=1.10.0
+pandas>=2.0.0
+
+# Spatial Statistics
+spatstat-interface>=0.1.0
+scipy>=1.10.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.13.0
+networkx>=3.0
+pyvista>=0.38.0  # 3D visualization
+
+# Machine Learning
+scikit-learn>=1.2.0
+tensorboard>=2.12.0
+wandb>=0.14.0  # Experiment tracking
+
+# Utilities
+tqdm>=4.65.0
+pyyaml>=6.0
+h5py>=3.8.0
+pillow>=9.4.0
+
+# Development
+pytest>=7.2.0
+black>=23.1.0
+flake8>=6.0.0
+jupyter>=1.0.0
+ipython>=8.10.0
+
+# Optional: for GPU acceleration
+# cupy-cuda11x>=11.0.0
+
