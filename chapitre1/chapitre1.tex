@@ -6,7 +6,7 @@
 
 \subsection{Organoïdes : révolution en biologie cellulaire et médecine régénérative}
 
-Les organoïdes, ces structures tridimensionnelles cultivées \textit{in vitro} qui miment la complexité architecturale et fonctionnelle des organes humains, représentent une avancée majeure en biologie cellulaire et en médecine régénérative. Contrairement aux cultures cellulaires bidimensionnelles traditionnelles où les cellules sont forcées de croître sur des surfaces planes artificielles, les organoïdes reproduisent l'organisation spatiale tridimensionnelle, les interactions cellulaires complexes, les gradients biochimiques et l'architecture tissulaire caractéristiques des tissus \textit{in vivo}.
+Les organoïdes, ces structures tridimensionnelles cultivées \textit{in vitro} qui miment la complexité architecturale et fonctionnelle des organes humains, représentent une avancée majeure en biologie cellulaire et en médecine régénérative~\cite{Zhao2022}. Contrairement aux cultures cellulaires bidimensionnelles traditionnelles où les cellules sont forcées de croître sur des surfaces planes artificielles, les organoïdes reproduisent l'organisation spatiale tridimensionnelle, les interactions cellulaires complexes, les gradients biochimiques et l'architecture tissulaire caractéristiques des tissus \textit{in vivo}.
 
 Depuis leur première description pour l'intestin en 2009 par l'équipe de Hans Clevers~\cite{Sato2009}, les organoïdes ont été développés pour de nombreux organes : cerveau, rein, foie, poumon, pancréas, rétine, et bien d'autres. Ces mini-organes auto-organisés, typiquement de quelques centaines de micromètres à quelques millimètres de diamètre, peuvent être générés à partir de cellules souches embryonnaires (ESC), de cellules souches pluripotentes induites (iPSC), ou de cellules souches adultes résidentes dans les tissus.
 
@@ -30,7 +30,7 @@ Les organoïdes trouvent également application dans la stratification de patien
 
 \subsubsection{Médecine régénérative et transplantation}
 
-À plus long terme, les organoïdes constituent une source potentielle de tissus pour la médecine régénérative. Des organoïdes de rétine ont déjà été transplantés avec succès chez des rongeurs, restaurant partiellement la vision. Les recherches actuelles visent à améliorer la vascularisation, l'innervation et la maturation fonctionnelle des organoïdes pour permettre leur utilisation clinique future.
+À plus long terme, les organoïdes constituent une source potentielle de tissus pour la médecine régénérative. Des organoïdes de rétine ont déjà été transplantés avec succès chez des rongeurs, restaurant partiellement la vision~\cite{Lin2020}. Les recherches actuelles visent à améliorer la vascularisation, l'innervation et la maturation fonctionnelle des organoïdes pour permettre leur utilisation clinique future.
 
 \subsection{Verrous scientifiques : quantification et standardisation}
 
@@ -49,20 +49,13 @@ Cette variabilité, bien qu'en partie représentative de la diversité biologiqu
 
 \subsubsection{Défis d'analyse et de quantification}
 
-L'analyse quantitative des organoïdes 3D requiert :
-\begin{itemize}
-    \item La caractérisation morphologique fine (taille, forme, organisation cellulaire)
-    \item L'identification et la quantification de sous-populations cellulaires
-    \item L'évaluation de biomarqueurs moléculaires distribués spatialement
-    \item La détection de phénotypes subtils (différenciation précoce, réponse à un traitement)
-    \item Le suivi longitudinal et l'analyse de dynamiques temporelles
-\end{itemize}
+L'analyse quantitative des organoïdes 3D nécessite une approche multifacette. Il s'agit tout d'abord de pouvoir caractériser finement leur morphologie, que ce soit en termes de taille, de forme ou d'organisation cellulaire. Il est également essentiel d'identifier et de quantifier précisément les différentes sous-populations cellulaires présentes au sein des structures. Un autre aspect fondamental réside dans l'évaluation de la distribution spatiale des biomarqueurs moléculaires, afin de mieux comprendre l'organisation fonctionnelle des organoïdes. Par ailleurs, l'analyse doit être suffisamment sensible pour détecter des phénotypes subtils, qu'il s'agisse de signes précoces de différenciation ou de réponses à un traitement donné. Enfin, le suivi longitudinal des organoïdes, ainsi que l'analyse des dynamiques temporelles, sont nécessaires pour capturer l'évolution de ces systèmes complexes au cours du temps.
 
 Les outils d'analyse actuels, principalement basés sur l'expertise humaine ou sur des méthodes semi-automatisées limitées, ne permettent pas de répondre efficacement à ces besoins, particulièrement dans un contexte de criblage à haut débit où des milliers d'organoïdes doivent être analysés.
 
 \subsubsection{Besoin d'outils automatisés robustes}
 
-Le développement d'outils d'analyse automatisés, robustes aux variations expérimentales, capables de quantifier objectivement les phénotypes, et suffisamment interprétables pour être adoptés par les biologistes, constitue un verrou critique pour libérer le plein potentiel des technologies organoïdes. Cette thèse s'inscrit directement dans cette problématique.
+Le développement d'outils d'analyse automatisés, robustes aux variations expérimentales, capables de quantifier objectivement les phénotypes, et suffisamment interprétables pour être adoptés par les biologistes, constitue un verrou critique pour libérer le plein potentiel des technologies organoïdes~\cite{Bai2023,Du2023}. Bien que des approches basées sur l'intelligence artificielle aient émergé récemment pour l'analyse morphologique d'organoïdes, leur généralisation et leur adoption restent limitées. Cette thèse s'inscrit directement dans cette problématique.
 
 \section{Problématique scientifique}
 
@@ -93,13 +86,13 @@ Les images 3D haute résolution d'organoïdes peuvent atteindre plusieurs gigaoc
 
 Ces contraintes de stockage, de traitement et d'analyse posent des défis infrastructurels :
 \begin{itemize}
-    \item Temps de calcul prohibitifs pour approches naïves (plusieurs heures par organoïde)
-    \item Limitations mémoire empêchant l'utilisation de certaines architectures de deep learning
-    \item Coûts de stockage et de calcul (cloud computing) importants
-    \item Nécessité d'optimisations algorithmiques et computationnelles
+    \item \textbf{Temps de calcul prohibitifs} pour approches naïves (plusieurs heures par organoïde)
+    \item \textbf{Limitations mémoire} empêchant l'utilisation de certaines architectures de deep learning
+    \item \textbf{Coûts de stockage et de calcul} (cloud computing) importants
+    \item \textbf{Nécessité d'optimisations algorithmiques et computationnelles}
 \end{itemize}
 
-\subsubsection{Absence de vérité terrain et de datasets publics}
+\subsubsection{Absence de datasets publics}
 
 Contrairement à d'autres domaines du deep learning (vision par ordinateur, traitement du langage) où existent de vastes datasets annotés publics (ImageNet, COCO), le domaine des organoïdes souffre d'un manque crucial de données annotées de qualité.
 
@@ -112,13 +105,31 @@ Les raisons sont multiples :
     \item \textbf{Fragmentation} : Les données sont dispersées entre laboratoires avec des protocoles hétérogènes
 \end{itemize}
 
-Cette rareté de données annotées limite drastiquement le développement et la validation de méthodes d'apprentissage automatique, nécessitant des approches innovantes pour l'entraînement avec données limitées.
+\subsubsection{Notre dataset collaboratif}
+
+Dans le cadre de cette thèse et du projet ANR Morpheus, nous avons constitué un dataset d'organoïdes de prostate acquis et annotés entre mai 2023 et février 2025 via une collaboration entre l'INRIA Sophia-Antipolis (équipe Morpheme), l'INSERM (équipe METATOX) et l'IPMC C3M :
+
+\begin{itemize}
+    \item \textbf{Volume} : 1,311 échantillons imagés, représentant 2,272 organoïdes individuels extraits
+    \item \textbf{Phénotypes} : 4 classes majeures bien caractérisées
+        \begin{itemize}
+            \item \textit{Chouxfleurs} (morphologie en chou-fleur) : 732 échantillons (1,404 organoïdes)
+            \item \textit{Cystiques} (phénotype sain, formation de kystes/cavités) : 528 échantillons (817 organoïdes)
+            \item \textit{Compact} (structure dense) : 41 échantillons (41 organoïdes)
+            \item \textit{Kératinisés} (différenciation kératinique) : 10 échantillons (10 organoïdes)
+        \end{itemize}
+    \item \textbf{Protocole} : Imagerie confocale 8-bit, magnifications 20× et 40×, analyse au 7ème jour de culture (J7)
+    \item \textbf{Pipeline} : Images brutes → Segmentation → Nuage de points 3D → Clustering DBSCAN → Création du graphe → Classification GNN
+    \item \textbf{Métadonnées} : Chaque organoïde est associé à des coordonnées 3D cellulaires, volumes, connectivité, phénotype
+\end{itemize}
+
+Cette collection, bien que substantielle pour le domaine, reste limitée comparée aux standards du deep learning classique (ImageNet : 14M images), nécessitant des stratégies d'augmentation de données et de transfer learning depuis des données synthétiques.
 
 \subsection{Limites des méthodes actuelles}
 
 \subsubsection{Analyse manuelle : l'expertise au prix de l'échelle}
 
-L'analyse manuelle par des experts biologistes reste actuellement la référence (\textit{gold standard}) pour l'évaluation d'organoïdes. Un expert peut, en observant un organoïde au microscope ou via des rendus 3D, identifier des caractéristiques phénotypiques subtiles basées sur :
+L'analyse manuelle par des experts biologistes reste actuellement la référence pour l'évaluation d'organoïdes. Un expert peut, en observant un organoïde au microscope ou via des rendus 3D, identifier des caractéristiques phénotypiques subtiles basées sur :
 \begin{itemize}
     \item La morphologie globale (forme, taille, régularité)
     \item L'organisation cellulaire (stratification, polarisation)
@@ -138,7 +149,7 @@ Cependant, cette approche souffre de limitations majeures qui limitent son utili
 \textbf{Limitations méthodologiques :}
 \begin{itemize}
     \item \textbf{Subjectivité} : Les critères d'évaluation peuvent varier selon l'expertise et l'expérience de l'annotateur
-    \item \textbf{Variabilité inter-observateur} : Des experts différents peuvent aboutir à des classifications divergentes (accords κ typiquement 0.6-0.8)
+    \item \textbf{Variabilité inter-observateur} : Des experts différents peuvent aboutir à des classifications divergentes
     \item \textbf{Variabilité intra-observateur} : Un même expert peut classifier différemment le même organoïde à différents moments
     \item \textbf{Biais cognitifs} : Effets d'ancrage, biais de confirmation peuvent influencer les jugements
 \end{itemize}
@@ -151,7 +162,7 @@ Les réseaux de neurones convolutifs (CNN) ont révolutionné l'analyse d'images
 
 \textbf{Contraintes computationnelles prohibitives :}
 \begin{itemize}
-    \item \textbf{Empreinte mémoire} : Un CNN 3D sur une image de 512×512×200 voxels requiert des dizaines de gigaoctets de mémoire GPU, nécessitant un downsampling massif qui détruit l'information fine
+    \item \textbf{Empreinte mémoire} : Un CNN 3D sur une image de 2048×2048×200 voxels requiert des dizaines de gigaoctets de mémoire GPU, nécessitant un downsampling massif qui détruit l'information fine
     \item \textbf{Temps d'entraînement} : Les convolutions 3D sont computationnellement coûteuses ($\mathcal{O}(N^4)$ pour un volume $N^3$)
     \item \textbf{Nombre de paramètres} : Les CNN 3D profonds contiennent des millions de paramètres, nécessitant de grandes quantités de données annotées pour éviter le sur-apprentissage
 \end{itemize}
@@ -166,7 +177,7 @@ Les réseaux de neurones convolutifs (CNN) ont révolutionné l'analyse d'images
 
 \subsubsection{Descripteurs manuels et machine learning classique}
 
-Une approche alternative consiste à extraire manuellement des descripteurs (\textit{handcrafted features}) quantifiant divers aspects des organoïdes, puis à appliquer des algorithmes de machine learning classique (Random Forest, SVM, etc.).
+Une approche alternative consiste à extraire manuellement des descripteurs quantifiant divers aspects des organoïdes, puis à appliquer des algorithmes de machine learning classique (Random Forest, SVM, etc.).
 
 Les descripteurs typiques incluent :
 \begin{itemize}
@@ -201,12 +212,7 @@ Cette organisation relationnelle, plutôt que les propriétés cellulaires indiv
 
 \subsubsection{Représentations par graphes : une abstraction naturelle}
 
-Les graphes offrent un formalisme mathématique naturel pour représenter les structures relationnelles. Un organoïde peut être modélisé comme un graphe $G = (V, E)$ où :
-\begin{itemize}
-    \item Chaque cellule constitue un nœud $v_i \in V$
-    \item Chaque nœud est enrichi de features : position 3D, morphologie, intensités de marqueurs
-    \item Les arêtes $(v_i, v_j) \in E$ encodent les relations de voisinage spatial
-\end{itemize}
+Les graphes offrent un formalisme mathématique naturel pour représenter les structures relationnelles. Un organoïde peut être modélisé comme un graphe $G = (V, E)$ où chaque cellule constitue un nœud $v_i \in V$ qui est enrichi de features : position 3D, morphologie, intensités de marqueurs et les arêtes $(v_i, v_j) \in E$ encodent les relations de voisinage spatial.
 
 Cette représentation présente plusieurs avantages majeurs :
 \begin{itemize}
@@ -230,40 +236,40 @@ L'application de GNNs à l'analyse d'organoïdes représente une opportunité m�
 
 \section{Contributions de la thèse}
 
-\subsection{Pipeline automatisé de bout en bout pour organoïdes 3D}
+\subsection{Contribution 1 : Pipeline automatisé de bout en bout}
 
-Cette thèse propose un pipeline complet et automatisé pour l'analyse d'organoïdes 3D, couvrant l'ensemble de la chaîne de traitement :
+Cette thèse propose un pipeline complet et automatisé pour l'analyse d'organoïdes 3D :
 
 \begin{enumerate}
-    \item \textbf{Acquisition et prétraitement} : Protocoles d'imagerie optimisés, normalisation d'intensité, débruitage, correction d'artefacts
-    \item \textbf{Segmentation cellulaire} : Identification automatique des cellules individuelles via deep learning (Cellpose)
-    \item \textbf{Extraction de features} : Calcul de propriétés morphologiques (volume, sphéricité, excentricité) et d'intensités de marqueurs pour chaque cellule
-    \item \textbf{Construction de graphes} : Transformation de l'organoïde en graphe géométrique avec définition appropriée de la connectivité
-    \item \textbf{Classification par GNN} : Entraînement et application de Graph Neural Networks pour prédiction de phénotypes
-    \item \textbf{Interprétation} : Identification des cellules et interactions clés contribuant à la prédiction
+    \item \textbf{Acquisition et prétraitement} : Protocoles d'imagerie optimisés, normalisation d'intensité, débruitage
+    \item \textbf{Segmentation cellulaire} : \textbf{Faster Cellpose} 
+    \item \textbf{Extraction de features} : propriétés morphologiques pour chaque cellule
+    \item \textbf{Construction de graphes} : Graphes géométriques 3D via K-NN
+    \item \textbf{Classification par GNN} : Comparaisons de différentes architectures GNN
+    \item \textbf{Interprétation} : GNNExplainer pour l'identification des cellules critiques
 \end{enumerate}
 
-Ce pipeline intégré, contrairement aux approches fragmentées existantes, assure une cohérence méthodologique de bout en bout et facilite l'optimisation conjointe des différentes étapes.
+\subsection{Contribution 2 : Optimisation de la segmentation pour grand débit}
 
-\subsection{Représentation par graphes géométriques et GNNs}
+Face à la lenteur de Cellpose original (30 sec/coupe, soit près d'1h30 par oranoïde), nous avons développé deux approches complémentaires de segmentation rapide.
 
-Une contribution majeure de ce travail réside dans la représentation des organoïdes sous forme de graphes géométriques et le développement d'architectures GNN adaptées à cette représentation.
+\subsubsection{Méthode géométrique par ellipses}
+Nous avons développé une méthode géométrique de segmentation reposant sur la détection déterministe d'ellipses sur les coupes 2D, suivie par un appariement en 3D à l'aide de processus ponctuels marqués. Cette approche permet de réduire le temps de calcul d'un facteur 10 par rapport à Cellpose, ce qui la rend particulièrement adaptée aux besoins de criblage primaire ultra-rapide.
+
+\subsubsection{Faster Cellpose via Knowledge Distillation}
+Pour accélérer significativement la segmentation, nous avons optimisé Cellpose en combinant plusieurs techniques complémentaires. Nous avons d'abord appliqué une distillation de connaissances, permettant de transférer les performances d'un modèle teacher vers un modèle student allégé, doté de moitié moins de paramètres. Ce modèle compact a été ensuite épuré par un "pruning" de 30\% de ses poids, ce qui a réduit la complexité du réseau tout en préservant sa précision. Enfin, nous avons affiné le processus d'inférence grâce à l'ajustement de la taille des batchs, l'utilisation du calcul en "mixed precision" et la diminution du nombre d'itérations. L'ensemble de ces optimisations a permis de diviser par cinq le temps de calcul par rapport à Cellpose standard, passant de 2500 heures à 500 heures pour l'analyse de 1500 organoïdes, et rendant ainsi l'expérimentation à grande échelle réalisable.
+
+\subsection{Contribution 3 : Représentation par graphes géométriques et GNNs}
+
+Une contribution majeure de ce travail réside dans la représentation des organoïdes sous forme de graphes géométriques et l'évaluation d'architectures GNN adaptées à cette représentation.
 
 \subsubsection{Graphes géométriques enrichis}
 
-Notre représentation combine :
-\begin{itemize}
-    \item \textbf{Coordonnées spatiales 3D} : Position $(x, y, z)$ de chaque cellule dans l'espace
-    \item \textbf{Features morphologiques} : Volume, sphéricité, axes principaux, surface
-    \item \textbf{Features photométriques} : Intensités moyennes et variances pour chaque canal fluorescent
-    \item \textbf{Connectivité spatiale} : Arêtes basées sur la proximité géométrique (K-nearest neighbors, rayon de connectivité)
-\end{itemize}
-
-Cette représentation hybride capture à la fois la géométrie spatiale et les propriétés biologiques cellulaires.
+Nous avons choisi de représenter chaque organoïde par un graphe enrichi, dans lequel chaque nœud correspond à une cellule positionnée par ses coordonnées spatiales tridimensionnelles $(x, y, z)$. À ces informations de localisation s’ajoutent des caractéristiques morphologiques pour chaque cellule, telles que le volume, la sphéricité, les axes principaux ou encore la surface. Les liens entre cellules (arêtes du graphe) sont établis sur la base de leur proximité géométrique, à l’aide de méthodes telles que le K-nearest neighbors ou un seuil de rayon défini. Cette modélisation hybride permet de capturer simultanément la géométrie spatiale et les propriétés biologiques des cellules au sein des organoïdes.
 
 \subsubsection{GNNs équivariants pour données géométriques}
 
-Nous exploitons des architectures de Graph Neural Networks équivariantes (EGNN - Equivariant Graph Neural Networks) qui respectent les symétries naturelles :
+Nous exploitons des architectures de Graph Neural Networks équivariantes qui respectent les symétries naturelles :
 \begin{itemize}
     \item \textbf{Invariance par translation} : Déplacer l'organoïde dans l'espace ne change pas la prédiction
     \item \textbf{Invariance par rotation} : Orienter l'organoïde différemment ne change pas la prédiction
@@ -276,14 +282,14 @@ Ces propriétés d'invariance, garanties par construction architecturale plutôt
 
 Cette approche offre plusieurs bénéfices par rapport aux méthodes existantes :
 \begin{itemize}
-    \item \textbf{Efficacité computationnelle} : Réduction d'un facteur 100+ de l'empreinte mémoire par rapport aux CNN 3D
+    \item \textbf{Efficacité computationnelle} : Réduction d'un facteur 1000 de l'empreinte mémoire par rapport aux CNN 3D
     \item \textbf{Expressivité} : Capture explicite de la structure relationnelle
     \item \textbf{Interprétabilité} : Possibilité d'identifier les cellules individuelles importantes pour la prédiction
     \item \textbf{Flexibilité} : Applicable à des organoïdes de tailles et formes variables sans modification
     \item \textbf{Robustesse} : Invariance géométrique intrinsèque
 \end{itemize}
 
-\subsection{Génération de données synthétiques contrôlées}
+\subsection{Contribution 4 : Génération de données synthétiques contrôlées}
 
 Pour pallier le manque crucial de données annotées, nous proposons une approche innovante de génération de données synthétiques basée sur la théorie des processus ponctuels spatiaux.
 
@@ -293,7 +299,6 @@ En simulant différents processus stochastiques de distribution spatiale de poin
 
 \begin{itemize}
     \item \textbf{Processus de Poisson homogène} : Distribution aléatoire complète, référence de hasard
-    \item \textbf{Processus de Poisson inhomogène} : Gradients spatiaux d'intensité, mimant des gradients biologiques
     \item \textbf{Processus de Matérn} : Clustering contrôlé, représentant l'agrégation cellulaire
     \item \textbf{Processus de Strauss} : Répulsion entre points, modélisant l'exclusion stérique entre cellules
 \end{itemize}
@@ -301,12 +306,11 @@ En simulant différents processus stochastiques de distribution spatiale de poin
 \subsubsection{Construction d'organoïdes synthétiques}
 
 À partir des distributions de points générées, nous construisons des organoïdes synthétiques complets :
-\begin{enumerate}
+\begin{itemize}
     \item Génération de centroides cellulaires selon un processus ponctuel choisi
-    \item Construction de diagrammes de Voronoï 3D pour créer des segmentations cellulaires réalistes
-    \item Assignation de propriétés morphologiques (volumes, formes) et d'intensités cohérentes
+    \item Construction de diagrammes de Voronoï sur la sphère pour créer des segmentations cellulaires réalistes
     \item Validation statistique : comparaison des fonctions K, F, G de Ripley aux valeurs théoriques et observées sur données réelles
-\end{enumerate}
+\end{itemize}
 
 \subsubsection{Stratégie de pré-entraînement et transfer learning}
 
@@ -320,29 +324,36 @@ Les organoïdes synthétiques, avec leurs labels parfaits et leur génération i
 
 Cette approche de transfer learning~\cite{Pan2010,Weiss2016} du synthétique au réel constitue une contribution méthodologique originale, permettant d'entraîner des modèles performants malgré la rareté des données réelles annotées.
 
-\subsection{Outils open-source pour la communauté}
+\subsection{Contribution 5 : Étude comparative stats spatiales vs GNN}
+
+Pour évaluer rigoureusement les mérites relatifs des approches GNN vs statistiques classiques, nous avons mené une étude comparative contrôlée (publication au GRETSI 2025) :
+
+\textbf{Méthode :}
+Comparaison sur données synthétiques sphériques avec vérité terrain connue, avec variation de bruit gaussien et poivre-et-sel.
+
+\textbf{Résultats clés :}
+\begin{itemize}
+    \item Sur les géométries régulières (sphériques) : les statistiques spatiales (K, F, G de Ripley) surpassent les GNN
+    \item Sur les géométries complexes/variables (ellipsoïdes) : les GNN surpassent les statistiques spatiales
+    \item Profondeur optimale des GNN : 5-6 couches (trade-off expressivité/overfitting)
+\end{itemize}
+
+Cette étude éclaire les conditions d'applicabilité de chaque approche et suggère des directions hybrides futures.
+
+\subsection{Contribution 6 : Outils open-source pour la communauté}
 
 Au-delà des contributions scientifiques, cette thèse vise un impact pratique via la mise à disposition d'outils logiciels.
 
 \subsubsection{Framework intégré}
 
-L'ensemble du pipeline développé sera publié sous licence open-source (MIT ou Apache 2.0), incluant :
+L'ensemble du pipeline développé sera publié sous licence open-source (MIT), incluant :
 \begin{itemize}
-    \item Code source documenté et modulaire
+    \item Code source documenté et modulaire 
+    \item Nos deux méthodes de segmentation (Ellipses + Faster Cellpose)
     \item Scripts d'entraînement et d'évaluation
     \item Notebooks Jupyter tutoriels
     \item Architectures GNN pré-entraînées
     \item Données synthétiques de référence
-\end{itemize}
-
-\subsubsection{Documentation et support}
-
-Pour faciliter l'adoption par la communauté :
-\begin{itemize}
-    \item Documentation technique exhaustive (API, tutoriels, exemples)
-    \item Guides d'utilisation pour biologistes non-informaticiens
-    \item Benchmarks et protocoles d'évaluation standardisés
-    \item Forum communautaire et support GitHub
 \end{itemize}
 
 \subsubsection{Impact attendu}
@@ -373,43 +384,40 @@ Ce chapitre établit le contexte scientifique et justifie la nécessité de notr
 
 \subsection{Chapitre 3 : Fondements théoriques}
 
-Le \textbf{Chapitre 3} établit les fondements mathématiques et algorithmiques nécessaires :
+Le \textbf{Chapitre 3} établit les fondements mathématiques et algorithmiques des Graph Neural Networks :
 \begin{itemize}
-    \item \textbf{Théorie des graphes} : Définitions, représentations matricielles, métriques topologiques
-    \item \textbf{Graph Neural Networks} : Paradigme du message passing, architectures standards (GCN, GAT, GraphSAGE)
-    \item \textbf{GNNs géométriques} : Extensions E(3)-équivariantes (EGNN, SchNet), invariance vs équivariance
-    \item \textbf{Expressivité théorique} : Limitations (WL-test, over-smoothing, over-squashing)
-    \item \textbf{Statistiques spatiales} : Processus ponctuels, fonctions de Ripley, tests d'agrégation
+    \item \textbf{Théorie des graphes} : Définitions, représentations matricielles, graphes géométriques, métriques topologiques
+    \item \textbf{Graph Neural Networks} : Paradigme du message passing, architectures standards (GCN, GAT, GraphSAGE, GIN)
+    \item \textbf{GNNs géométriques} : Extensions E(3)-équivariantes (EGNN), invariance vs équivariance, applications biologiques
+    \item \textbf{Expressivité théorique} : Limitations (WL-test, over-smoothing, over-squashing), implications pratiques
 \end{itemize}
-
-Ce chapitre fournit le bagage théorique nécessaire à la compréhension des contributions méthodologiques.
 
 \subsection{Chapitre 4 : Méthodologie}
 
-Le \textbf{Chapitre 4} décrit en détail la méthodologie proposée, organisée selon les étapes du pipeline :
+Le \textbf{Chapitre 4} décrit en détail la méthodologie proposée :
 \begin{itemize}
     \item \textbf{Architecture générale} : Vue d'ensemble, choix de conception, justifications
-    \item \textbf{Prétraitement} : Protocoles d'acquisition, normalisation, correction d'artefacts
-    \item \textbf{Segmentation} : Comparaison de méthodes (Cellpose, Stardist, watershed), validation
-    \item \textbf{Construction de graphes} : Définition des nœuds, features, stratégies de connectivité
-    \item \textbf{Génération synthétique} : Processus ponctuels, Voronoï 3D, validation statistique
-    \item \textbf{Architectures GNN} : Choix, adaptations, entraînement
+    \item \textbf{Prétraitement} : Protocoles d'imagerie, normalisation, correction d'artefacts
+    \item \textbf{Segmentation optimisée} : Nos deux contributions méthodologiques
+    \item \textbf{Construction de graphes} : Graphes géométriques 3D via K-NN
+    \item \textbf{Génération synthétique} : Processus ponctuels, Voronoï 3D, validation
+    \item \textbf{Architectures GNN} : Comparaisons de différentes architectures GNN
 \end{itemize}
 
-Ce chapitre constitue le cœur technique de la thèse, décrivant nos contributions algorithmiques.
+Ce chapitre constitue le cœur technique de la thèse, détaillant nos contributions algorithmiques.
 
 \subsection{Chapitre 5 : Résultats}
 
-Le \textbf{Chapitre 5} présente les résultats expérimentaux obtenus, organisés selon trois axes :
+Le \textbf{Chapitre 5} présente les résultats expérimentaux obtenus :
 \begin{itemize}
-    \item \textbf{Validation des synthétiques} : Réalisme statistique, comparaison K/F/G, distributions de métriques
-    \item \textbf{Performances sur synthétiques} : Discrimination entre processus, ablations, sensibilité aux hyperparamètres
-    \item \textbf{Performances sur données réelles} : Classification de phénotypes, comparaisons avec état de l'art, généralis ation
-    \item \textbf{Approche hybride} : Gains du pré-entraînement + fine-tuning, data efficiency
-    \item \textbf{Interprétabilité} : Cellules clés, patterns spatiaux, validation biologique
+    \item \textbf{Validation synthétiques} : Vérification statistique (Ripley), séparabilité des classes
+    \item \textbf{Performances sur synthétiques} : Comparaison des architectures GNN, analyses d'ablatation
+    \item \textbf{Étude comparative stats vs GNN} : Résultats publiés au GRETSI 2025 (robustesse bruit, généralisation géométrique)
+    \item \textbf{Données réelles} : Transfer learning, fine-tuning, performances finales
+    \item \textbf{Interprétabilité} : GNNExplainer, validation biologique
 \end{itemize}
 
-Une discussion critique analyse les forces, limitations et positionnement de notre approche.
+Une discussion critique analysant les forces, les limitations et le positionnement de notre approche.
 
 \subsection{Chapitre 6 : Conclusion}
 
@@ -427,10 +435,9 @@ Le \textbf{Chapitre 6} conclut le manuscrit en :
 Les cinq annexes fournissent des compléments techniques et théoriques :
 \begin{itemize}
     \item \textbf{Annexe A} : Fondamentaux du deep learning (histoire, architectures, optimisation, régularisation)
-    \item \textbf{Annexe B} : Compléments sur graphes et GNNs (hypergraphes, Geometric Deep Learning, expressivité)
+    \item \textbf{Annexe B} : Compléments sur les graphes et les GNNs (hypergraphes, Geometric Deep Learning, expressivité)
     \item \textbf{Annexe C} : Théorie des processus ponctuels (Poisson, Cox, Gibbs, estimation, surfaces courbes)
     \item \textbf{Annexe D} : Détails d'implémentation (technologies, architecture logicielle, optimisations, reproductibilité)
-    \item \textbf{Annexe E} : Données et benchmarks (description datasets, protocoles d'annotation, accès code/données)
+    \item \textbf{Annexe E} : Données et benchmarks (description des datasets, protocoles d'annotation, accès au code/données)
 \end{itemize}
 
-Ces annexes permettent au lecteur d'approfondir les aspects techniques sans alourdir le corps principal du manuscrit.

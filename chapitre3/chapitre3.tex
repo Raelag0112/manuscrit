@@ -1,8 +1,8 @@
 % !TEX root = ../sommaire.tex
 
-\chapter{Fondements théoriques}
+\chapter{Fondements théoriques des Graph Neural Networks}
 
-Ce chapitre établit les fondements mathématiques et algorithmiques nécessaires à la compréhension de notre approche. Nous couvrons la théorie des graphes, les Graph Neural Networks dans leur forme générale puis géométrique, et les statistiques spatiales pour processus ponctuels.
+Ce chapitre établit les fondements mathématiques et algorithmiques des Graph Neural Networks, pierre angulaire de notre approche. Nous y couvrons la théorie des graphes et les architectures GNN standards et géométriques.
 
 \section{Théorie des graphes}
 
@@ -52,14 +52,14 @@ Pour les organoïdes, chaque cellule est un nœud avec sa position 3D : $\mathbf
 
 Les graphes géométriques possèdent des propriétés spécifiques :
 \begin{itemize}
-    \item La topologie est souvent induite par la géométrie (connectivité basée sur proximité)
+    \item La topologie est souvent induite par la géométrie (connectivité basée sur la proximité spatiale)
     \item Ils admettent des transformations géométriques naturelles (groupe euclidien $E(d)$)
-    \item Les distances euclidiennes $\|\mathbf{x}_i - \mathbf{x}_j\|$ sont des features naturelles d'arêtes
+    \item Les distances euclidiennes $\|\mathbf{x}_i - \mathbf{x}_j\|$ sont des features naturelles des arêtes
 \end{itemize}
 
 \subsection{Représentations matricielles}
 
-Plusieurs représentations matricielles d'un graphe sont fondamentales pour les algorithmes sur graphes.
+Plusieurs représentations matricielles d'un graphe sont fondamentales pour les algorithmes sur les graphes.
 
 \subsubsection{Matrice d'adjacence}
 
@@ -94,8 +94,8 @@ Le Laplacien de graphe est défini par :
 Cette matrice, symétrique semi-définie positive, joue un rôle central en théorie spectrale des graphes. Ses propriétés :
 \begin{itemize}
     \item $\mathbf{L}\mathbf{1} = \mathbf{0}$ : le vecteur constant est vecteur propre de valeur propre 0
-    \item Le nombre de valeurs propres nulles égale le nombre de composantes connexes
-    \item Les vecteurs propres (harmoniques de Fourier sur graphe) forment une base pour fonctions sur le graphe
+    \item La multiplicité de la valeur propre 0 est égal au nombre de composantes connexes
+    \item Les vecteurs propres (harmoniques de Fourier sur le graphe) forment une base pour les fonctions sur le graphe
 \end{itemize}
 
 \subsubsection{Laplacien normalisé}
@@ -132,78 +132,76 @@ Un clustering élevé indique une structure fortement modulaire, communautaire.
 \textbf{Centralité :}
 Plusieurs mesures quantifient l'"importance" d'un nœud :
 \begin{itemize}
-    \item \textbf{Centralité de degré} : Simplement le degré $d_i$
-    \item \textbf{Centralité d'intermédiarité (betweenness)} : Nombre de plus courts chemins passant par le nœud
-    \item \textbf{Centralité de proximité (closeness)} : Inverse de la distance moyenne aux autres nœuds
-    \item \textbf{Centralité de vecteur propre} : Importance basée sur l'importance des voisins (idée derrière PageRank)
+    \item \textbf{Centralité de degré} : le degré $d_i$ lui-même
+    \item \textbf{Centralité d'intermédiarité (betweenness)} : le nombre de plus courts chemins passant par le nœud
+    \item \textbf{Centralité de proximité (closeness)} : l'inverse de la distance moyenne aux autres nœuds
+    \item \textbf{Centralité de vecteur propre} : l'importance basée sur l'importance des voisins (c'est l'idée derrière l'algorithme PageRank de Google)
 \end{itemize}
 
 \subsubsection{Métriques globales}
 
 \textbf{Densité :}
-Proportion d'arêtes présentes par rapport au maximum possible :
+La proportion d'arêtes présentes par rapport au maximum possible :
 \[
 \rho = \frac{2|E|}{N(N-1)}
 \]
 
 \textbf{Diamètre :}
-Plus grande distance géodésique (plus court chemin) entre deux nœuds :
+La plus grande distance géodésique (le plus court chemin) entre deux nœuds :
 \[
 \text{diam}(G) = \max_{i,j} d_G(v_i, v_j)
 \]
 
 \textbf{Coefficient de clustering global :}
-Moyenne des coefficients de clustering locaux :
+La moyenne des coefficients de clustering locaux :
 \[
 \bar{C} = \frac{1}{N}\sum_{i=1}^N C_i
 \]
 
 \textbf{Composantes connexes :}
-Un graphe est connexe si existe un chemin entre toute paire de nœuds. Le nombre de composantes connexes caractérise la fragmentation.
+Un graphe est connexe s'il existe un chemin entre toute paire de nœuds. Le nombre de composantes connexes caractérise la fragmentation.
 
 \subsection{Graphes géométriques : spécificités}
-
-\subsubsection{Construction de graphes géométriques}
-
-Étant donné un ensemble de points $\{\mathbf{x}_i\}_{i=1}^N \subset \mathbb{R}^d$, plusieurs stratégies construisent un graphe :
-
-\textbf{K-Nearest Neighbors (K-NN) :}
-Connecter chaque point à ses $k$ plus proches voisins selon la distance euclidienne. Graphe dirigé asymétrique en général, peut être symétrisé (arête si au moins un voisinage mutuel).
-
-\textbf{$\epsilon$-radius graph :}
-Connecter deux points si leur distance $< \epsilon$. Graphe non-orienté par construction. Sensible au choix de $\epsilon$.
-
-\textbf{Relative Neighborhood Graph (RNG) :}
-Connecter $i$ et $j$ ssi aucun autre point $k$ n'est plus proche des deux que $i$ et $j$ ne le sont l'un de l'autre.
-
-\textbf{Gabriel graph :}
-Connecter $i$ et $j$ ssi la sphère de diamètre $\overline{ij}$ ne contient aucun autre point.
-
-\textbf{Triangulation de Delaunay :}
-Triangulation (tétraédrisation en 3D) maximisant l'angle minimal des simplexes. Graphe planaire en 2D, propriétés géométriques élégantes.
-
-Le choix de stratégie impacte la structure du graphe résultant et donc les performances des GNNs.
 
 \subsubsection{Graphes géométriques vs abstraits}
 
 Les graphes géométriques diffèrent fondamentalement des graphes abstraits :
 
-\textbf{Graphes abstraits} (réseaux sociaux, molécules, knowledge graphs) :
+\textbf{Graphes abstraits} (réseaux sociaux, knowledge graphs) :
 \begin{itemize}
     \item La topologie est l'information primordiale
     \item Pas de notion de "position" dans un espace euclidien
     \item Les transformations pertinentes sont des permutations de nœuds (isomorphismes)
 \end{itemize}
 
-\textbf{Graphes géométriques} (nuages de points 3D, graphes de scènes, organoïdes) :
+\textbf{Graphes géométriques} (nuages de points 3D, protéines, organoïdes) :
 \begin{itemize}
     \item La géométrie (positions) est aussi importante que la topologie
     \item Les coordonnées sont des features essentielles
-    \item Les transformations pertinentes sont géométriques (rotations, translations)
-    \item Nécessitent des architectures spécialisées respectant les symétries géométriques
+    \item Les transformations pertinentes sont géométriques (rotations, translations, réflexions) en plus des permutations de nœuds
+    \item Ils sont adaptés à des architectures spécialisées respectant les symétries géométriques (GNNs équivariants)
 \end{itemize}
 
-Cette distinction motive l'utilisation de GNNs géométriques équivariants dans notre travail.
+\subsubsection{Construction de graphes géométriques}
+
+Étant donné un ensemble de points $\{\mathbf{x}_i\}_{i=1}^N \subset \mathbb{R}^d$, plusieurs stratégies permettent de construire un graphe :
+
+\textbf{K-Nearest Neighbors (K-NN) :}
+On connecte chaque point à ses $k$ plus proches voisins selon la distance euclidienne. Le graphe est dirigé asymétrique en général, il peut être symétrisé (on ajoute une arête s'il y a au moins un voisinage mutuel).
+
+\textbf{$\epsilon$-radius graph :}
+On connecte deux points si leur distance est inférieure à $\epsilon$. Le graphe est non-orienté par construction. Il est sensible au choix de $\epsilon$.
+
+\textbf{Relative Neighborhood Graph (RNG) :}
+On connecte $i$ et $j$ si et seulement si aucun autre point $k$ n'est plus proche des deux que $i$ et $j$ le sont l'un de l'autre.
+
+\textbf{Gabriel graph :}
+On connecte $i$ et $j$ si et seulement si la sphère de diamètre $\overline{ij}$ ne contient aucun autre point.
+
+\textbf{Triangulation de Delaunay :}
+On effectue une triangulation (tétraédrisation en 3D) maximisant l'angle minimal des simplexes. Le graphe est planaire en 2D et possède des propriétés géométriques élégantes.
+
+Le choix de la stratégie influe sur la structure du graphe résultant et donc les performances des GNNs. Nous avons choisi une approche hybride combinant le K-NN et le rayon fixe pour construire notre graphe.
 
 \section{Graph Neural Networks : principes généraux}
 
@@ -211,33 +209,31 @@ Cette distinction motive l'utilisation de GNNs géométriques équivariants dans
 
 \subsubsection{Limitations des réseaux classiques}
 
-Les architectures de deep learning standard (MLP, CNN) ne sont pas adaptées aux graphes :
+Les architectures de deep learning standard (par exemple les perceptrons multicouches MLP, les convolutions CNN) ne sont pas adaptées aux graphes :
 
 \textbf{Perceptrons multicouches (MLP) :}
 \begin{itemize}
-    \item Requièrent entrées de taille fixe (vecteur de dimension fixe)
-    \item Les graphes ont tailles variables ($N$ varie)
+    \item Requièrent des entrées de taille fixe (vecteur de dimension fixe)
+    \item Les graphes ont des tailles variables ($N$ varie)
     \item Pas de notion de localité ou de structure
-    \item Nombre de paramètres explose avec $N$
 \end{itemize}
 
 \textbf{CNN :}
 \begin{itemize}
     \item Conçus pour grilles régulières (images, vidéos)
-    \item Les graphes ont topologies irrégulières (voisinages de tailles variables)
-    \item Les convolutions standards ne se généralisent pas directement aux graphes
+    \item Les graphes ont des topologies irrégulières (voisinages de tailles variables)
+    \item Les convolutions classiques ne se généralisent pas directement aux graphes
 \end{itemize}
 
 \subsubsection{Propriétés désirées}
 
-Une architecture pour graphes devrait satisfaire :
+Une architecture pour les graphes devrait satisfaire :
 \begin{enumerate}
-    \item \textbf{Permutation-invariance} : $f(P \cdot G) = f(G)$ pour toute permutation $P$ des nœuds
+    \item \textbf{Invariance par permutation des nœuds} : $f(P \cdot G) = f(G)$ pour toute permutation $P$ des nœuds
     \item \textbf{Localité} : Exploiter l'information du voisinage local
-    \item \textbf{Partage de poids} : Même transformation appliquée à chaque nœud/arête
+    \item \textbf{Partage des poids} : Même transformation appliquée à chaque nœud/arête
     \item \textbf{Taille variable} : Traiter des graphes de tailles différentes sans modification
 \end{enumerate}
-
 Les GNNs satisfont ces propriétés par construction.
 
 \subsection{Paradigme du Message Passing Neural Network}
@@ -246,23 +242,29 @@ Le framework unifié des Message Passing Neural Networks (MPNN)~\cite{Gilmer2017
 
 \subsubsection{Schéma général}
 
-Un MPNN opère en $K$ étapes itératives de passage de messages. À chaque étape $k$, deux opérations sont effectuées :
+De façon générale, un Message Passing Neural Network (MPNN) met à jour l'information de chaque nœud du graphe en faisant circuler des messages entre voisins pendant plusieurs étapes. Le principe est le suivant : à chaque étape, chaque nœud collecte des informations provenant des nœuds qui lui sont connectés (ses voisins) — c'est la phase d'agrégation — puis met à jour son propre état en fonction de ce qu'il était auparavant et de ce qu'il a reçu — c'est la phase de mise à jour.
 
-\textbf{1. Agrégation de messages :}
+Formellement, pour $K$ étapes de propagation de messages, on procède ainsi :
+
+\textbf{1. Agrégation de messages :}\\
+À l'étape $k$, chaque nœud $i$ rassemble les états de ses voisins $j \in \mathcal{N}(i)$ issus de l'étape précédente :
 \[
 \mathbf{m}_i^{(k)} = \text{AGG}\left(\left\{\mathbf{h}_j^{(k-1)} : j \in \mathcal{N}(i)\right\}\right)
 \]
+où $\mathbf{h}_i^{(k-1)}$ est la représentation (latente) du nœud $i$ à l'étape précédente.
 
-où $\mathbf{h}_i^{(k-1)} \in \mathbb{R}^{D_h}$ est la représentation latente du nœud $i$ à l'étape $k-1$.
-
-\textbf{2. Mise à jour de l'état :}
+\textbf{2. Mise à jour de l'état :}\\
+Ensuite, le nœud $i$ met à jour son état à l'étape $k$ en combinant son ancienne représentation et le message agrégé :
 \[
 \mathbf{h}_i^{(k)} = \text{UPDATE}\left(\mathbf{h}_i^{(k-1)}, \mathbf{m}_i^{(k)}\right)
 \]
 
-\textbf{Initialisation :} $\mathbf{h}_i^{(0)} = \mathbf{f}_i$ (features initiales)
+\textbf{Initialisation :}\\
+Au début, l'état de chaque nœud est simplement son vecteur de features :
+$\mathbf{h}_i^{(0)} = \mathbf{f}_i$
 
-\textbf{Lecture (Readout) :} Pour obtenir une représentation du graphe entier :
+\textbf{Lecture (Readout) :}\\
+Une fois toutes les étapes complétées, on peut résumer tout le graphe (si besoin) grâce à une fonction de lecture qui combine les états finaux de tous les nœuds :
 \[
 \mathbf{h}_G = \text{READOUT}\left(\left\{\mathbf{h}_i^{(K)} : i = 1, \ldots, N\right\}\right)
 \]
@@ -271,33 +273,33 @@ où $\mathbf{h}_i^{(k-1)} \in \mathbb{R}^{D_h}$ est la représentation latente d
 
 Les fonctions d'agrégation courantes sont :
 
-\textbf{Somme :}
+\textbf{La somme :}
 \[
 \mathbf{m}_i = \sum_{j \in \mathcal{N}(i)} \mathbf{h}_j
 \]
-Permutation-invariante, préserve l'information totale mais sensible à la taille du voisinage.
+Elle est invariante par permutation des nœuds, préserve l'information totale mais est sensible à la taille du voisinage.
 
-\textbf{Moyenne :}
+\textbf{La moyenne :}
 \[
 \mathbf{m}_i = \frac{1}{|\mathcal{N}(i)|}\sum_{j \in \mathcal{N}(i)} \mathbf{h}_j
 \]
-Normalisée par la taille du voisinage, plus stable.
+Elle est normalisée par la taille du voisinage, plus stable.
 
-\textbf{Maximum :}
+\textbf{Le maximum :}
 \[
 \mathbf{m}_i = \max_{j \in \mathcal{N}(i)} \mathbf{h}_j
 \]
-(élément-wise maximum). Robuste aux outliers mais perte d'information.
+Elle est robuste aux outliers mais perte d'information.
 
-\textbf{Attention-weighted :}
+\textbf{L'attention pondérée :}
 \[
 \mathbf{m}_i = \sum_{j \in \mathcal{N}(i)} \alpha_{ij} \mathbf{h}_j
 \]
-où $\alpha_{ij}$ sont des poids d'attention appris. Permet de pondérer différemment les voisins selon leur pertinence.
+où $\alpha_{ij}$ sont des poids d'attention appris. Elle permet de pondérer différemment les voisins selon leur pertinence.
 
 \subsubsection{Fonctions de mise à jour}
 
-La mise à jour combine typiquement l'état précédent et le message agrégé :
+La mise à jour combine typiquement l'état précédent et le message agrégé. On peut utiliser différentes fonctions de mise à jour :
 
 \textbf{Simple :}
 \[
@@ -309,45 +311,16 @@ La mise à jour combine typiquement l'état précédent et le message agrégé :
 \mathbf{h}_i^{(k)} = \sigma\left(\mathbf{W}_1^{(k)} \mathbf{h}_i^{(k-1)} + \mathbf{W}_2^{(k)} \mathbf{m}_i^{(k)}\right)
 \]
 
-\textbf{GRU-like :}
+\textbf{Une variante de GRU :}
 \[
 \mathbf{h}_i^{(k)} = \text{GRU}\left(\mathbf{h}_i^{(k-1)}, \mathbf{m}_i^{(k)}\right)
 \]
 
-où $\sigma$ est une activation non-linéaire (ReLU, ELU, etc.), $\mathbf{W}$ sont des matrices de poids apprises.
+où $\sigma$ est une activation non-linéaire (par exemple ReLU, ELU, etc.), et les $\mathbf{W}$ sont des matrices de poids apprises.
 
 \subsection{Couches de convolution sur graphes}
 
 Le concept de convolution, central aux CNN, peut être généralisé aux graphes via deux approches.
-
-\subsubsection{Approche spectrale}
-
-Basée sur la théorie spectrale, la convolution est définie via la transformée de Fourier sur graphes.
-
-\textbf{Transformée de Fourier sur graphes :}
-Les vecteurs propres $\{\mathbf{u}_\ell\}_{\ell=0}^{N-1}$ du Laplacien normalisé $\mathbf{L}$ forment une base orthonormale (modes de Fourier sur le graphe). Un signal $\mathbf{f} \in \mathbb{R}^N$ se décompose :
-\[
-\hat{\mathbf{f}} = \mathbf{U}^T \mathbf{f}
-\]
-
-où $\mathbf{U} = [\mathbf{u}_0, \ldots, \mathbf{u}_{N-1}]$.
-
-\textbf{Convolution spectrale :}
-La convolution d'un signal $\mathbf{f}$ avec un filtre $\mathbf{g}$ est :
-\[
-\mathbf{f} \star_G \mathbf{g} = \mathbf{U} \left((\mathbf{U}^T \mathbf{f}) \odot (\mathbf{U}^T \mathbf{g})\right)
-\]
-
-où $\odot$ est le produit élément-wise.
-
-\textbf{Limitations :}
-\begin{itemize}
-    \item Coût de calcul élevé (décomposition spectrale $\mathcal{O}(N^3)$)
-    \item Filtres non-localisés spatialement
-    \item Dépendance à la structure du graphe (filtres non transférables à un autre graphe)
-\end{itemize}
-
-Ces limitations ont motivé les approches spatiales, dominantes aujourd'hui.
 
 \subsubsection{Approche spatiale}
 
@@ -359,38 +332,115 @@ Les méthodes spatiales opèrent directement dans le domaine des nœuds en agré
 \textbf{Avantages :}
 \begin{itemize}
     \item Efficacité computationnelle ($\mathcal{O}(|E| \cdot D_h^2)$ par couche)
-    \item Localité spatiale des filtres
+    \item Localité spatiale des filtres : chaque nœud agrège les features de ses voisins locaux
     \item Transférabilité entre graphes
     \item Flexibilité (différentes agrégations possibles)
 \end{itemize}
 
+\subsubsection{Approche spectrale}
+
+Basée sur la théorie spectrale, la convolution est définie via la transformée de Fourier sur graphes. Cette approche est plus coûteuse en calcul mais permet de définir des filtres non-locaux.
+
+\textbf{Transformée de Fourier sur graphes :}
+Les vecteurs propres $\{\mathbf{u}_\ell\}_{\ell=0}^{N-1}$ du Laplacien normalisé $\mathbf{L}$ forment une base orthonormale (modes de Fourier sur le graphe). Un signal $\mathbf{f} \in \mathbb{R}^N$ se décompose de la manière suivante :
+\[
+\hat{\mathbf{f}} = \mathbf{U}^T \mathbf{f}
+\]
+
+où $\mathbf{U} = [\mathbf{u}_0, \ldots, \mathbf{u}_{N-1}]$.
+
+\textbf{Convolution spectrale :}
+La convolution d'un signal $\mathbf{f}$ avec un filtre $\mathbf{g}$ est définie ainsi :
+\[
+\mathbf{f} \star_G \mathbf{g} = \mathbf{U} \left((\mathbf{U}^T \mathbf{f}) \odot (\mathbf{U}^T \mathbf{g})\right)
+\]
+
+où $\odot$ est le produit élément-par-élément.
+
+\textbf{Limitations :}
+\begin{itemize}
+    \item Coût de calcul élevé (décomposition spectrale en $\mathcal{O}(N^3)$)
+    \item Filtres non-localisés spatialement : chaque nœud agrège les features de tous les nœuds du graphe
+    \item Dépendance à la structure du graphe : les filtres sont spécifiques au graphe et ne sont pas transférables à un autre graphe
+\end{itemize}
+
+\subsubsection{Filtres de Chebyshev : approximation polynomiale}
+
+Pour pallier le coût prohibitif de la décomposition spectrale, Defferrard et al.~\cite{Defferrard2016} ont proposé d'approximer les filtres spectraux par des polynômes de Chebyshev. Cette approche réduit drastiquement la complexité tout en préservant l'expressivité des filtres.
+
+\textbf{Motivation :}
+Au lieu de paramétrer directement les filtres dans le domaine spectral (ce qui nécessite la décomposition en vecteurs propres), on les exprime comme des polynômes des valeurs propres du Laplacien. Les polynômes de Chebyshev $T_k(x)$ forment une base orthogonale optimale pour cette approximation.
+
+\textbf{Définition récursive des polynômes de Chebyshev :}
+\begin{align*}
+T_0(x) &= 1 \\
+T_1(x) &= x \\
+T_k(x) &= 2x \, T_{k-1}(x) - T_{k-2}(x) \quad \text{pour } k \geq 2
+\end{align*}
+
+\textbf{Filtre polynomial de Chebyshev d'ordre $K$ :}
+Un filtre spectral $g_\theta(\Lambda)$ (où $\Lambda$ est la matrice diagonale des valeurs propres du Laplacien) peut s'approximer par :
+\[
+g_\theta(\Lambda) \approx \sum_{k=0}^{K} \theta_k T_k(\tilde{\Lambda})
+\]
+
+où $\tilde{\Lambda} = \frac{2}{\lambda_{\max}}\Lambda - \mathbf{I}$ normalise les valeurs propres dans $[-1, 1]$ (intervalle où les polynômes de Chebyshev sont définis), et $\theta_k$ sont les paramètres apprenables.
+
+\textbf{Convolution avec filtres de Chebyshev :}
+La convolution d'un signal $\mathbf{f}$ avec un filtre de Chebyshev d'ordre $K$ devient :
+\[
+\mathbf{f} \star_G g_\theta = \sum_{k=0}^{K} \theta_k T_k(\tilde{\mathbf{L}}) \mathbf{f}
+\]
+
+où $\tilde{\mathbf{L}} = \frac{2}{\lambda_{\max}}\mathbf{L} - \mathbf{I}$ est le Laplacien normalisé, et $T_k(\tilde{\mathbf{L}})$ est évalué récursivement :
+\begin{align*}
+\mathbf{x}_0 &= \mathbf{f} \\
+\mathbf{x}_1 &= \tilde{\mathbf{L}} \mathbf{f} \\
+\mathbf{x}_k &= 2\tilde{\mathbf{L}} \mathbf{x}_{k-1} - \mathbf{x}_{k-2} \quad \text{pour } k \geq 2
+\end{align*}
+
+\textbf{Avantages :}
+\begin{itemize}
+    \item \textbf{Localisation spatiale :} Un filtre d'ordre $K$ agrège l'information jusqu'à distance $K$ dans le graphe (notion de $K$-hop voisinage)
+    \item \textbf{Efficacité :} Complexité $\mathcal{O}(K|E|)$ par couche (pas de décomposition spectrale nécessaire)
+    \item \textbf{Stabilité numérique :} Les polynômes de Chebyshev sont bien conditionnés
+\end{itemize}
+
+\textbf{Cas particulier $K=1$ :}
+Avec un filtre d'ordre 1, on obtient :
+\[
+g_\theta(\tilde{\mathbf{L}}) = \theta_0 T_0(\tilde{\mathbf{L}}) + \theta_1 T_1(\tilde{\mathbf{L}}) = \theta_0 \mathbf{I} + \theta_1 \tilde{\mathbf{L}}
+\]
+
+Cette simplification drastique conduit directement à l'architecture GCN (voir Section suivante).
+
 \subsection{Pooling et agrégation globale}
 
-Pour passer d'une représentation au niveau des nœuds à une représentation du graphe entier (nécessaire pour classification de graphes), des opérations de pooling sont nécessaires.
+Pour passer d'une représentation au niveau des nœuds à une représentation du graphe entier (nécessaire pour classification de graphes), des opérations de pooling sont nécessaires. Ces opérations permettent de réduire la taille du graphe tout en préservant l'information importante.
 
 \subsubsection{Global pooling}
 
-Les opérations les plus simples agrègent les features de tous les nœuds :
+Les opérations les plus simples agrègent les features de tous les nœuds. On peut utiliser la moyenne, le maximum ou la somme :
 
 \textbf{Global mean/max/sum pooling :}
 \[
 \mathbf{h}_G = \frac{1}{N}\sum_{i=1}^N \mathbf{h}_i^{(K)} \quad \text{ou} \quad \mathbf{h}_G = \max_{i=1}^N \mathbf{h}_i^{(K)} \quad \text{ou} \quad \mathbf{h}_G = \sum_{i=1}^N \mathbf{h}_i^{(K)}
-\end{imize}
+\]
 
-Ces opérations sont permutation-invariantes mais perdent potentiellement de l'information structurelle.
+Ces opérations sont invariantes par permutation des nœuds mais perdent potentiellement de l'information structurelle.
 
 \subsubsection{Hierarchical pooling}
 
-Des approches plus sophistiquées effectuent un pooling hiérarchique, réduisant progressivement le nombre de nœuds :
+Des approches plus sophistiquées effectuent un pooling hiérarchique, réduisant progressivement le nombre de nœuds. On peut utiliser différentes méthodes :
 
 \textbf{DiffPool :}
-Apprend une assignation soft de nœuds à des clusters, réduisant le graphe couche par couche.
+Apprend une assignation soft de nœuds à des clusters, réduisant le graphe couche par couche. Cette méthode est différentiable et permet de réduire la taille du graphe de manière continue.
 
 \textbf{TopK pooling :}
-Sélectionne les top-k nœuds selon un score appris, supprime les autres.
+Sélectionne les top-k nœuds selon un score appris, supprime les autres. Cette méthode est plus rapide et permet de réduire la taille du graphe de manière discrète.
 
 \textbf{SAGPool :}
-Self-Attention Graph Pooling, utilise l'attention pour sélectionner les nœuds importants.
+Self-Attention Graph Pooling, utilise l'attention pour sélectionner les nœuds importants. Cette méthode est inspirée de l'attention multi-têtes utilisée dans les Transformers.
 
 \subsubsection{Set-based pooling}
 
@@ -402,15 +452,262 @@ Moyenne sur plusieurs permutations aléatoires pour approximer une fonction set-
 
 Le choix de pooling impacte significativement les performances pour la classification de graphes.
 
+\section{Ensembles non ordonnés et DeepSets}
+
+Avant d'explorer les architectures GNN, il est essentiel de comprendre les fondements théoriques du traitement des ensembles non ordonnés. Cette section présente l'architecture DeepSets~\cite{Zaheer2017}, qui établit les bases mathématiques de l'invariance aux permutations et constitue un précurseur conceptuel important des GNNs.
+
+\subsection{Motivation : traitement d'ensembles et nuages de points}
+
+De nombreux problèmes d'apprentissage machine impliquent des données sous forme d'ensembles non ordonnés :
+\begin{itemize}
+    \item \textbf{Nuages de points 3D :} Scans LiDAR, scans 3D de scènes ou d'objets, représentations géométriques d'organoïdes
+    \item \textbf{Ensembles de vecteurs :} Collections d'images (album photos), ensembles de documents (corpus), ensembles de protéines (complexes)
+    \item \textbf{Sous-graphes :} Représentation d'un graphe comme ensemble de nœuds avec features
+\end{itemize}
+
+\textbf{Propriété fondamentale : invariance aux permutations}
+
+Un ensemble $\mathcal{X} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_n\}$ ne possède pas d'ordre intrinsèque. Toute fonction $f$ opérant sur des ensembles doit être invariante aux permutations :
+\[
+f(\{\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_n\}) = f(\{\mathbf{x}_{\pi(1)}, \mathbf{x}_{\pi(2)}, \ldots, \mathbf{x}_{\pi(n)}\})
+\]
+pour toute permutation $\pi \in S_n$ où $S_n$ est le groupe symétrique.
+
+\textbf{Approches naïves et leurs limitations :}
+
+\textit{Agrégation simple :}
+Calculer la moyenne ou la somme des features : $f(\mathcal{X}) = \frac{1}{n}\sum_{i=1}^n \mathbf{x}_i$. Cette approche est invariante aux permutations mais trop limitative : elle ne peut pas apprendre de transformations non-linéaires complexes.
+
+\textit{Traiter comme séquence :}
+Utiliser un RNN/LSTM en traitant l'ensemble comme une séquence arbitraire. Problème : le résultat dépend de l'ordre (non invariant), et il faut moyenner sur toutes les permutations (coût factoriel $\mathcal{O}(n!)$).
+
+\textit{Data augmentation :}
+Entraîner avec toutes les permutations possibles. Problème : intractable pour $n > 10$, approximation coûteuse, pas de garantie théorique d'invariance complète.
+
+\subsection{Théorème de représentation universelle de DeepSets}
+
+Zaheer et al.~\cite{Zaheer2017} établissent un résultat théorique fondamental caractérisant toutes les fonctions invariantes aux permutations.
+
+\subsubsection{Énoncé du théorème}
+
+\textbf{Théorème (Zaheer et al., 2017) :}
+Une fonction $f: \mathcal{P}(\mathcal{X}) \to \mathbb{R}$ opérant sur des ensembles finis est invariante aux permutations si et seulement si elle peut s'écrire sous la forme :
+\[
+f(\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}) = \rho\left(\sum_{i=1}^n \phi(\mathbf{x}_i)\right)
+\]
+où $\phi: \mathcal{X} \to \mathbb{R}^d$ et $\rho: \mathbb{R}^d \to \mathbb{R}$ sont des fonctions continues.
+
+\textbf{Interprétation :}
+\begin{itemize}
+    \item $\phi$ : fonction d'encodage qui transforme chaque élément individuellement (element-wise, order-free)
+    \item $\sum$ : agrégation symétrique (invariante aux permutations). Peut être remplacée par $\max$, $\min$, ou moyenne
+    \item $\rho$ : fonction de décodage opérant sur la représentation agrégée
+\end{itemize}
+
+\textbf{Généralisation pour outputs vectoriels :}
+Pour $f: \mathcal{P}(\mathcal{X}) \to \mathbb{R}^k$ (classification multi-classes, embeddings), le théorème se généralise naturellement.
+
+\subsubsection{Universalité avec réseaux de neurones}
+
+Le théorème d'approximation universelle garantit que si $\phi$ et $\rho$ sont des réseaux de neurones multi-couches avec fonctions d'activation non-linéaires, alors toute fonction continue invariante aux permutations peut être approximée arbitrairement bien.
+
+\textbf{Conséquence pratique :}
+Il suffit d'utiliser des MLPs pour $\phi$ et $\rho$ pour obtenir un approximateur universel de fonctions sur ensembles.
+
+\subsection{Architecture DeepSets}
+
+\subsubsection{Définition formelle}
+
+L'architecture DeepSets pour ensembles de taille variable s'écrit :
+\[
+f(\mathcal{X}) = \rho\left(\text{AGG}\left(\{\phi(\mathbf{x}_i) : \mathbf{x}_i \in \mathcal{X}\}\right)\right)
+\]
+
+\textbf{Composants :}
+
+\textit{1. Encodeur par élément $\phi$ (MLP) :}
+\[
+\phi(\mathbf{x}_i) = \text{MLP}_\phi(\mathbf{x}_i) = \mathbf{W}_L^{(\phi)} \sigma(\mathbf{W}_{L-1}^{(\phi)} \cdots \sigma(\mathbf{W}_1^{(\phi)} \mathbf{x}_i))
+\]
+Typiquement 2-3 couches cachées avec ReLU. Transforme $\mathbf{x}_i \in \mathbb{R}^{D_{\text{in}}}$ en $\mathbf{z}_i \in \mathbb{R}^{d}$.
+
+\textit{2. Agrégation symétrique AGG :}
+\begin{align*}
+\text{AGG}_{\text{sum}}(\{\mathbf{z}_i\}) &= \sum_{i=1}^n \mathbf{z}_i \\
+\text{AGG}_{\text{mean}}(\{\mathbf{z}_i\}) &= \frac{1}{n}\sum_{i=1}^n \mathbf{z}_i \\
+\text{AGG}_{\text{max}}(\{\mathbf{z}_i\}) &= \max_{i=1}^n \mathbf{z}_i \quad \text{(element-wise)}
+\end{align*}
+
+\textit{3. Décodeur $\rho$ (MLP) :}
+\[
+\rho(\mathbf{z}) = \text{MLP}_\rho(\mathbf{z}) = \mathbf{W}_K^{(\rho)} \sigma(\mathbf{W}_{K-1}^{(\rho)} \cdots \sigma(\mathbf{W}_1^{(\rho)} \mathbf{z}))
+\]
+Produit l'output final : classe, score, embedding.
+
+\subsubsection{Variantes d'agrégation}
+
+Le choix de l'agrégation influence l'expressivité :
+
+\textbf{Somme :}
+Sensible à la cardinalité de l'ensemble. Deux ensembles de tailles différentes auront des sorties différentes même si leurs éléments ont des features similaires. Avantage : préserve l'information sur la taille.
+
+\textbf{Moyenne :}
+Invariante à la cardinalité (scaling). Préférable si la taille de l'ensemble est arbitraire ou non informative. Utilisée couramment dans les GNNs (mean aggregation).
+
+\textbf{Max :}
+Capture les features saillantes. Moins sensible aux outliers négatifs. Utilisée dans PointNet pour sa robustesse.
+
+\textbf{Multi-agrégation :}
+Combiner plusieurs agrégations (concaténer $\text{sum}$, $\text{mean}$, $\text{max}$) pour bénéficier de leurs avantages respectifs.
+
+\subsection{PointNet : DeepSets pour nuages de points 3D}
+
+Qi et al.~\cite{Qi2017} proposent PointNet, une application spécialisée de DeepSets aux nuages de points 3D, contemporaine de DeepSets (2017).
+
+\subsubsection{Architecture PointNet}
+
+Pour un nuage de points $\{\mathbf{x}_i\}_{i=1}^n$ avec $\mathbf{x}_i \in \mathbb{R}^3$ (ou $\mathbb{R}^{3+D_f}$ avec features) :
+\[
+f(\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}) = \text{MLP}_{\rho}\left(\max_{i=1}^n \text{MLP}_{\phi}(\mathbf{x}_i)\right)
+\]
+
+\textbf{Différences avec DeepSets vanille :}
+
+\textit{1. Max pooling :}
+PointNet utilise exclusivement max-pooling (pas sum/mean) pour capturer les caractéristiques saillantes géométriques.
+
+\textit{2. Spatial Transformer Network (optionnel) :}
+Un module T-Net apprend une transformation affine $\mathbf{T} \in \mathbb{R}^{3 \times 3}$ pour aligner canoniquement le nuage : $\mathbf{x}_i' = \mathbf{T}\mathbf{x}_i$. Procure une quasi-invariance aux rotations et translations.
+
+\textit{3. Feature Transformer :}
+Un second T-Net dans l'espace des features (dim 64) pour alignement dans l'espace latent.
+
+\subsubsection{Performances et limitations}
+
+\textbf{Avantages de PointNet :}
+\begin{itemize}
+    \item Traite directement les nuages de points sans voxelisation ni projection
+    \item Invariance stricte aux permutations
+    \item Rapide : $\mathcal{O}(n)$ complexité
+    \item Robustesse aux points manquants et au bruit
+\end{itemize}
+
+\textbf{Limitations fondamentales :}
+\begin{itemize}
+    \item \textbf{Pas de contexte local :} Chaque point est traité indépendamment par $\phi$ avant agrégation globale. Les structures locales (surfaces, arêtes) ne sont pas explicitement capturées
+    \item \textbf{Agrégation globale unique :} Une seule max-pooling sur tous les points. Perd l'information sur les relations spatiales locales
+    \item \textbf{Limité pour scènes complexes :} Difficulté à capturer les patterns géométriques fins
+\end{itemize}
+
+PointNet++~\cite{Qi2017b} adresse ces limitations en introduisant une hiérarchie multi-échelles avec agrégations locales (set abstraction layers), se rapprochant conceptuellement des GNNs.
+
+\subsection{Lien avec les Graph Neural Networks}
+
+DeepSets et GNNs partagent des fondements communs mais diffèrent dans leur structure.
+
+\subsubsection{GNN comme généralisation de DeepSets}
+
+Un GNN peut être vu comme une généralisation de DeepSets où :
+\begin{itemize}
+    \item \textbf{DeepSets :} Agrégation globale sur \textit{tous} les éléments de l'ensemble
+    \item \textbf{GNN :} Agrégations \textit{locales} structurées par la topologie du graphe (voisinages)
+\end{itemize}
+
+\textbf{Formalisation :}
+
+\textit{DeepSets (agrégation globale) :}
+\[
+\mathbf{h}_G = \rho\left(\sum_{i=1}^n \phi(\mathbf{x}_i)\right)
+\]
+
+\textit{GNN (agrégations locales itératives) :}
+\[
+\mathbf{h}_i^{(k+1)} = \phi^{(k)}\left(\mathbf{h}_i^{(k)}, \sum_{j \in \mathcal{N}(i)} \psi^{(k)}(\mathbf{h}_j^{(k)})\right)
+\]
+
+Chaque nœud agrège uniquement son voisinage local $\mathcal{N}(i)$ défini par le graphe. Après $K$ couches, l'information se propage à distance $K$.
+
+\subsubsection{Cas particulier : graphe complet}
+
+Si le graphe est complet ($E = V \times V$, tous les nœuds connectés), alors $\mathcal{N}(i) = V \setminus \{i\}$ et un GNN à 1 couche se réduit essentiellement à DeepSets :
+\[
+\mathbf{h}_i = \phi\left(\mathbf{x}_i, \sum_{j \neq i} \psi(\mathbf{x}_j)\right) \approx \phi(\mathbf{x}_i, \text{AGG}(\mathcal{X}))
+\]
+
+C'est le cas pour les K-NN graphes avec $K$ grand ou graphes géométriques denses.
+
+\subsubsection{Nuages de points : DeepSets vs graphes}
+
+Pour analyser des nuages de points 3D (comme les organoïdes), deux approches sont possibles :
+
+\textbf{Approche DeepSets/PointNet :}
+\begin{itemize}
+    \item Traiter le nuage comme un ensemble non structuré
+    \item Agrégation globale unique
+    \item Ignore les relations de proximité spatiale
+    \item Avantage : simplicité, rapidité
+    \item Limitation : perte d'information structurelle locale
+\end{itemize}
+
+\textbf{Approche graphe (GNN) :}
+\begin{itemize}
+    \item Construire un graphe K-NN ou basé sur distance-seuil
+    \item Agrégations locales itératives respectant la géométrie
+    \item Capture explicitement les voisinages spatiaux
+    \item Avantage : expressivité, information relationnelle
+    \item Coût : complexité de construction du graphe et propagation
+\end{itemize}
+
+\textbf{Justification pour notre approche :}
+
+Pour les organoïdes, la structure spatiale locale (contacts cellule-cellule, organisation en couches) est biologiquement cruciale. Les GNNs sont donc préférables à DeepSets car ils encodent explicitement ces relations. Cependant, DeepSets établit les fondations théoriques de l'invariance aux permutations que les GNNs héritent et généralisent.
+
 \section{Architectures GNN standards}
 
 \subsection{Graph Convolutional Networks (GCN)}
 
 \subsubsection{Motivation et dérivation}
 
-Kipf et Welling~\cite{Kipf2017} ont proposé une simplification des convolutions spectrales aboutissant à une opération spatiale efficace.
+Kipf et Welling~\cite{Kipf2017} ont proposé une simplification élégante des convolutions spectrales aboutissant à une opération spatiale efficace. GCN est devenu une architecture de référence pour son équilibre entre simplicité, efficacité et performances.
 
-\textbf{Convolution GCN :}
+\textbf{Dérivation depuis l'approche spectrale :}
+En partant de la convolution spectrale avec filtres de Chebyshev d'ordre 1 (voir Section précédente), on a :
+\[
+g_\theta \star \mathbf{f} = \theta_0 \mathbf{f} + \theta_1 \tilde{\mathbf{L}} \mathbf{f}
+\]
+
+où $\tilde{\mathbf{L}} = \frac{2}{\lambda_{\max}}\mathbf{L} - \mathbf{I}$ est le Laplacien normalisé.
+
+\textbf{Simplifications successives :}
+
+\textit{1. Approximation de $\lambda_{\max}$ :}
+Pour un graphe connecté non orienté, $\lambda_{\max}$ (la plus grande valeur propre du Laplacien normalisé) est proche de 2. En posant $\lambda_{\max} \approx 2$, on obtient :
+\[
+\tilde{\mathbf{L}} \approx \mathbf{L} - \mathbf{I}
+\]
+
+\textit{2. Réduction du nombre de paramètres :}
+On contraint les paramètres avec $\theta = \theta_0 = -\theta_1$ (un seul paramètre libre), ce qui donne :
+\[
+g_\theta \star \mathbf{f} \approx \theta(\mathbf{I} + \mathbf{D}^{-1/2}\mathbf{A}\mathbf{D}^{-1/2}) \mathbf{f}
+\]
+
+car $\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1/2}\mathbf{A}\mathbf{D}^{-1/2}$ pour le Laplacien normalisé.
+
+\textit{3. Ajout de self-loops :}
+Pour stabiliser l'entraînement et éviter la disparition du gradient, on ajoute des self-loops : $\tilde{\mathbf{A}} = \mathbf{A} + \mathbf{I}$ avec le degré correspondant $\tilde{\mathbf{D}}$. On obtient alors la formule finale :
+\[
+g_\theta \star \mathbf{f} = \theta \tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2} \mathbf{f}
+\]
+
+Cette opération agrège les features du nœud lui-même et de ses voisins directs (1-hop), avec une normalisation symétrique. En notation par nœud :
+\[
+\mathbf{h}_i^{(k+1)} = \sigma\left(\sum_{j \in \tilde{\mathcal{N}}(i)} \frac{1}{\sqrt{\tilde{d}_i \tilde{d}_j}} \mathbf{W}^{(k)}\mathbf{h}_j^{(k)}\right)
+\]
+
+où $\tilde{\mathcal{N}}(i) = \mathcal{N}(i) \cup \{i\}$ inclut le nœud lui-même (self-loop), et $\mathbf{W}^{(k)} = \theta^{(k)} \mathbf{I}$ généralise le scalaire $\theta$ en une matrice de transformation.
+
+\textbf{Formulation matricielle :}
 Une couche GCN est définie par :
 \[
 \mathbf{H}^{(k+1)} = \sigma\left(\tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}\mathbf{H}^{(k)}\mathbf{W}^{(k)}\right)
@@ -419,131 +716,536 @@ Une couche GCN est définie par :
 où :
 \begin{itemize}
     \item $\tilde{\mathbf{A}} = \mathbf{A} + \mathbf{I}$ (ajout de self-loops)
-    \item $\tilde{\mathbf{D}}$ est la matrice de degré de $\tilde{\mathbf{A}}$
-    \item $\mathbf{H}^{(k)} \in \mathbb{R}^{N \times D_h^{(k)}}$ matrice des features de tous les nœuds
+    \item $\tilde{\mathbf{D}}$ est la matrice de degré de $\tilde{\mathbf{A}}$ : $\tilde{D}_{ii} = \sum_j \tilde{A}_{ij}$
+    \item $\mathbf{H}^{(k)} \in \mathbb{R}^{N \times D_h^{(k)}}$ matrice des features de tous les nœuds à la couche $k$
     \item $\mathbf{W}^{(k)} \in \mathbb{R}^{D_h^{(k)} \times D_h^{(k+1)}}$ matrice de poids apprise
+    \item $\sigma$ est une fonction d'activation non-linéaire (ReLU, ELU, etc.)
 \end{itemize}
 
-\textbf{Interprétation :}
-Chaque nœud effectue une moyenne pondérée normalisée des features de ses voisins (incluant lui-même via self-loop), transformée linéairement puis non-linéairement.
+\textbf{Interprétation spatiale :}
+Chaque nœud effectue une moyenne pondérée normalisée des features de ses voisins (incluant lui-même via self-loop). La normalisation $\tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}$ assure que les nœuds de haut degré ne dominent pas l'agrégation.
+
+\subsubsection{Normalisation symétrique vs alternative}
+
+Plusieurs normalisations sont possibles :
+
+\textbf{Normalisation symétrique (standard) :}
+\[
+\hat{\mathbf{A}} = \tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}
+\]
+Traite de manière symétrique source et destination.
+
+\textbf{Normalisation par ligne :}
+\[
+\hat{\mathbf{A}} = \tilde{\mathbf{D}}^{-1}\tilde{\mathbf{A}}
+\]
+Correspond à une marche aléatoire, chaque voisin contribue proportionnellement.
+
+\textbf{Sans normalisation :}
+\[
+\hat{\mathbf{A}} = \tilde{\mathbf{A}}
+\]
+Les nœuds de haut degré dominent, généralement instable.
 
 \subsubsection{Propriétés}
 
 \begin{itemize}
-    \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot D_h^2)$ par couche, linéaire en nombre d'arêtes
-    \item \textbf{Localité} : Une couche GCN agrège information du voisinage à 1-hop. $K$ couches élargissent la réception field à $K$-hops
-    \item \textbf{Permutation-invariance} : Garantie par la formulation matricielle
+    \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot D_h^2)$ par couche, linéaire en nombre d'arêtes. Pour graphes sparse ($|E| \ll N^2$), très efficace.
+    \item \textbf{Localité} : Une couche GCN agrège information du voisinage à 1-hop. $K$ couches élargissent le champ récepteur à $K$-hops.
+    \item \textbf{Permutation-équivariance} : Garantie par la formulation matricielle : $f(P \cdot G) = P \cdot f(G)$ pour toute permutation $P$.
+    \item \textbf{Scalabilité} : Peut s'appliquer à des graphes de millions de nœuds avec techniques de mini-batching.
 \end{itemize}
+
+\subsubsection{Implémentation pratique}
+
+Une architecture GCN typique pour classification de graphes :
+\begin{enumerate}
+    \item \textbf{Encodage initial} : $\mathbf{H}^{(0)} = \mathbf{X}$ (features initiales)
+    \item \textbf{Couches GCN} : 2-4 couches avec dimensions cachées 64-256
+    \item \textbf{Activation} : ReLU ou ELU après chaque couche
+    \item \textbf{Dropout} : Régularisation entre couches (taux 0.2-0.5)
+    \item \textbf{Pooling} : Global mean/max pooling sur les nœuds
+    \item \textbf{Classification} : MLP final pour prédiction
+\end{enumerate}
 
 \subsubsection{Limitations}
 
 \begin{itemize}
-    \item \textbf{Over-smoothing} : Avec de nombreuses couches, les features de nœuds convergent vers des valeurs similaires
-    \item \textbf{Traitement uniforme du voisinage} : Tous les voisins contribuent également (après normalisation)
-    \item \textbf{Expressivité limitée} : Équivalent au 1-WL test (Weisfeiler-Lehman)
+    \item \textbf{Over-smoothing} : Avec de nombreuses couches ($K > 4$), les features de nœuds convergent vers des valeurs similaires, perdant l'information structurelle locale.
+    \item \textbf{Traitement uniforme du voisinage} : Tous les voisins contribuent également (après normalisation), pas de mécanisme d'attention.
+    \item \textbf{Expressivité limitée} : Au mieux équivalent au 1-WL test (Weisfeiler-Lehman), ne peut distinguer certains graphes non-isomorphes.
+    \item \textbf{Sensibilité à la structure} : Performance dépend fortement de la topologie du graphe et du choix de construction pour graphes géométriques.
 \end{itemize}
+
+\subsubsection{Variantes et améliorations}
+
+\textbf{GCN avec residual connections :}
+\[
+\mathbf{H}^{(k+1)} = \sigma\left(\tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}\mathbf{H}^{(k)}\mathbf{W}^{(k)}\right) + \mathbf{H}^{(k)}
+\]
+Atténue l'over-smoothing, améliore le gradient flow.
+
+\textbf{GCN avec edge weights :}
+Pour graphes pondérés, $\tilde{A}_{ij} = w_{ij}$ où $w_{ij}$ est le poids de l'arête.
+
+\textbf{GCN avec features d'arêtes :}
+Extension où les arêtes portent aussi des features, intégrées via concaténation ou transformation.
 
 \subsection{Graph Attention Networks (GAT)}
 
+\subsubsection{Motivation : attention adaptative}
+
+GAT~\cite{Velickovic2018} introduit un mécanisme d'attention pour pondérer différemment les contributions des voisins, contrairement à GCN où tous les voisins contribuent uniformément (après normalisation). L'idée est d'apprendre quels voisins sont les plus pertinents pour chaque nœud.
+
 \subsubsection{Mécanisme d'attention}
 
-GAT~\cite{Velickovic2018} introduit un mécanisme d'attention pour pondérer différemment les contributions des voisins.
+\textbf{Étape 1 : Transformation linéaire partagée}
+\[
+\mathbf{h}_i' = \mathbf{W}\mathbf{h}_i
+\]
+où $\mathbf{W} \in \mathbb{R}^{D' \times D}$ transforme les features de dimension $D$ vers $D'$.
 
-\textbf{Calcul des coefficients d'attention :}
+\textbf{Étape 2 : Calcul des coefficients d'attention non-normalisés}
 \[
 e_{ij} = \text{LeakyReLU}\left(\mathbf{a}^T [\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_j]\right)
 \]
 
-où $\|$ dénote la concaténation, $\mathbf{a}$ est un vecteur de poids appris, $\mathbf{W}$ transforme les features.
+où :
+\begin{itemize}
+    \item $\|$ dénote la concaténation : $[\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_j] \in \mathbb{R}^{2D'}$
+    \item $\mathbf{a} \in \mathbb{R}^{2D'}$ est un vecteur de poids appris (mécanisme d'attention)
+    \item LeakyReLU avec pente négative 0.2 (typiquement)
+\end{itemize}
 
-\textbf{Normalisation via softmax :}
+Le score $e_{ij}$ mesure l'importance du nœud $j$ pour le nœud $i$.
+
+\textbf{Étape 3 : Normalisation via softmax}
 \[
-\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k \in \mathcal{N}(i)} \exp(e_{ik})}
+\alpha_{ij} = \text{softmax}_j(e_{ij}) = \frac{\exp(e_{ij})}{\sum_{k \in \mathcal{N}(i) \cup \{i\}} \exp(e_{ik})}
 \]
 
-\textbf{Agrégation pondérée :}
+Les coefficients $\alpha_{ij}$ sont des poids d'attention normalisés sommant à 1.
+
+\textbf{Étape 4 : Agrégation pondérée}
 \[
-\mathbf{h}_i^{(k+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} \mathbf{W}\mathbf{h}_j^{(k)}\right)
+\mathbf{h}_i^{(k+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i) \cup \{i\}} \alpha_{ij} \mathbf{W}\mathbf{h}_j^{(k)}\right)
 \]
 
 \subsubsection{Multi-head attention}
 
-Par analogie avec les Transformers, GAT utilise plusieurs têtes d'attention en parallèle :
+Par analogie avec les Transformers, GAT utilise plusieurs têtes d'attention en parallèle pour stabiliser l'apprentissage et capturer différents aspects des relations.
+
+\textbf{Couches cachées (concaténation) :}
 \[
 \mathbf{h}_i^{(k+1)} = \|_{m=1}^M \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij}^m \mathbf{W}^m\mathbf{h}_j^{(k)}\right)
 \]
 
-où $M$ est le nombre de têtes, $\|$ dénote la concaténation.
+où $M$ est le nombre de têtes, chaque tête $m$ a ses propres paramètres $\mathbf{W}^m, \mathbf{a}^m$. La sortie est de dimension $M \cdot D'$.
 
-\subsubsection{Avantages}
+\textbf{Dernière couche (moyenne) :}
+\[
+\mathbf{h}_i^{(K)} = \sigma\left(\frac{1}{M}\sum_{m=1}^M \sum_{j \in \mathcal{N}(i)} \alpha_{ij}^m \mathbf{W}^m\mathbf{h}_j^{(K-1)}\right)
+\]
+
+La moyenne évite l'explosion de dimensionnalité en couche finale.
+
+\subsubsection{Propriétés et avantages}
 
 \begin{itemize}
-    \item Pondération adaptative : voisins importants reçoivent plus d'attention
-    \item Interprétabilité : les $\alpha_{ij}$ révèlent quelles connexions sont importantes
-    \item Performances souvent supérieures à GCN
+    \item \textbf{Pondération adaptative} : Voisins importants reçoivent plus d'attention. Par exemple, dans un organoïde, les cellules structurellement similaires peuvent recevoir plus de poids.
+    \item \textbf{Parallélisation} : Le calcul des coefficients d'attention est parallélisable sur les arêtes.
+    \item \textbf{Localité} : L'attention est calculée uniquement sur le voisinage local (contrairement à l'attention globale des Transformers).
+    \item \textbf{Inductive} : Peut généraliser à de nouveaux nœuds non vus pendant l'entraînement.
+    \item \textbf{Interprétabilité} : Les coefficients $\alpha_{ij}$ révèlent quelles connexions sont importantes pour la prédiction.
+    \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot D' \cdot D + |E| \cdot D')$, reste linéaire en nombre d'arêtes.
+\end{itemize}
+
+\subsubsection{GATv2 : amélioration du mécanisme d'attention}
+
+Brody et al. ont montré que le mécanisme d'attention de GAT original est limité : l'ordre des opérations (transformation linéaire puis attention) restreint l'expressivité. GATv2 modifie le calcul :
+
+\textbf{GAT original :}
+\[
+e_{ij} = \mathbf{a}^T [\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_j]
+\]
+
+\textbf{GATv2 :}
+\[
+e_{ij} = \mathbf{a}^T \text{LeakyReLU}\left(\mathbf{W}[\mathbf{h}_i \| \mathbf{h}_j]\right)
+\]
+
+L'activation non-linéaire est appliquée après la transformation, permettant une attention plus dynamique et expressive.
+
+\subsubsection{Limitations}
+
+\begin{itemize}
+    \item \textbf{Coût mémoire} : Stockage des coefficients d'attention pour $M$ têtes.
+    \item \textbf{Over-smoothing} : Toujours présent avec de nombreuses couches.
+    \item \textbf{Attention locale uniquement} : Pas d'attention globale sur tout le graphe (par design, pour scalabilité).
 \end{itemize}
 
 \subsection{GraphSAGE : sampling et agrégation}
 
 \subsubsection{Motivation : scalabilité}
 
-Pour les très grands graphes (millions de nœuds), calculer l'agrégation sur tous les voisins devient prohibitif. GraphSAGE~\cite{Hamilton2017} propose un sampling du voisinage.
+Pour les très grands graphes (millions de nœuds), calculer l'agrégation sur tous les voisins devient prohibitif. GraphSAGE~\cite{Hamilton2017} (SAmple and aggreGatE) propose un sampling du voisinage pour permettre un mini-batch training efficace.
 
-\subsubsection{Agrégateurs}
+\textbf{Problème avec GCN full-batch :}
+GCN requiert l'ensemble du graphe en mémoire pour calculer les représentations. Pour un graphe de millions de nœuds, cela devient impraticable.
 
-GraphSAGE définit plusieurs agrégateurs :
+\textbf{Solution GraphSAGE :}
+À chaque couche, échantillonner un nombre fixe de voisins au lieu d'utiliser tout le voisinage. Cela permet de contrôler la complexité et rend le mini-batch training possible.
+
+\subsubsection{Algorithme}
+
+\textbf{Forward pass pour un nœud $v_i$ :}
+
+\begin{enumerate}
+    \item \textbf{Échantillonnage} : Échantillonner $S$ voisins uniformément : $\mathcal{N}_S(i) \subset \mathcal{N}(i)$, $|\mathcal{N}_S(i)| = S$
+    
+    \item \textbf{Agrégation des voisins} :
+    \[
+    \mathbf{h}_{\mathcal{N}(i)}^{(k)} = \text{AGGREGATE}^{(k)}\left(\left\{\mathbf{h}_j^{(k-1)} : j \in \mathcal{N}_S(i)\right\}\right)
+    \]
+    
+    \item \textbf{Mise à jour avec self-information} :
+    \[
+    \mathbf{h}_i^{(k)} = \sigma\left(\mathbf{W}^{(k)} \cdot [\mathbf{h}_i^{(k-1)} \| \mathbf{h}_{\mathcal{N}(i)}^{(k)}]\right)
+    \]
+    
+    \item \textbf{Normalisation L2} (optionnel) :
+    \[
+    \mathbf{h}_i^{(k)} \leftarrow \frac{\mathbf{h}_i^{(k)}}{\|\mathbf{h}_i^{(k)}\|_2}
+    \]
+\end{enumerate}
+
+La concaténation $[\mathbf{h}_i^{(k-1)} \| \mathbf{h}_{\mathcal{N}(i)}^{(k)}]$ préserve explicitement l'information du nœud central.
+
+\subsubsection{Fonctions d'agrégation}
+
+GraphSAGE définit plusieurs agrégateurs avec différentes propriétés :
 
 \textbf{Mean aggregator :}
 \[
-\mathbf{m}_i = \text{MEAN}(\{\mathbf{h}_j : j \in \mathcal{N}_{\text{sample}}(i)\})
+\text{AGGREGATE}_{\text{mean}}^{(k)} = \frac{1}{|\mathcal{N}_S(i)|}\sum_{j \in \mathcal{N}_S(i)} \mathbf{h}_j^{(k-1)}
 \]
 
+Permutation-invariant, simple et efficace. Variante : inclure le nœud central directement dans la moyenne (équivalent à GCN avec sampling).
+
 \textbf{LSTM aggregator :}
-Traite le voisinage comme une séquence (après permutation aléatoire) et applique un LSTM.
+\[
+\text{AGGREGATE}_{\text{LSTM}}^{(k)} = \text{LSTM}\left(\text{permute}(\{\mathbf{h}_j^{(k-1)} : j \in \mathcal{N}_S(i)\})\right)
+\]
+
+Traite le voisinage comme une séquence (après permutation aléatoire). Non permutation-invariant par construction, mais plus expressif en pratique.
 
 \textbf{Pooling aggregator :}
 \[
-\mathbf{m}_i = \max\{\sigma(\mathbf{W}_{\text{pool}}\mathbf{h}_j) : j \in \mathcal{N}_{\text{sample}}(i)\}
+\text{AGGREGATE}_{\text{pool}}^{(k)} = \max_{j \in \mathcal{N}_S(i)} \left\{\sigma\left(\mathbf{W}_{\text{pool}}\mathbf{h}_j^{(k-1)} + \mathbf{b}\right)\right\}
 \]
+
+où max est element-wise. Transformation non-linéaire avant agrégation, plus expressif que mean.
+
+\textbf{GCN aggregator :}
+\[
+\text{AGGREGATE}_{\text{GCN}}^{(k)} = \frac{1}{|\mathcal{N}_S(i)| + 1}\sum_{j \in \mathcal{N}_S(i) \cup \{i\}} \mathbf{h}_j^{(k-1)}
+\]
+
+Inclut le nœud central, pas de concaténation séparée. Plus proche de GCN original.
+
+\subsubsection{Stratégies d'échantillonnage}
+
+\textbf{Uniform sampling :}
+Choisir $S$ voisins uniformément. Simple mais peut manquer des voisins importants.
+
+\textbf{Importance sampling :}
+Pondérer l'échantillonnage par importance (degré, centralité, etc.). Complexe mais plus efficace.
+
+\textbf{Échantillonnage multi-couches :}
+Pour $K$ couches avec $S$ voisins par couche, le nombre total de nœuds échantillonnés est $\mathcal{O}(S^K)$, contrôlable en ajustant $S$.
 
 \subsubsection{Inductive learning}
 
-Contrairement à GCN (transductive, nécessite l'ensemble du graphe à l'entraînement), GraphSAGE peut générer embeddings pour nœuds non vus à l'entraînement (inductive), utile pour graphes dynamiques ou nouvelles données.
+\textbf{Transductive (GCN) :}
+Les embeddings sont appris pour chaque nœud spécifique. Pour prédire sur un nouveau nœud, il faut ré-entraîner.
+
+\textbf{Inductive (GraphSAGE) :}
+Les fonctions d'agrégation sont apprises. Pour un nouveau nœud, on applique simplement ces fonctions sur son voisinage. Pas besoin de ré-entraînement.
+
+\textbf{Applications :}
+\begin{itemize}
+    \item Graphes dynamiques avec nouveaux nœuds ajoutés continuellement
+    \item Généralisation inter-graphes (entraîner sur un graphe, appliquer à un autre)
+    \item Prédiction sur sous-graphes non vus
+\end{itemize}
+
+\subsubsection{Complexité}
+
+\textbf{Sans sampling (GCN) :} $\mathcal{O}(|E| \cdot D^2)$ par couche
+
+\textbf{Avec sampling (GraphSAGE) :} $\mathcal{O}(S \cdot |V_{\text{batch}}| \cdot D^2)$ où $V_{\text{batch}}$ est le mini-batch
+
+Pour grands graphes avec $|E| \gg S \cdot |V|$, gain substantiel.
+
+\subsubsection{Limitations}
+
+\begin{itemize}
+    \item \textbf{Variance due au sampling} : Différents échantillons donnent différents résultats, nécessite moyenne sur plusieurs forward passes pour stabilité
+    \item \textbf{Choix de $S$} : Hyperparamètre critique affectant trade-off précision/vitesse
+    \item \textbf{Explosion de voisinage} : Avec $K$ couches, $S^K$ nœuds échantillonnés, peut exploser pour $K$ grand
+\end{itemize}
 
 \subsection{Graph Isomorphism Network (GIN)}
 
-\subsubsection{Expressivité maximale}
+\subsubsection{Motivation : expressivité maximale}
 
-Xu et al.~\cite{Xu2019} ont montré que la plupart des GNNs sont au mieux aussi puissants que le 1-WL test pour distinguer des graphes. GIN atteint cette borne supérieure.
+Xu et al.~\cite{Xu2019} ont mené une analyse théorique rigoureuse de l'expressivité des GNNs, montrant que la plupart sont au mieux aussi puissants que le test de Weisfeiler-Lehman 1-WL pour distinguer des graphes. GIN atteint cette borne supérieure théorique.
 
-\textbf{Agrégation GIN :}
+\subsubsection{Fondements théoriques}
+
+\textbf{Théorème (Xu et al., 2019) :}
+Soit $\mathcal{F}$ l'ensemble des fonctions de voisinage permutation-invariantes. Un GNN est maximalement expressif (équivalent à 1-WL) si et seulement si son agrégation est \textit{injective} sur les multisets.
+
+\textbf{Conséquence :}
+\begin{itemize}
+    \item \textbf{Sum aggregation} : Injective sur multisets (si le domaine des features est suffisamment riche)
+    \item \textbf{Mean aggregation} : Non injective (ex: $\{1,1\}$ et $\{1\}$ donnent même moyenne)
+    \item \textbf{Max aggregation} : Non injective (ex: $\{1,2\}$ et $\{1,2,2\}$ donnent même max)
+\end{itemize}
+
+Donc GCN (mean) et GraphSAGE (mean/max) sont strictement moins expressifs que 1-WL.
+
+\subsubsection{Architecture GIN}
+
+\textbf{Couche GIN :}
 \[
-\mathbf{h}_i^{(k+1)} = \text{MLP}\left((1 + \epsilon^{(k)}) \cdot \mathbf{h}_i^{(k)} + \sum_{j \in \mathcal{N}(i)} \mathbf{h}_j^{(k)}\right)
+\mathbf{h}_i^{(k+1)} = \text{MLP}^{(k)}\left(\left(1 + \epsilon^{(k)}\right) \cdot \mathbf{h}_i^{(k)} + \sum_{j \in \mathcal{N}(i)} \mathbf{h}_j^{(k)}\right)
 \]
 
-où $\epsilon$ est un paramètre appris ou fixé.
+où :
+\begin{itemize}
+    \item $\epsilon^{(k)}$ est un paramètre scalaire (appris ou fixé, souvent $\epsilon = 0$)
+    \item $\text{MLP}^{(k)}$ est un perceptron multi-couches (au moins 1 couche cachée)
+    \item La somme $\sum_{j \in \mathcal{N}(i)}$ assure l'injectivité sur multisets
+    \item Le terme $(1 + \epsilon)$ pondère le nœud central vs ses voisins
+\end{itemize}
+
+\textbf{Readout pour classification de graphes :}
+\[
+\mathbf{h}_G = \sum_{k=0}^K \text{READOUT}^{(k)}\left(\left\{\mathbf{h}_i^{(k)} : i \in V\right\}\right)
+\]
+
+où READOUT est une fonction permutation-invariante (sum ou mean). La somme sur les couches combine information multi-échelles (Jumping Knowledge).
+
+\subsubsection{Choix du MLP}
+
+Le MLP doit être suffisamment expressif pour approximer des fonctions injectives. Architecture typique :
+\[
+\text{MLP}(\mathbf{x}) = \mathbf{W}_2 \cdot \sigma(\mathbf{W}_1 \cdot \mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2
+\]
+
+avec 2 couches et activation ReLU. BatchNorm et Dropout ajoutés pour stabilité.
 
 \subsubsection{Propriétés théoriques}
 
-GIN est prouvé être aussi expressif que le WL-test : si deux graphes sont distinguables par 1-WL, ils sont distinguables par GIN (moyennant des MLPs universels). Cela en fait une référence théorique forte.
+\textbf{Théorème principal :}
+GIN avec MLPs universels est aussi expressif que le 1-WL test. Plus précisément :
+\begin{itemize}
+    \item Si deux graphes $G_1, G_2$ sont distingués par 1-WL, alors $\exists$ un GIN tel que $f(G_1) \neq f(G_2)$
+    \item Réciproquement, si GIN ne peut distinguer $G_1, G_2$, alors 1-WL non plus
+\end{itemize}
+
+\textbf{Corollaires pratiques :}
+\begin{itemize}
+    \item GIN peut distinguer tous les arbres (1-WL aussi)
+    \item GIN ne peut distinguer certains graphes réguliers (limitation de 1-WL)
+    \item Pour la plupart des applications pratiques, l'expressivité de GIN suffit
+\end{itemize}
+
+\subsubsection{GIN-$\epsilon$ : variantes}
+
+\textbf{GIN-0 :} $\epsilon = 0$ (fixé)
+\[
+\mathbf{h}_i^{(k+1)} = \text{MLP}\left(\mathbf{h}_i^{(k)} + \sum_{j \in \mathcal{N}(i)} \mathbf{h}_j^{(k)}\right)
+\]
+
+\textbf{GIN-$\epsilon$ :} $\epsilon$ appris
+Permet d'apprendre le poids relatif du nœud central vs voisinage.
+
+\subsubsection{Comparaison avec autres GNNs}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\hline
+\textbf{Architecture} & \textbf{Agrégation} & \textbf{Expressivité} \\
+\hline
+GCN & Mean (normalisée) & $<$ 1-WL \\
+GraphSAGE & Mean/Max & $<$ 1-WL \\
+GAT & Attention-weighted sum & $<$ 1-WL \\
+GIN & Sum + MLP & $=$ 1-WL \\
+\hline
+\end{tabular}
+\end{table}
+
+GAT, bien qu'utilisant l'attention, utilise une somme pondérée qui n'est pas injective sur multisets (différents ensembles de poids peuvent donner même résultat).
+
+\subsubsection{Applications et performances}
+
+GIN obtient typiquement des performances state-of-the-art sur benchmarks de classification de graphes (MUTAG, PROTEINS, IMDB, etc.) grâce à son expressivité maximale. Pour les organoïdes, GIN est une baseline théorique forte.
+
+\subsubsection{Limitations}
+
+\begin{itemize}
+    \item \textbf{Over-smoothing} : Toujours présent, même avec expressivité maximale
+    \item \textbf{Limitation 1-WL} : Ne peut distinguer certains graphes non-isomorphes (ex: graphes réguliers fortement réguliers)
+    \item \textbf{Pas d'information géométrique} : Ne tire pas parti des coordonnées 3D (pour nos organoïdes)
+    \item \textbf{Complexité du MLP} : Plus de paramètres que GCN simple, risque de sur-apprentissage sur petits datasets
+\end{itemize}
 
 \subsection{Autres architectures notables}
 
 \subsubsection{Principal Neighbourhood Aggregation (PNA)}
 
-PNA~\cite{Corso2020} combine plusieurs agrégateurs (mean, max, sum, std) et plusieurs scalers (identité, amplification, atténuation) pour améliorer l'expressivité.
+PNA~\cite{Corso2020} combine plusieurs agrégateurs et scalers pour améliorer l'expressivité au-delà de GIN.
+
+\textbf{Motivation :}
+GIN atteint l'expressivité 1-WL mais n'exploite qu'un seul type d'agrégation (somme). PNA propose d'utiliser plusieurs agrégations en parallèle.
+
+\textbf{Architecture :}
+\[
+\mathbf{h}_i^{(k+1)} = \text{MLP}\left(\bigoplus_{s \in S} \bigoplus_{a \in A} s\left(a\left(\{\mathbf{h}_j^{(k)} : j \in \mathcal{N}(i)\}\right)\right)\right)
+\]
+
+où $\bigoplus$ dénote la concaténation, et :
+
+\textbf{Agrégateurs $A$} :
+\begin{itemize}
+    \item $\text{mean}(\cdot)$ : Moyenne
+    \item $\text{max}(\cdot)$ : Maximum element-wise
+    \item $\text{min}(\cdot)$ : Minimum element-wise
+    \item $\text{std}(\cdot)$ : Écart-type
+    \item $\text{sum}(\cdot)$ : Somme
+\end{itemize}
+
+\textbf{Scalers $S$} :
+\begin{itemize}
+    \item Identité : $s(\mathbf{x}) = \mathbf{x}$
+    \item Amplification : $s(\mathbf{x}) = \log(|\mathcal{N}(i)| + 1) \cdot \mathbf{x}$
+    \item Atténuation : $s(\mathbf{x}) = \mathbf{x} / (|\mathcal{N}(i)| + 1)$
+\end{itemize}
+
+Les scalers compensent les différences de degré entre nœuds, évitant le biais vers nœuds de haut degré.
+
+\textbf{Avantages :}
+\begin{itemize}
+    \item Plus expressif que GIN dans certains cas
+    \item Robuste aux variations de degré
+    \item Performances state-of-the-art sur plusieurs benchmarks
+\end{itemize}
+
+\textbf{Limitations :}
+\begin{itemize}
+    \item Coût computationnel : $|A| \times |S|$ agrégations par couche
+    \item Haute dimensionnalité des features concaténées
+\end{itemize}
 
 \subsubsection{Graph Transformer Networks}
 
-Application du mécanisme d'attention des Transformers~\cite{Vaswani2017} aux graphes, avec attention globale ou restreinte au voisinage.
+Les Graph Transformers~\cite{Dwivedi2021,Rampasek2023} généralisent l'architecture Transformer~\cite{Vaswani2017} aux données de graphes.
+
+\textbf{Principe :}
+Remplacer le passage de messages local par une attention globale sur tous les nœuds du graphe, comme dans les Transformers de texte.
+
+\textbf{Attention multi-têtes sur graphes :}
+\[
+\mathbf{h}_i^{(k+1)} = \sum_{j=1}^N \alpha_{ij} \mathbf{V}_j^{(k)}
+\]
+
+où les poids d'attention sont calculés :
+\[
+\alpha_{ij} = \frac{\exp((\mathbf{Q}_i^{(k)})^T \mathbf{K}_j^{(k)} / \sqrt{d})}{\sum_{\ell=1}^N \exp((\mathbf{Q}_i^{(k)})^T \mathbf{K}_\ell^{(k)} / \sqrt{d})}
+\]
+
+avec $\mathbf{Q}, \mathbf{K}, \mathbf{V}$ les projections query, key, value.
+
+\textbf{Intégration de la structure de graphe :}
+
+Contrairement aux Transformers standards (où l'attention est purement par contenu), les Graph Transformers doivent encoder la topologie :
+
+\textbf{1. Encodage positionnel structurel :}
+Ajouter des features basées sur la structure (distance géodésique, Laplacian eigenvectors, centralité).
+
+\textbf{2. Biais d'attention basés sur la structure :}
+\[
+\alpha_{ij} \propto \exp\left(\frac{\mathbf{Q}_i^T \mathbf{K}_j}{\sqrt{d}} + b_{ij}\right)
+\]
+où $b_{ij}$ encode la relation structurelle (ex: $b_{ij} = -\infty$ si pas d'arête).
+
+\textbf{Variantes :}
+
+\textbf{Spectral Attention Network (SAN)~\cite{Kreuzer2021} :}
+Utilise les vecteurs propres du Laplacien comme encodage positionnel.
+
+\textbf{Structure-Aware Transformer~\cite{Chen2022} :}
+Intègre explicitement les plus courts chemins et la structure locale.
+
+\textbf{Graphormer~\cite{Ying2021} :}
+Utilise encodages de centralité, distances spatiales, et biais d'arêtes.
+
+\textbf{Avantages :}
+\begin{itemize}
+    \item Attention globale : capture dépendances longue distance sans empiler couches
+    \item Expressivité : peut dépasser 1-WL avec bons encodages structurels
+    \item Pas d'over-squashing : information flow global
+\end{itemize}
+
+\textbf{Limitations :}
+\begin{itemize}
+    \item Complexité $\mathcal{O}(N^2)$ : prohibitif pour très grands graphes
+    \item Nécessite encodages structurels soigneusement conçus
+    \item Plus de paramètres que MPNNs standards
+\end{itemize}
+
+Des analyses récentes~\cite{Cai2023} établissent des connections théoriques entre MPNNs classiques et Graph Transformers, montrant que sous certaines conditions, ils sont équivalents.
 
 \subsubsection{Jumping Knowledge Networks}
 
-Combinent les représentations de toutes les couches pour chaque nœud~\cite{Xu2018}, atténuant le problème d'over-smoothing.
+Xu et al.~\cite{Xu2018} proposent de combiner les représentations de toutes les couches pour atténuer l'over-smoothing.
+
+\textbf{Principe :}
+Au lieu d'utiliser seulement $\mathbf{h}_i^{(K)}$, on agrège les représentations de toutes les couches :
+\[
+\mathbf{h}_i^{\text{final}} = \text{AGG}\left(\mathbf{h}_i^{(0)}, \mathbf{h}_i^{(1)}, \ldots, \mathbf{h}_i^{(K)}\right)
+\]
+
+\textbf{Variantes d'agrégation :}
+
+\textbf{Concaténation :}
+\[
+\mathbf{h}_i^{\text{final}} = [\mathbf{h}_i^{(0)} \| \mathbf{h}_i^{(1)} \| \cdots \| \mathbf{h}_i^{(K)}]
+\]
+Préserve toute l'information mais augmente la dimensionnalité.
+
+\textbf{Max-pooling :}
+\[
+\mathbf{h}_i^{\text{final}} = \max\left(\mathbf{h}_i^{(0)}, \mathbf{h}_i^{(1)}, \ldots, \mathbf{h}_i^{(K)}\right)
+\]
+Element-wise, compact mais perte d'information.
+
+\textbf{LSTM-attention :}
+Utiliser un LSTM pour agréger séquentiellement les représentations avec attention.
+
+\textbf{Avantages :}
+\begin{itemize}
+    \item Atténue l'over-smoothing en préservant information multi-échelles
+    \item Permet réseaux plus profonds
+    \item Amélioration empirique sur plusieurs benchmarks
+\end{itemize}
 
 \section{GNNs géométriques : architectures E(n)-équivariantes}
 
-Les graphes géométriques (nuages de points 3D, organoïdes) nécessitent des architectures respectant les symétries géométriques.
+Les graphes géométriques (nuages de points 3D, organoïdes) nécessitent des architectures respectant les symétries géométriques. Cette section présente les principes et architectures des GNNs géométriques équivariants.
 
 \subsection{Symétries géométriques et groupes de transformation}
 
@@ -582,7 +1284,7 @@ $f$ est invariante si :
 f(T(\mathbf{X})) = f(\mathbf{X})
 \]
 
-pour tout $\mathbf{X}$ et tout $T$.
+pour tout $\mathbf{X}$.
 
 \textbf{Équivariance :}
 $f$ est équivariante si :
@@ -590,19 +1292,21 @@ $f$ est équivariante si :
 f(T(\mathbf{X})) = T(f(\mathbf{X}))
 \]
 
+pour tout $\mathbf{X}$.
+
 \subsubsection{Quand utiliser quoi ?}
 
 \textbf{Invariance} est désirée pour :
 \begin{itemize}
-    \item Classification de graphes (label du graphe ne change pas si on le rotate)
-    \item Prédiction de propriétés globales scalaires
+    \item Classification de graphes (le label du graphe ne change pas si on lui applique une transformation)
+    \item Prédiction de propriétés globales scalaires (exemple : déformation d'un organoïde)
 \end{itemize}
 
 \textbf{Équivariance} est désirée pour :
 \begin{itemize}
-    \item Prédiction de features de nœuds (positions, vecteurs)
+    \item Prédiction de features de nœuds (positions, vecteurs) (exemple : prédiction des forces atomiques)
     \item Génération de structures géométriques
-    \item Couches intermédiaires (composition d'équivariances)
+    \item es couches intermédiaires (composition d'équivariances)
 \end{itemize}
 
 Pour la classification d'organoïdes, nous voulons :
@@ -611,13 +1315,17 @@ Pour la classification d'organoïdes, nous voulons :
     \item Couche finale \textbf{invariante} (prédiction de classe invariante)
 \end{itemize}
 
-\subsection{Equivariant Graph Neural Networks (EGNN)}
+\subsection{Architectures GNN géométriques principales}
 
-\subsubsection{Architecture}
+Les GNN géométriques exploitent explicitement les coordonnées 3D des nœuds tout en respectant les symétries du groupe euclidien $E(3)$ (rotations, translations, réflexions) ou du groupe orthogonal $O(3)$ (rotations et réflexions). Nous présentons ici les architectures majeures, de la plus simple (EGNN) aux plus sophistiquées (harmoniques sphériques).
 
-EGNN~\cite{Satorras2021} maintient l'équivariance $E(n)$ via une construction élégante.
+\subsubsection{Equivariant Graph Neural Networks (EGNN)}
 
-\textbf{Messages invariants :}
+EGNN~\cite{Satorras2021} maintient l'équivariance $E(n)$ via une construction élégante et efficace. C'est l'une des architectures géométriques les plus simples à implémenter tout en garantissant l'équivariance par construction.
+
+\textbf{Architecture :}
+
+\textit{Messages invariants :}
 Les messages sont construits en utilisant uniquement des quantités invariantes (distances) :
 \[
 \mathbf{m}_{ij} = \phi_e\left(\mathbf{h}_i, \mathbf{h}_j, \|\mathbf{x}_i - \mathbf{x}_j\|^2, a_{ij}\right)
@@ -625,19 +1333,19 @@ Les messages sont construits en utilisant uniquement des quantités invariantes 
 
 où $\phi_e$ est un MLP, $a_{ij}$ attributs d'arête, $\mathbf{h}_i$ features scalaires invariantes.
 
-\textbf{Mise à jour équivariante des coordonnées :}
+\textit{Mise à jour équivariante des coordonnées :}
 \[
 \mathbf{x}_i' = \mathbf{x}_i + \frac{1}{|\mathcal{N}(i)|}\sum_{j \in \mathcal{N}(i)} (\mathbf{x}_i - \mathbf{x}_j) \cdot \phi_x(\mathbf{m}_{ij})
 \]
 
 où $\phi_x$ prédit un coefficient scalaire.
 
-\textbf{Mise à jour des features :}
+\textit{Mise à jour des features :}
 \[
 \mathbf{h}_i' = \phi_h\left(\mathbf{h}_i, \sum_{j \in \mathcal{N}(i)} \mathbf{m}_{ij}\right)
 \]
 
-\subsubsection{Garanties théoriques}
+\textbf{Garanties théoriques :}
 
 EGNN est prouvé être E(n)-équivariant :
 \begin{itemize}
@@ -647,7 +1355,7 @@ EGNN est prouvé être E(n)-équivariant :
 
 Cette propriété est garantie par construction, sans besoin d'augmentation.
 
-\subsubsection{Variantes et extensions}
+\textbf{Variantes et extensions :}
 
 \begin{itemize}
     \item \textbf{EGNN avec attention} : Incorporation de mécanismes d'attention dans les messages
@@ -655,29 +1363,350 @@ Cette propriété est garantie par construction, sans besoin d'augmentation.
     \item \textbf{EGNN conditionnels} : Conditionnement sur contexte global
 \end{itemize}
 
-\subsection{Autres architectures géométriques}
+\textbf{Avantages :}
+\begin{itemize}
+    \item Simplicité d'implémentation (environ 100 lignes de code)
+    \item Garanties théoriques d'équivariance par construction
+    \item Efficacité computationnelle comparable aux GNN standards
+    \item Pas besoin d'augmentation de données pour la géométrie
+\end{itemize}
 
-\subsubsection{SchNet}
+\subsubsection{SchNet : convolutions continues radiales}
 
-Développé pour la chimie quantique, SchNet~\cite{Schutt2017,Schutt2018} utilise des convolutions continues basées sur les distances inter-atomiques.
+Développé pour la prédiction de propriétés moléculaires en chimie quantique~\cite{Schutt2017,Schutt2018}, SchNet utilise des convolutions continues basées sur les distances inter-atomiques.
 
-\textbf{Interaction block :}
+\textbf{Principe :}
+Au lieu d'utiliser une connectivité discrète (arêtes binaires), SchNet opère sur un graphe dense avec des filtres radiaux continus.
+
+\textbf{Radial Basis Function (RBF) expansion :}
+Les distances euclidiennes $r_{ij} = \|\mathbf{x}_i - \mathbf{x}_j\|$ sont expand uses dans une base de fonctions gaussiennes :
 \[
-\mathbf{v}_i = \sum_{j \in \mathcal{N}(i)} \mathbf{W}\mathbf{v}_j \odot g(r_{ij})
+\mathbf{e}_{ij} = [e^{-(r_{ij} - \mu_1)^2/\sigma^2}, \ldots, e^{-(r_{ij} - \mu_K)^2/\sigma^2}]
 \]
 
-où $g$ est une fonction d'expansion radiale (RBF - Radial Basis Functions), $r_{ij} = \|\mathbf{x}_i - \mathbf{x}_j\|$.
+où $\mu_1, \ldots, \mu_K$ sont des centres régulièrement espacés couvrant la plage de distances.
 
-\subsubsection{DimeNet}
+\textbf{Continuous-filter convolution :}
+\[
+\mathbf{v}_i^{(k+1)} = \sum_{j \in \mathcal{N}(i)} \mathbf{v}_j^{(k)} \odot \mathbf{W}^{(k)} \mathbf{e}_{ij}
+\]
 
-DimeNet~\cite{Klicpera2020,Gasteiger2020} étend SchNet en intégrant les angles de liaison en plus des distances, capturant la géométrie locale plus finement.
+où :
+\begin{itemize}
+    \item $\mathbf{W}^{(k)} \in \mathbb{R}^{D \times K}$ transforme l'encodage RBF en poids de filtre
+    \item $\odot$ est le produit element-wise (modulation)
+    \item La somme agrège sur le voisinage (typiquement cutoff radius de 5-10 Å)
+\end{itemize}
+
+\textbf{Interaction block SchNet :}
+\begin{enumerate}
+    \item Transformation dense : $\mathbf{v}_i' = \mathbf{W}_1 \mathbf{v}_i$
+    \item Filtre radial : $\mathbf{w}_{ij} = \mathbf{W}_{\text{filter}}(\mathbf{e}_{ij})$
+    \item Convolution : $\mathbf{m}_i = \sum_j \mathbf{v}_j' \odot \mathbf{w}_{ij}$
+    \item Mise à jour : $\mathbf{v}_i^{\text{new}} = \mathbf{v}_i + \mathbf{W}_2 \mathbf{m}_i$
+\end{enumerate}
+
+\textbf{Propriétés :}
+\begin{itemize}
+    \item \textbf{Invariance à E(3)} : Utilise uniquement les distances (scalaires invariants)
+    \item \textbf{Représentation continue} : Pas de discrétisation artificielle des distances
+    \item \textbf{Performances} : State-of-the-art sur QM9 (prédiction d'énergie moléculaire) à l'époque
+\end{itemize}
+
+\textbf{Limitations :}
+\begin{itemize}
+    \item Invariant mais pas équivariant : ne peut prédire des quantités vectorielles (forces)
+    \item N'utilise que les distances : ignore les angles et l'orientation
+    \item Moins expressif géométriquement que DimeNet ou PaiNN
+\end{itemize}
+
+\subsubsection{DimeNet : intégration directionnelle}
+
+DimeNet~\cite{Klicpera2020,Gasteiger2020} (Directional Message Passing Neural Network) étend SchNet en intégrant les angles de liaison en plus des distances, capturant la géométrie locale 3D plus finement.
+
+\textbf{Motivation :}
+Les propriétés moléculaires dépendent non seulement des distances mais aussi des angles (ex: angles de liaison dans les molécules organiques). SchNet ignore cette information directionnelle.
+
+\textbf{Triplets et angles :}
+DimeNet considère des triplets de nœuds $(i, j, k)$ où $j$ est le nœud central :
+\[
+\theta_{ijk} = \arccos\left(\frac{(\mathbf{x}_i - \mathbf{x}_j) \cdot (\mathbf{x}_k - \mathbf{x}_j)}{\|\mathbf{x}_i - \mathbf{x}_j\| \cdot \|\mathbf{x}_k - \mathbf{x}_j\|}\right)
+\]
+
+\textbf{Spherical Basis Function (SBF) expansion :}
+Les angles sont encodés via des harmoniques sphériques :
+\[
+\mathbf{a}_{ijk} = \text{SBF}(\theta_{ijk}, r_{ij}, r_{jk})
+\]
+
+qui combine information angulaire et radiale.
 
 \textbf{Directional Message Passing :}
-Utilise les triplets de nœuds $(i,j,k)$ pour capturer les angles $\angle ijk$, encodés via des harmoniques sphériques.
+\begin{enumerate}
+    \item Messages basés sur distances (comme SchNet) : $\mathbf{m}_{ij}$
+    \item Messages basés sur triplets :
+    \[
+    \mathbf{m}_{ijk} = \mathbf{W}_{\text{tri}}(\mathbf{a}_{ijk}) \odot \mathbf{h}_k
+    \]
+    \item Agrégation :
+    \[
+    \mathbf{h}_j^{\text{new}} = \mathbf{h}_j + \sum_i \mathbf{m}_{ij} + \sum_{i,k} \mathbf{m}_{ijk}
+    \]
+\end{enumerate}
 
-\subsubsection{PaiNN}
+\textbf{Propriétés :}
+\begin{itemize}
+    \item \textbf{Expressivité géométrique accrue} : Capture information 3D complète (distances + angles)
+    \item \textbf{Performances} : Meilleur que SchNet sur QM9 et MD17 (dynamique moléculaire)
+    \item \textbf{Invariance E(3)} : Utilise scalaires invariants (distances, angles)
+\end{itemize}
 
-Polarizable Atom Interaction Neural Network utilise des features tensorielles (scalaires + vecteurs) pour représenter richement l'état des nœuds, permettant de prédire des propriétés vectorielles.
+\textbf{Limitations :}
+\begin{itemize}
+    \item \textbf{Complexité} : $\mathcal{O}(|E|^2)$ pour triplets, plus coûteux que SchNet
+    \item \textbf{Toujours invariant} : Ne peut prédire forces ou autres quantités vectorielles
+    \item \textbf{Paramètres nombreux} : SBF expansion augmente nombre de paramètres
+\end{itemize}
+
+\textbf{DimeNet++ :}
+Version améliorée avec :
+\begin{itemize}
+    \item Mise à jour basée sur paires d'arêtes au lieu de triplets complets (réduction complexité)
+    \item Output blocks séparés pour efficacité
+    \item Performances et vitesse améliorées
+\end{itemize}
+
+\subsubsection{PaiNN : features vectorielles équivariantes}
+
+Polarizable Atom Interaction Neural Network~\cite{Schutt2021} maintient des features \textit{scalaires} (invariantes) et \textit{vectorielles} (équivariantes), permettant de prédire des propriétés vectorielles comme les forces. Cette approche représente un point intermédiaire entre les modèles purement scalaires (SchNet) et les modèles utilisant des représentations tensorielles complètes via harmoniques sphériques (comme NequIP~\cite{Batzner2022}).
+
+\textbf{Représentation duale :}
+Chaque nœud $i$ a :
+\begin{itemize}
+    \item Features scalaires : $\mathbf{s}_i \in \mathbb{R}^{F}$ (invariantes à E(3))
+    \item Features vectorielles : $\mathbf{V}_i \in \mathbb{R}^{F \times 3}$ (équivariantes à E(3))
+\end{itemize}
+
+Sous rotation $\mathbf{R}$ : $\mathbf{s}_i' = \mathbf{s}_i$ (invariant), $\mathbf{V}_i' = \mathbf{R} \mathbf{V}_i$ (équivariant).
+
+\textbf{Message Passing PaiNN :}
+
+\textbf{1. Messages scalaires et vectoriels :}
+\[
+\mathbf{m}_{ij}^s = \mathbf{W}_s(\mathbf{s}_j) \odot \mathbf{W}_{\text{filter}}(r_{ij})
+\]
+\[
+\mathbf{m}_{ij}^v = \mathbf{W}_v(\mathbf{s}_j) \odot \mathbf{W}_{\text{filter}}(r_{ij}) \otimes \frac{\mathbf{x}_i - \mathbf{x}_j}{r_{ij}}
+\]
+
+Le vecteur directionnel $\frac{\mathbf{x}_i - \mathbf{x}_j}{r_{ij}}$ assure l'équivariance.
+
+\textbf{2. Agrégation :}
+\[
+\Delta \mathbf{s}_i = \sum_{j} \mathbf{m}_{ij}^s, \quad \Delta \mathbf{V}_i = \sum_{j} \mathbf{m}_{ij}^v
+\]
+
+\textbf{3. Mise à jour équivariante :}
+\begin{align*}
+\mathbf{V}_i' &= \mathbf{V}_i + \Delta \mathbf{V}_i + \mathbf{W}_{vv}(\|\mathbf{V}_i\|) \odot \mathbf{V}_i \\
+\mathbf{s}_i' &= \mathbf{s}_i + \mathbf{W}_{ss}(\mathbf{s}_i) + \mathbf{W}_{vs}(\|\mathbf{V}_i\|)
+\end{align*}
+
+Les termes $\|\mathbf{V}_i\|$ (normes des vecteurs) sont scalaires invariants permettant interactions entre features vectorielles et scalaires tout en préservant équivariance.
+
+\textbf{Propriétés :}
+\begin{itemize}
+    \item \textbf{Équivariance E(3)} : Features vectorielles se transforment correctement sous rotations
+    \item \textbf{Prédiction de forces} : Output vectoriel équivariant permet de prédire forces atomiques directement
+    \item \textbf{Expressivité} : Features vectorielles capturent direction, orientation locale
+    \item \textbf{Performances} : Excellent sur prédiction de forces (MD17, MD22)
+\end{itemize}
+
+\textbf{Applications :}
+\begin{itemize}
+    \item Simulation de dynamique moléculaire (prédiction de forces)
+    \item Prédiction de moments dipolaires
+    \item Toute propriété vectorielle moléculaire
+\end{itemize}
+
+\textbf{Limitations :}
+\begin{itemize}
+    \item Plus complexe à implémenter que SchNet ou EGNN
+    \item Plus de paramètres (features scalaires + vectorielles)
+    \item Coût computationnel légèrement supérieur
+\end{itemize}
+
+\subsubsection{Architectures basées sur les harmoniques sphériques}
+
+Au-delà de PaiNN, des architectures plus sophistiquées utilisent des représentations tensorielles via harmoniques sphériques pour atteindre une expressivité maximale~\cite{Duval2024}.
+
+\textbf{NequIP (E(3)-Equivariant Graph Neural Networks)~\cite{Batzner2022} :}
+
+NequIP représente les features de nœuds comme des sommes directes de représentations irréductibles de SO(3) :
+\[
+\mathbf{h}_i = \bigoplus_{l=0}^{L_{\max}} \mathbf{h}_i^{(l)}
+\]
+
+où $\mathbf{h}_i^{(l)} \in \mathbb{R}^{2l+1}$ transforme selon les harmoniques sphériques de degré $l$.
+
+\textbf{Convolution tensorielle :}
+\[
+\mathbf{h}_i^{(l')} = \sum_{j \in \mathcal{N}(i)} \sum_{l, l''} \mathbf{W}_{l,l'',l'} \left(\mathbf{h}_j^{(l)} \otimes Y^{(l'')}(\hat{\mathbf{r}}_{ij})\right)
+\]
+
+où $\otimes$ est le produit tensoriel de Clebsch-Gordan, $Y^{(l'')}$ sont les harmoniques sphériques, et $\hat{\mathbf{r}}_{ij}$ est la direction normalisée.
+
+\textbf{Propriétés :}
+\begin{itemize}
+    \item \textbf{Expressivité maximale} : Représentation complète de toutes les informations géométriques
+    \item \textbf{Équivariance SO(3)} : Garantie mathématique stricte
+    \item \textbf{Performances} : État de l'art sur MD17 et autres benchmarks de forces
+\end{itemize}
+
+\textbf{Limitations :}
+\begin{itemize}
+    \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot L_{\max}^6)$ pour les produits de Clebsch-Gordan
+    \item \textbf{Implémentation} : Nécessite bibliothèques spécialisées (e3nn)
+    \item \textbf{Interprétabilité} : Représentations tensorielles abstraites
+\end{itemize}
+
+\textbf{Autres architectures tensorielles :}
+\begin{itemize}
+    \item \textbf{TFN (Tensor Field Networks)~\cite{Thomas2018}} : Première architecture utilisant harmoniques sphériques pour réseaux équivariants à la rotation et translation sur nuages de points 3D
+    \item \textbf{Cormorant~\cite{Anderson2019}} : Réseaux moléculaires covariants utilisant convolutions de Clebsch-Gordan pour combinaison de représentations irréductibles
+    \item \textbf{SE(3)-Transformers~\cite{Fuchs2020}} : Combine mécanisme d'attention des Transformers avec équivariance tensorielle pour rotations et translations 3D
+\end{itemize}
+
+\textbf{Pertinence pour les organoïdes :}
+
+Pour notre application (classification d'organoïdes), ces architectures tensorielles sont probablement sur-dimensionnées :
+\begin{itemize}
+    \item La géométrie des organoïdes est moins contrainte que celle des molécules
+    \item Output scalaire (classe) ne nécessite pas équivariance complète
+    \item Coût computationnel prohibitif pour graphes de 1000+ nœuds
+    \item Difficulté d'interprétation biologique
+\end{itemize}
+
+Des architectures plus simples (EGNN, variantes de SchNet) offrent un meilleur compromis pour notre cas d'usage.
+
+\subsection{Panorama des GNNs géométriques : enseignements des surveys récents}
+
+Deux surveys récents offrent une vue d'ensemble complète du domaine des GNNs géométriques : le "Hitchhiker's Guide to Geometric GNNs"~\cite{Duval2024} et "A Survey of Geometric Graph Neural Networks"~\cite{Han2024}. Cette sous-section synthétise leurs apports principaux.
+
+\subsubsection{Taxonomie des approches (Duval et al., 2024)}
+
+Duval et al.~\cite{Duval2024} proposent une classification des GNNs géométriques pour systèmes atomiques 3D selon trois axes :
+
+\textbf{1. Niveau d'équivariance :}
+\begin{itemize}
+    \item \textbf{Invariance E(3)} : Output scalaire invariant (SchNet, DimeNet)
+    \item \textbf{Équivariance E(3)} : Features vectorielles/tensorielles équivariantes (PaiNN, EGNN)
+    \item \textbf{Équivariance SE(3)} : Groupe spécial euclidien (rotations propres uniquement, pas de réflexions)
+\end{itemize}
+
+\textbf{2. Représentation des features :}
+\begin{itemize}
+    \item \textbf{Scalaires uniquement} : Features invariantes $\mathbf{h}_i \in \mathbb{R}^F$
+    \item \textbf{Scalaires + Vecteurs} : $(\mathbf{s}_i, \mathbf{V}_i)$ avec $\mathbf{V}_i \in \mathbb{R}^{F \times 3}$
+    \item \textbf{Scalaires + Tenseurs d'ordre supérieur} : Harmoniques sphériques, représentations irréductibles
+\end{itemize}
+
+\textbf{3. Information géométrique utilisée :}
+\begin{itemize}
+    \item \textbf{Distances uniquement} : $r_{ij} = \|\mathbf{x}_i - \mathbf{x}_j\|$
+    \item \textbf{Distances + Angles} : Triplets $(i,j,k)$, angles $\theta_{ijk}$
+    \item \textbf{Distances + Vecteurs directionnels} : $\mathbf{r}_{ij} = \mathbf{x}_i - \mathbf{x}_j$
+    \item \textbf{Géométrie locale complète} : Frames locaux, coordonnées relatives
+\end{itemize}
+
+\subsubsection{Design patterns pour GNNs géométriques (Han et al., 2024)}
+
+Han et al.~\cite{Han2024} identifient des patterns de conception récurrents :
+
+\textbf{Pattern 1 : Invariants comme features de messages}
+\[
+\mathbf{m}_{ij} = \phi(\mathbf{h}_i, \mathbf{h}_j, r_{ij}, \theta_{ijk}, \ldots)
+\]
+Utiliser uniquement des quantités invariantes (distances, angles, produits scalaires) garantit l'équivariance.
+
+\textbf{Pattern 2 : Décomposition en produits directs}
+\[
+\mathbf{m}_{ij} = \phi_{\text{scalaire}}(\ldots) \odot \mathbf{v}_{\text{directionnel}}
+\]
+Séparer coefficient scalaire (appris) et partie directionnelle (géométrique).
+
+\textbf{Pattern 3 : Frames de référence locaux}
+Construire un repère orthonormé local $(e_1, e_2, e_3)$ pour chaque nœud, exprimer les vecteurs dans ce frame, garantit équivariance si le frame est construit de manière équivariante.
+
+\textbf{Pattern 4 : Harmoniques sphériques et tenseurs}
+Représenter les features angulaires via harmoniques sphériques $Y_l^m(\theta, \phi)$ :
+\[
+\mathbf{h}_i = \bigoplus_{l=0}^{L_{\max}} \mathbf{h}_i^{(l)}
+\]
+où $\mathbf{h}_i^{(l)}$ transforme selon la représentation irréductible de degré $l$ de SO(3).
+
+\subsubsection{Trade-offs fondamentaux}
+
+Les deux surveys identifient des compromis clés :
+
+\textbf{Expressivité vs Complexité :}
+\begin{itemize}
+    \item Scalaires seuls (SchNet) : Simple, $\mathcal{O}(|E|)$, mais limité
+    \item Vecteurs (PaiNN, EGNN) : Plus expressif, $\mathcal{O}(|E| \cdot F)$, coût modéré
+    \item Tenseurs ordre $L$ : Très expressif, $\mathcal{O}(|E| \cdot L^3)$, coûteux
+\end{itemize}
+
+\textbf{Information géométrique vs Inductive bias :}
+\begin{itemize}
+    \item Distances seules : Peu d'information, fort biais inductif (invariance E(3))
+    \item + Angles : Information directionnelle, complexité accrue
+    \item + Vecteurs : Équivariance explicite, grande flexibilité
+\end{itemize}
+
+\textbf{Invariance vs Équivariance :}
+\begin{itemize}
+    \item \textbf{Invariance} : Suffisante pour prédiction de scalaires (énergie), plus simple
+    \item \textbf{Équivariance} : Nécessaire pour prédiction vectorielle (forces), plus général
+\end{itemize}
+
+\subsubsection{Leçons pour les organoïdes}
+
+Ces surveys suggèrent plusieurs directions pour notre application aux organoïdes :
+
+\textbf{1. Choix d'architecture :}
+Pour classification (output scalaire), des modèles invariants simples (type EGNN avec features scalaires) suffisent. L'équivariance complète avec features vectorielles est sur-ingénierie.
+
+\textbf{2. Information géométrique :}
+Les organoïdes ont une géométrie moins contrainte que les molécules (pas d'angles de liaison fixes). Les distances et vecteurs directionnels suffisent, pas besoin d'angles explicites.
+
+\textbf{3. Scalabilité :}
+Avec 50-5000 cellules, la complexité $\mathcal{O}(|E|)$ est critique. Favoriser approches simples (EGNN, SchNet-like) plutôt que tenseurs d'ordre élevé.
+
+\textbf{4. Interprétabilité :}
+Les features scalaires sont plus faciles à interpréter biologiquement que des représentations tensorielles abstraites.
+
+\subsubsection{État de l'art : performances comparées}
+
+Les surveys rapportent des performances sur benchmarks de chimie quantique (QM9, MD17) :
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lccc}
+\hline
+\textbf{Modèle} & \textbf{Type} & \textbf{Énergie (MAE)} & \textbf{Forces (MAE)} \\
+\hline
+SchNet & Invariant, scalaires & 0.41 eV & - \\
+DimeNet++ & Invariant, angles & 0.33 eV & - \\
+PaiNN & Équivariant, vecteurs & 0.38 eV & 0.012 eV/Å \\
+EGNN & Équivariant, vecteurs & 0.48 eV & 0.019 eV/Å \\
+NequIP & Équivariant, tenseurs & 0.22 eV & 0.008 eV/Å \\
+\hline
+\end{tabular}
+\caption{Performances sur QM9 (adapté de Duval et al., 2024)}
+\end{table}
+
+Pour les organoïdes (classification, pas régression), les différences entre ces architectures sont moins critiques que pour prédiction d'énergies moléculaires précises.
 
 \subsection{Applications des GNNs géométriques}
 
@@ -703,329 +1732,135 @@ Segmentation et classification de nuages de points (LiDAR, scans 3D). Architectu
 
 \subsection{Adaptation aux données biologiques cellulaires}
 
-L'application de GNNs géométriques aux organoïdes requiert des adaptations :
+L'application de GNNs géométriques aux organoïdes s'inscrit dans un contexte plus large d'utilisation des GNNs en biologie et médecine~\cite{Zhang2021GNN,Lecca2023}. Cette sous-section examine les applications biologiques des GNNs, avec un focus particulier sur l'histopathologie et les tissus cellulaires, domaine le plus proche de notre cas d'usage.
 
-\subsubsection{Échelle et densité}
+\subsubsection{GNNs en histopathologie : enseignements du survey de Brussee et al.}
 
-Les graphes d'organoïdes (50-5000 cellules) sont plus petits que les molécules de drogues mais présentent une densité spatiale variable et des clusters, nécessitant des stratégies de connectivité adaptées.
+Le survey récent de Brussee et al.~\cite{Brussee2024} "Graph Neural Networks in Histopathology: Emerging Trends and Future Directions" offre une vue d'ensemble des applications des GNNs à l'analyse de tissus biologiques, avec des similitudes frappantes avec notre problématique organoïdes. Cette revue exhaustive révèle comment la communauté de pathologie computationnelle a progressivement adopté les architectures de graphes pour capturer l'organisation spatiale des tissus, un défi conceptuellement proche de celui posé par l'analyse structurale des organoïdes.
 
-\subsubsection{Features hétérogènes}
+\textbf{Représentations par graphes en histopathologie :}
 
-Contrairement aux atomes (types discrets en nombre limité), les cellules ont des features continues, multidimensionnelles, hétérogènes (morphologie, intensités multicanal), nécessitant normalisation et gestion appropriées.
+Brussee et al. identifient trois niveaux de représentation graphique des tissus, formant une hiérarchie de complexité croissante. Au niveau le plus fin, les \textit{graphes cellulaires} (Cell Graphs) représentent chaque cellule individuelle comme un nœud, positionné typiquement au centre de masse ou au noyau cellulaire. Les arêtes entre nœuds encodent la proximité spatiale via différentes stratégies de construction : K plus proches voisins, triangulation de Delaunay, ou connectivité par rayon fixe. Les features associées à chaque nœud capturent la morphologie cellulaire (aire, périmètre, excentricité, convexité), les intensités des marqueurs immunohistochimiques, et potentiellement le type cellulaire si disponible. Cette représentation est \textbf{exactement celle que nous utilisons pour les organoïdes}, validant empiriquement notre approche méthodologique.
 
-\subsubsection{Symétries relaxées}
+À un niveau intermédiaire d'abstraction, les \textit{graphes tissulaires} (Tissue Graphs) agrègent les cellules en régions fonctionnelles ou morphologiques : clusters cellulaires, glandes, lobules ou autres structures histologiques identifiables. Chaque région devient un nœud, et les arêtes capturent les relations spatiales entre ces entités de plus haut niveau. Les features de nœuds sont alors des statistiques agrégées calculées sur les populations cellulaires contenues dans chaque région. Cette approche pourrait s'avérer pertinente pour analyser des organoïdes complexes présentant des sous-structures différenciées (par exemple, un organoïde cérébral avec zones ventriculaires et zones corticales distinctes).
 
-Bien que l'invariance aux rotations soit désirée globalement, certains organoïdes présentent une polarisation intrinsèque (axe apico-basal). Le niveau d'équivariance souhaité doit être considéré.
+Enfin, les \textit{graphes hiérarchiques} (Hierarchical Graphs) exploitent une représentation multi-échelle, où l'information circule entre plusieurs niveaux : cellules individuelles au niveau le plus fin, agrégées en patches locaux, eux-mêmes regroupés en régions, jusqu'au slide histologique complet. Le pooling hiérarchique entre ces niveaux permet de capturer simultanément des patterns locaux (interactions cellule-cellule) et globaux (architecture tissulaire d'ensemble). Cette approche multi-résolution reste toutefois rare en histopathologie, la plupart des études se concentrant sur les graphes cellulaires simples.
 
-\section{Expressivité et limitations théoriques}
+\textbf{Architectures GNN utilisées en histopathologie :}
 
-\subsection{Weisfeiler-Lehman test}
+L'analyse quantitative de Brussee et al. révèle une distribution intéressante des architectures employées dans la littérature histopathologique. Les Graph Convolutional Networks (GCN) dominent avec environ 35\% des études, privilégiées pour leur simplicité conceptuelle et leur efficacité computationnelle sur de grands graphes cellulaires. Les Graph Attention Networks (GAT) suivent de près avec 30\% d'utilisation, leur mécanisme d'attention permettant de pondérer dynamiquement l'importance des cellules voisines — une capacité particulièrement utile dans les tissus hétérogènes où certaines cellules (par exemple tumorales infiltrantes) portent une information diagnostique plus riche. GraphSAGE représente environ 15\% des applications, apprécié pour sa scalabilité sur de très grands tissus grâce à son échantillonnage de voisinage. Les Graph Isomorphism Networks (GIN) comptent pour 10\%, choisis lorsque l'expressivité maximale est recherchée. Le reste (10\%) utilise des architectures de Message Passing personnalisées, adaptées à des contraintes spécifiques.
 
-\subsubsection{Algorithme WL}
+Une observation clé émerge de cette analyse : les architectures géométriques équivariantes (EGNN, SchNet, PaiNN, et leurs variantes) sont \textit{rarement} utilisées en histopathologie. Cette absence s'explique par plusieurs facteurs convergents. D'abord, les tissus biologiques sont généralement imagés dans une orientation canonique fixe : les coupes histologiques suivent des plans anatomiques standardisés, et les lames sont montées selon des conventions établies. L'invariance aux rotations arbitraires n'apporte donc aucun bénéfice pratique. Ensuite, les performances des architectures GNN standards (GCN, GAT) se sont révélées amplement suffisantes pour les tâches de classification tissulaire, rendant inutile la complexité supplémentaire des modèles équivariants. Enfin, le coût computationnel additionnel des GNNs géométriques n'est pas justifié lorsque l'équivariance n'est pas requise.
 
-Le test de Weisfeiler-Lehman (1-WL) est un algorithme itératif testant l'isomorphisme de graphes :
+Cette observation a une implication directe pour notre travail sur les organoïdes : elle suggère qu'une architecture GNN standard (GCN, GAT, GIN) pourrait en principe suffire pour la classification. Cependant, notre utilisation d'EGNN (équivariant) apporte une valeur ajoutée spécifique à notre contexte : contrairement aux sections tissulaires orientées canoniquement, les organoïdes sont cultivés en suspension 3D et imagés dans des orientations arbitraires. Cette différence fondamentale justifie l'emploi d'une architecture respectant l'équivariance E(3), transformant ce qui serait sur-ingénierie en histopathologie en choix architectural pertinent pour les organoïdes.
 
-\begin{enumerate}
-    \item Initialiser chaque nœud avec un label (degré ou label initial)
-    \item Itérer : nouveau label = hash(label ancien, multiset labels voisins)
-    \item Comparer les multisets de labels finaux des deux graphes
-\end{enumerate}
+\textbf{Tâches et performances :}
 
-Si les multisets diffèrent, les graphes sont non-isomorphes. Sinon, inconnu.
+Le survey de Brussee et al. compile les résultats de plusieurs dizaines d'études, révélant le spectre d'applications et les niveaux de performance atteints par les GNNs en pathologie computationnelle. Pour la prédiction de survie des patients à partir de l'architecture tissulaire, les modèles GNN atteignent typiquement des C-index entre 0.65 et 0.75, surpassant significativement les approches basées sur des features morphologiques manuellement définies. La classification de sous-types tumoraux représente une application majeure, avec des accuracy de 85-95\% rapportées sur des cancers colorectaux, du sein et de la prostate — des performances comparables aux diagnostics de pathologistes experts. Les GNNs montrent également leur utilité pour prédire la réponse thérapeutique à partir de biopsies pré-traitement, avec des aires sous courbe ROC (AUC) de 0.70-0.85, ouvrant des perspectives pour la médecine personnalisée. Enfin, la détection de métastases dans les ganglions lymphatiques atteint des accuracy de 90-95\%, souvent en servant de système d'aide au diagnostic pour réduire la charge de travail des pathologistes.
 
-\subsubsection{Lien avec les GNNs}
+Ces performances sont encourageantes pour notre travail : l'accuracy de 90-95\% que nous visons pour la classification d'organoïdes se situe dans la fourchette haute des résultats histopathologiques, suggérant que cet objectif est réaliste avec des architectures GNN appropriées et des données de qualité suffisante.
 
-Xu et al. (2019) ont prouvé que les GNNs utilisant somme+agrégation sont au plus aussi puissants que 1-WL. GIN atteint cette borne. GCN et GAT sont strictement moins expressifs.
+\textbf{Défis identifiés (directement pertinents pour nous) :}
 
-\textbf{Implications :}
-\begin{itemize}
-    \item Certains graphes non-isomorphes sont indistinguables par GNNs standards
-    \item Pour la classification d'organoïdes, c'est généralement suffisant (graphes très différents)
-    \item Pour tâches nécessitant discrimination fine, des architectures plus puissantes (k-WL, higher-order) peuvent être nécessaires
-\end{itemize}
+Brussee et al. identifient plusieurs défis méthodologiques et pratiques qui résonnent directement avec les problématiques rencontrées dans notre travail sur organoïdes. Le premier concerne la \textit{construction des graphes} elle-même : le choix du paramètre K dans l'algorithme K-NN, ou du rayon de connectivité dans les approches par distance, influence significativement les performances finales. Les auteurs recommandent d'explorer K entre 5 et 10 pour les tissus biologiques, et surtout d'évaluer plusieurs configurations par validation croisée plutôt que de fixer arbitrairement ce paramètre. Cette recommandation s'applique directement à nos graphes cellulaires d'organoïdes.
 
-\subsection{Over-smoothing}
+L'\textit{hétérogénéité des features} constitue un deuxième défi majeur. Les features morphologiques (aires, périmètres, formes) et les intensités de marqueurs fluorescents opèrent sur des échelles très différentes, rendant la normalisation essentielle — typiquement via z-scores calculés pour chaque feature indépendamment. De plus, la présence de features fortement corrélées peut induire de la redondance ; une réduction de dimensionnalité (PCA, sélection de features) peut s'avérer bénéfique dans ces cas.
 
-\subsubsection{Phénomène}
+Le \textit{déséquilibre de classes} apparaît fréquemment en pathologie, où certains sous-types tumoraux sont rares comparés à d'autres. Les solutions incluent l'over/under-sampling, l'utilisation de fonctions de loss pondérées par l'inverse de la fréquence des classes, ou encore la data augmentation ciblée sur les classes minoritaires. Ce défi est directement pertinent pour nos organoïdes, où certaines lignées ou conditions expérimentales peuvent être sous-représentées.
 
-Avec un nombre de couches $K$ croissant, les représentations de tous les nœuds convergent vers une valeur commune, perdant toute information de structure.
+L'\textit{interprétabilité} des modèles est cruciale en contexte médical pour garantir l'acceptation clinique et la confiance des utilisateurs. Les techniques comme GNNExplainer (qui identifie les sous-graphes les plus informatifs), l'analyse des poids d'attention (dans les GAT), ou la visualisation de l'importance des cellules individuelles permettent de relier les prédictions du modèle à des patterns biologiques interprétables. Cette validation biologique des patterns appris est indispensable pour dépasser le statut de "boîte noire" et comprendre ce que le réseau a effectivement capturé.
 
-\textbf{Intuition :}
-Chaque couche "dilue" l'information en moyennant avec les voisins. Après $K$ couches, tous les nœuds ont accès à une information similaire (agrégation sur $K$-hop voisinage), rendant leurs représentations indistinguables.
+Enfin, la \textit{généralisation inter-cohortes} représente un défi récurrent : les modèles entraînés sur des données d'un laboratoire ou protocole donné peuvent mal performer sur des données issues d'autres sources, en raison de variations dans les protocoles de coloration, les scanners utilisés, ou les procédures de préparation. Les stratégies de normalisation de domaine, le fine-tuning sur des petits ensembles de données de la nouvelle cohorte, ou l'adversarial training pour rendre les représentations invariantes au domaine sont des pistes explorées pour améliorer la robustesse.
 
-\textbf{Analyse théorique :}
-Pour GCN, les représentations convergent vers l'espace propre dominant du Laplacien normalisé.
+\textbf{Leçons pour notre travail sur organoïdes :}
 
-\subsubsection{Conséquences pratiques}
+Cette analyse détaillée de l'état de l'art histopathologique apporte plusieurs enseignements directement exploitables pour notre recherche. D'abord, elle valide fondamentalement notre approche : les Cell Graphs, représentation exacte que nous utilisons, sont l'approche dominante et la plus efficace en pathologie computationnelle pour capturer l'organisation spatiale cellulaire. Ensuite, concernant les architectures, les GNN standards (GCN, GAT, GIN) ont démontré leur suffisance pour les tâches de classification tissulaire, mais notre choix d'EGNN apporte une équivariance géométrique justifiée par la nature 3D et l'orientation arbitraire des organoïdes en suspension — un avantage absent en histopathologie 2D.
 
-\begin{itemize}
-    \item Les GNNs standards sont limités à 2-4 couches en pratique
-    \item Les réseaux profonds (> 8 couches) voient leurs performances s'effondrer
-    \item Problématique pour graphes de grand diamètre nécessitant propagation longue distance
-\end{itemize}
+Le choix de nos features (morphologie cellulaire + intensités multicanal) s'aligne avec les standards établis en histopathologie, confortant notre pipeline d'extraction. L'interprétabilité doit être intégrée dès la conception via des outils comme GNNExplainer, non pas comme ajout cosmétique mais comme composante essentielle pour la validation biologique et l'acceptabilité des résultats. Enfin, nos 1311 échantillons d'organoïdes, bien que substantiels pour un dataset de recherche académique, restent modestes comparés aux 1000-10000 slides typiques des études histopathologiques à large échelle ; cela souligne l'importance critique de la data augmentation et potentiellement du transfert d'apprentissage depuis des données synthétiques ou pré-entraînées.
 
-\subsubsection{Solutions proposées}
+\subsubsection{Autres applications biologiques des GNNs}
 
-\begin{itemize}
-    \item \textbf{Skip connections} : Connexions résiduelles préservant information initiale
-    \item \textbf{Initial residual connections} : $\mathbf{h}_i^{(k+1)} = \mathbf{h}_i^{(k)} + \Delta\mathbf{h}_i^{(k)}$
-    \item \textbf{Jumping Knowledge} : Concaténer représentations de toutes les couches
-    \item \textbf{PairNorm, DGN} : Normalisation des représentations pour préserver diversité
-\end{itemize}
+Au-delà de l'histopathologie, les GNNs trouvent des applications dans plusieurs domaines biologiques et médicaux, chacun avec ses spécificités en termes de construction de graphes et de tâches prédictives. En neurosciences~\cite{Luo2024,Bessadok2022}, les GNNs opèrent sur des graphes de connectivité cérébrale construits à partir d'imagerie par résonance magnétique fonctionnelle (fMRI) ou de tractographie (DTI). Chaque région cérébrale constitue un nœud, et les connexions fonctionnelles ou structurelles forment les arêtes. Ces modèles permettent de prédire des troubles neurologiques comme la maladie d'Alzheimer ou les troubles du spectre autistique, et d'identifier des biomarqueurs de connectivité pathologique. Contrairement à nos graphes spatiaux d'organoïdes, ces graphes cérébraux sont abstraits : la topologie reflète des corrélations fonctionnelles plutôt qu'une proximité physique.
 
-\subsection{Over-squashing}
+L'analyse single-cell~\cite{Shahir2024} représente un autre domaine d'application prometteur. Ici, les graphes encodent la similarité entre cellules individuelles mesurée par séquençage d'ARN (RNA-seq). Chaque cellule devient un nœud caractérisé par un vecteur d'expression génique de haute dimension (typiquement 2000-5000 gènes), et les arêtes connectent des cellules au profil transcriptomique proche. Les GNNs facilitent le clustering cellulaire, l'inférence de trajectoires développementales, et l'identification de types cellulaires. Des approches comme Cellograph proposent des méthodes semi-supervisées pour analyser simultanément des cellules issues de conditions expérimentales multiples. Bien que ces graphes soient aussi cellulaires comme les nôtres, ils opèrent dans un espace de features abstraites (expression génique) plutôt que dans l'espace physique 3D.
 
-\subsubsection{Problème de goulets d'étranglement}
+Enfin, en biologie des réseaux~\cite{Zhang2021GNN}, les GNNs analysent des réseaux d'interactions moléculaires : réseaux protéine-protéine où chaque protéine est un nœud et les interactions physiques ou fonctionnelles forment les arêtes, réseaux métaboliques, ou réseaux de régulation génique. Ces modèles permettent de prédire des fonctions géniques inconnues par propagation d'annotations dans le réseau, ou d'identifier des cibles thérapeutiques potentielles en analysant les interactions drogue-protéine. Ces applications illustrent la polyvalence des GNNs au-delà des graphes spatiaux, mais s'éloignent conceptuellement de notre problématique d'analyse morphologique d'organoïdes.
 
-L'information doit traverser des goulets d'étranglement topologiques (nœuds de faible degré, coupes minimales) pour se propager. Cela cause une compression/perte d'information~\cite{Alon2021}.
+\subsubsection{Spécificités des organoïdes vs autres données biologiques}
 
-\textbf{Exemple :}
-Dans un graphe en "haltère" (deux clusters denses connectés par un nœud pont), l'information des deux clusters doit passer par le nœud pont, créant un bottleneck.
+Notre application aux organoïdes présente des caractéristiques uniques qui justifient certains choix architecturaux et méthodologiques, tout en s'inscrivant dans un continuum d'approches GNN pour données biologiques.
 
-\subsubsection{Relation avec courbure}
+En termes d'\textit{échelle et densité}, les organoïdes occupent une position intermédiaire. Typiquement composés de 50 à 5000 cellules avec une densité variable et une organisation en clusters, ils sont plus petits que les images histopathologiques standards (1000 à 100000 cellules par champ, densité élevée et relativement uniforme) mais comparables aux graphes single-cell (1000 à 50000 cellules, bien que ces derniers soient des graphes abstraits de similarité plutôt que spatiaux). Cette échelle modérée rend les GNNs particulièrement appropriés : suffisamment de cellules pour capturer des patterns structuraux complexes, mais pas au point de nécessiter des stratégies d'échantillonnage intensif comme GraphSAGE.
 
-Des travaux récents lient l'over-squashing à la courbure discrète des graphes (courbure de Ricci). Les graphes de courbure négative (expansifs) facilitent la propagation ; les graphes de courbure positive (contractifs) l'entravent.
+La \textit{géométrie 3D native} constitue sans doute la spécificité la plus marquante des organoïdes. Contrairement à l'histopathologie, qui analyse des sections 2D de tissus 3D avec une perte inévitable d'information le long de l'axe Z, nos données d'organoïdes capturent la vraie structure tridimensionnelle via microscopie confocale ou light-sheet. Cette géométrie 3D complète justifie pleinement l'utilisation de GNNs géométriques équivariants, capables d'exploiter les coordonnées spatiales et de respecter l'invariance aux transformations euclidiennes. En histopathologie 2D, cette équivariance géométrique serait sur-dimensionnée ; pour les organoïdes en suspension 3D, elle devient un atout architectural majeur.
 
-\subsubsection{Atténuation}
+Concernant les \textit{features}, les organoïdes combinent des descripteurs morphologiques cellulaires (aires, volumes, excentricités) et des intensités multicanal continues provenant de marqueurs fluorescents. Cette nature hybride est similaire à l'histopathologie (couleur RGB, marqueurs immunohistochimiques), mais contraste avec les graphes single-cell où les features sont des vecteurs d'expression génique de très haute dimension (2000-5000 dimensions, souvent sparse). Notre espace de features est donc modérément dimensionnel (typiquement 10-50 features par cellule) et dense, facilitant l'apprentissage avec des architectures GNN standards.
 
-\begin{itemize}
-    \item Rewiring du graphe pour améliorer la connectivité
-    \item Ajout d'arêtes longue-distance
-    \item Architectures avec agrégation multi-échelles
-\end{itemize}
+La \textit{taille du dataset} représente une contrainte importante. Nos 1311 échantillons d'organoïdes, bien que substantiels pour un dataset académique de biologie, demeurent modestes comparés aux études histopathologiques à large échelle (typiquement 100 à 10000 slides) ou même aux datasets single-cell (10 à 100 échantillons mais contenant chacun des milliers de cellules analysables indépendamment). Cette limitation souligne la nécessité de stratégies de data augmentation efficaces et suggère l'intérêt du pré-entraînement sur données synthétiques — une approche que nous explorons dans ce travail.
 
-\section{Statistiques spatiales pour données ponctuelles}
+L'\textit{orientation arbitraire} des organoïdes en suspension 3D constitue un différentiateur clé par rapport à l'histopathologie. Les lames histologiques sont montées selon des conventions anatomiques standardisées, éliminant le besoin d'invariance aux rotations. Les organoïdes, eux, sont imagés dans des orientations aléatoires dictées par leur position dans le milieu de culture. Cette variabilité orientationnelle inhérente rend l'équivariance E(3) non seulement utile mais pratiquement indispensable pour des performances robustes, sans recourir à une augmentation de données exhaustive par rotations.
 
-Les processus ponctuels spatiaux modélisent la distribution aléatoire de points dans l'espace~\cite{Illian2008,Diggle2013,Baddeley2015}. Ils sont fondamentaux pour notre génération de données synthétiques.
-
-\subsection{Processus de Poisson : fondation}
-
-\subsubsection{Processus de Poisson homogène}
-
-Le processus de Poisson homogène (PPH) d'intensité $\lambda$ sur un domaine $D \subset \mathbb{R}^d$ est caractérisé par :
-
-\textbf{1. Nombre de points :}
-Le nombre de points $N$ dans $D$ suit une loi de Poisson :
-\[
-P(N = n) = \frac{(\lambda |D|)^n}{n!}e^{-\lambda |D|}
-\]
-
-où $|D|$ est l'aire (2D) ou le volume (3D) de $D$.
-
-\textbf{2. Positions indépendantes :}
-Conditionnellement sur $N = n$, les positions des $n$ points sont indépendantes et uniformément distribuées dans $D$.
-
-\textbf{Propriétés remarquables :}
-\begin{itemize}
-    \item Indépendance complète : aucune interaction entre points
-    \item Superposition : somme de processus de Poisson indépendants $\rightarrow$ Poisson
-    \item Modèle de référence de "hasard complet" (Complete Spatial Randomness - CSR)
-\end{itemize}
-
-\subsubsection{Processus de Poisson inhomogène}
-
-Extension où l'intensité varie spatialement : $\lambda = \lambda(\mathbf{x})$ fonction de la position.
-
-\textbf{Nombre de points dans une région $A$ :}
-\[
-N_A \sim \text{Poisson}\left(\int_A \lambda(\mathbf{x}) d\mathbf{x}\right)
-\]
-
-\textbf{Interprétation biologique :}
-Les gradients de $\lambda$ modélisent des gradients biologiques (prolifération différentielle, zonation fonctionnelle).
-
-\subsubsection{Simulation}
-
-\textbf{PPH :}
-\begin{enumerate}
-    \item Tirer $N \sim \text{Poisson}(\lambda |D|)$
-    \item Placer $N$ points uniformément et indépendamment dans $D$
-\end{enumerate}
-
-\textbf{PPI :}
-\begin{enumerate}
-    \item Méthode d'acceptation-rejet (thinning) : générer PPH avec $\lambda_{\max}$ puis accepter chaque point avec probabilité $\lambda(\mathbf{x})/\lambda_{\max}$
-    \item Ou méthode d'inversion pour distributions spécifiques
-\end{enumerate}
-
-\subsection{Processus avec interactions}
-
-\subsubsection{Processus de Matérn (clustering)}
-
-Génère des clusters de points.
-
-\textbf{Algorithme :}
-\begin{enumerate}
-    \item Générer centres de clusters selon un PPH de faible intensité $\lambda_{\text{parent}}$
-    \item Autour de chaque centre, générer un nombre aléatoire de points selon PPH d'intensité $\lambda_{\text{cluster}}$ dans un rayon $r$
-\end{enumerate}
-
-\textbf{Paramètres :}
-$(\lambda_{\text{parent}}, \lambda_{\text{cluster}}, r)$ contrôlent le degré de clustering.
-
-\textbf{Interprétation biologique :}
-Modélise l'agrégation cellulaire, formations de niches, prolifération locale amplifiée.
-
-\subsubsection{Processus de Strauss (répulsion)}
-
-Processus de Gibbs avec énergie pénalisant les paires de points proches.
-
-\textbf{Densité :}
-\[
-p(\mathbf{x}) \propto \beta^n \gamma^{s(\mathbf{x})}
-\]
-
-où $n$ est le nombre de points, $s(\mathbf{x})$ le nombre de paires à distance $< r$, $\gamma \in [0,1]$ paramètre de répulsion.
-
-\textbf{Simulation :}
-Méthodes MCMC (Metropolis-Hastings) car pas de forme close.
-
-\textbf{Interprétation biologique :}
-Modélise l'exclusion stérique entre cellules, régularité spatiale observée dans certains épithéliums.
-
-\subsection{Fonctions de Ripley}
-
-Les fonctions de Ripley~\cite{Ripley1977} caractérisent l'organisation spatiale d'un processus ponctuel.
-
-\subsubsection{Fonction K de Ripley}
-
-\textbf{Définition :}
-\[
-K(r) = \frac{1}{\lambda} \mathbb{E}[\text{nombre de points dans rayon } r \text{ d'un point typique}]
-\]
-
-\textbf{Estimateur :}
-\[
-\hat{K}(r) = \frac{|D|}{N^2} \sum_{i=1}^N \sum_{j \neq i} \mathbb{1}(\|\mathbf{x}_i - \mathbf{x}_j\| \leq r) \cdot w_{ij}
-\]
-
-où $w_{ij}$ corrige les effets de bord.
-
-\textbf{Valeur théorique pour PPH :}
-\begin{itemize}
-    \item 2D : $K(r) = \pi r^2$
-    \item 3D : $K(r) = \frac{4}{3}\pi r^3$
-\end{itemize}
-
-\textbf{Interprétation :}
-\begin{itemize}
-    \item $K_{\text{obs}}(r) > K_{\text{Poisson}}(r)$ : agrégation (clustering)
-    \item $K_{\text{obs}}(r) < K_{\text{Poisson}}(r)$ : régularité (répulsion)
-    \item $K_{\text{obs}}(r) \approx K_{\text{Poisson}}(r)$ : distribution aléatoire (CSR)
-\end{itemize}
-
-\subsubsection{Fonction L (transformation stabilisée)}
-
-Pour faciliter l'interprétation, on utilise souvent :
-\[
-L(r) = \sqrt{\frac{K(r)}{\pi}} - r \quad \text{(2D)} \quad \text{ou} \quad L(r) = \left(\frac{3K(r)}{4\pi}\right)^{1/3} - r \quad \text{(3D)}
-\]
-
-Pour CSR, $L(r) = 0$. Écarts positifs/négatifs indiquent clustering/régularité.
-
-\subsubsection{Fonction F (nearest neighbor)}
-
-Distribution des distances au plus proche voisin :
-\[
-F(r) = P(\text{distance au plus proche voisin} \leq r)
-\]
-
-\textbf{Pour PPH :}
-\[
-F(r) = 1 - \exp(-\lambda \pi r^2) \quad \text{(2D)}
-\]
-
-Processus réguliers ont $F$ plus faible (distances plus grandes), processus agrégés ont $F$ plus élevée.
-
-\subsubsection{Fonction G}
-
-Distribution des distances entre points quelconques :
-\[
-G(r) = P(\text{distance d'un point typique au plus proche autre point} \leq r)
-\]
-
-\subsection{Extension aux surfaces courbes}
-
-\subsubsection{Processus ponctuels sur la sphère}
-
-Pour les organoïdes (souvent sphériques), les processus sont définis sur $\mathbb{S}^2$ (sphère unitaire en 3D).
-
-\textbf{Distance géodésique :}
-Sur la sphère de rayon $R$, la distance géodésique entre deux points de coordonnées angulaires $(\theta_1, \phi_1)$ et $(\theta_2, \phi_2)$ est :
-\[
-d_g = R \arccos(\sin\theta_1\sin\theta_2\cos(\phi_1-\phi_2) + \cos\theta_1\cos\theta_2)
-\]
-
-\textbf{Aire d'une calotte sphérique :}
-Une calotte de rayon géodésique $r$ a une aire :
-\[
-A(r) = 2\pi R^2(1 - \cos(r/R))
-\]
-
-\textbf{Fonction K sur la sphère :}
-\[
-K(r) = 2\pi(1 - \cos(r/R))
-\]
-
-pour un processus de Poisson sur $\mathbb{S}^2$ de rayon $R$.
-
-\subsubsection{Simulation sur la sphère}
-
-\textbf{Poisson homogène sur $\mathbb{S}^2$ :}
-\begin{enumerate}
-    \item Tirer $N \sim \text{Poisson}(4\pi R^2 \lambda)$
-    \item Pour chaque point : $\theta \sim \arccos(U[-1,1])$, $\phi \sim U[0, 2\pi]$
-\end{enumerate}
-
-\textbf{Processus inhomogène :}
-Utiliser thinning avec fonction d'intensité $\lambda(\theta, \phi)$.
-
-\subsection{Tests statistiques}
-
-\subsubsection{Enveloppes de confiance}
-
-Pour tester si un pattern observé diffère significativement du CSR :
-\begin{enumerate}
-    \item Simuler $M$ réalisations de PPH (typiquement $M = 99$ ou $M = 999$)
-    \item Calculer $K(r)$ pour chaque simulation
-    \item Construire enveloppes : min/max ou percentiles (2.5\%, 97.5\%)
-    \item Comparer $K_{\text{obs}}(r)$ aux enveloppes
-\end{enumerate}
-
-Si $K_{\text{obs}}$ sort des enveloppes, rejet de l'hypothèse CSR au niveau $\alpha = 0.05$ (pour 99 simulations).
-
-\subsubsection{Tests formels}
-
-\textbf{Test de Monte Carlo :}
-P-value = rang de $K_{\text{obs}}$ parmi les $M$ simulations / $(M+1)$.
-
-\textbf{Test de Diggle :}
-Statistique intégrée basée sur l'écart cumulé :
-\[
-U = \int_{r_{\min}}^{r_{\max}} [K_{\text{obs}}(r) - K_{\text{Poisson}}(r)]^2 dr
-\]
-
-\subsection{Applications en biologie cellulaire}
-
-Les statistiques spatiales sont utilisées depuis longtemps en biologie cellulaire :
-\begin{itemize}
-    \item Distribution de récepteurs membranaires (clustering vs distribution aléatoire)
-    \item Organisation de protéines dans le noyau
-    \item Arrangement de cellules dans des tissus développementaux
-    \item Patron de division cellulaire dans des épithéliums
-\end{itemize}
-
-Leur application à la validation d'organoïdes synthétiques (notre contribution) assure le réalisme statistique des données générées.
+Enfin, l'\textit{interprétabilité biologique} des résultats revêt une importance capitale. Pour les organoïdes comme en histopathologie, les cellules individuelles sont identifiables visuellement, et les patterns morphologiques appris par le réseau peuvent être interprétés et validés par des biologistes. Cette interprétabilité directe contraste avec les graphes single-cell, où l'interprétation passe par des voies biologiques abstraites et des ontologies géniques. La possibilité de visualiser quelles cellules ou quelles régions de l'organoïde contribuent le plus à la prédiction (via GNNExplainer ou attention maps) offre une validation biologique indispensable et renforce la confiance dans les modèles.
 
 \section{Récapitulatif}
 
-Ce chapitre a établi les fondements théoriques nécessaires :
+Ce chapitre a établi les fondements théoriques des Graph Neural Networks et leurs applications aux données biologiques géométriques, depuis les principes mathématiques jusqu'aux architectures de pointe.
+
+\subsection*{Fondements théoriques}
+
+\textbf{Théorie des graphes} : Nous avons introduit les définitions formelles des graphes, leurs représentations matricielles (adjacence, Laplacien), et les propriétés spécifiques aux graphes géométriques où les nœuds possèdent des coordonnées spatiales. Les métriques topologiques (degré, clustering, centralité) et les stratégies de construction (K-NN, rayon fixe, Delaunay) ont été présentées, constituant la base de nos graphes cellulaires d'organoïdes.
+
+\textbf{Paradigme Message Passing Neural Network} : Le framework unifié MPNN formalise la plupart des architectures GNN via deux opérations fondamentales : l'agrégation de messages des voisins et la mise à jour des états de nœuds. Nous avons distingué les approches spectrales (convolutions via décomposition propre du Laplacien) des approches spatiales (agrégation directe sur le graphe), avec une attention particulière portée aux \textit{filtres de Chebyshev} qui approximent efficacement les filtres spectraux par des polynômes, réduisant la complexité de $\mathcal{O}(N^3)$ à $\mathcal{O}(K|E|)$ tout en localisant spatialement les opérations.
+
+\subsection*{Architectures GNN standards}
+
+Nous avons présenté les architectures majeures pour graphes généraux :
+
+\textbf{GCN} (Graph Convolutional Networks) avec sa dérivation détaillée depuis les filtres de Chebyshev d'ordre 1 : l'approximation $\lambda_{\max} \approx 2$, la réduction des paramètres, et l'ajout de self-loops conduisent à l'opération de convolution normalisée symétrique qui définit GCN. Cette architecture offre un excellent équilibre simplicité/efficacité.
+
+\textbf{GAT} (Graph Attention Networks) introduit un mécanisme d'attention permettant de pondérer dynamiquement l'importance des voisins, avec des extensions multi-têtes et GATv2 corrigeant certaines limitations. \textbf{GraphSAGE} privilégie la scalabilité via l'échantillonnage de voisinage et l'apprentissage inductif. \textbf{GIN} (Graph Isomorphism Networks) atteint l'expressivité maximale théorique (test de Weisfeiler-Lehman 1-WL) grâce à une agrégation injective. \textbf{PNA} (Principal Neighbourhood Aggregation) combine plusieurs agrégateurs et scalers adaptatifs pour améliorer l'expressivité. Les \textbf{Graph Transformers} généralisent l'attention des Transformers aux graphes avec encodages structurels, et \textbf{Jumping Knowledge} permet d'agréger l'information de multiples couches.
+
+\subsection*{GNNs géométriques équivariants}
+
+Cette section centrale couvre les architectures exploitant explicitement les coordonnées 3D :
+
+\textbf{Concepts fondamentaux} : Nous avons formalisé les groupes de symétries E(n) (euclidien), SE(3) (euclidien spécial), O(3) (orthogonal) et la distinction cruciale entre invariance (output inchangé) et équivariance (output transformé de manière cohérente). L'équivariance permet de construire des architectures intrinsèquement robustes aux transformations géométriques sans augmentation de données exhaustive.
+
+\textbf{Architectures principales} présentées dans un ordre croissant de complexité :
 \begin{itemize}
-    \item \textbf{Théorie des graphes} : Définitions, représentations, graphes géométriques
-    \item \textbf{GNNs standards} : Paradigme MPNN, architectures (GCN, GAT, GraphSAGE, GIN)
-    \item \textbf{GNNs géométriques} : Équivariance E(n), EGNN et variantes
-    \item \textbf{Limitations} : Expressivité (WL-test), over-smoothing, over-squashing
-    \item \textbf{Statistiques spatiales} : Processus ponctuels, fonctions de Ripley, tests
+    \item \textbf{EGNN} : Messages construits avec invariants (distances), mise à jour équivariante des coordonnées via vecteurs directionnels, simplicité d'implémentation avec garanties théoriques E(n)
+    \item \textbf{SchNet} : Convolutions continues via RBF expansion des distances, filtres radiaux, invariance E(3) mais pas équivariance
+    \item \textbf{DimeNet} : Intègre angles en plus des distances via triplets de nœuds, SBF expansion, expressivité géométrique accrue
+    \item \textbf{PaiNN} : Features scalaires + vectorielles, équivariance partielle permettant prédiction de forces
+    \item \textbf{Architectures tensorielles} : NequIP, TFN, Cormorant, SE(3)-Transformers utilisent représentations via harmoniques sphériques pour expressivité maximale mais complexité $\mathcal{O}(L^3)$
 \end{itemize}
 
-Ces concepts seront mobilisés dans les chapitres suivants : le Chapitre 4 décrira comment nous construisons des graphes géométriques d'organoïdes et appliquons des EGNNs, tandis que le Chapitre 4 utilisera les processus ponctuels pour générer des données synthétiques validées statistiquement.
+\textbf{Panorama des surveys récents} (Duval et al. 2024, Han et al. 2024) : Nous avons synthétisé les taxonomies proposées (niveau d'équivariance, représentation des features, information géométrique), les design patterns récurrents (invariants comme messages, décomposition en produits directs, frames locaux, harmoniques sphériques), et les trade-offs fondamentaux (expressivité vs complexité, information géométrique vs biais inductif, invariance vs équivariance). Un tableau comparatif des performances sur QM9 et MD17 illustre ces compromis.
+
+\subsection*{Adaptation aux données biologiques cellulaires}
+
+\textbf{Histopathologie} (survey Brussee et al. 2024) : Analyse détaillée révélant que les Cell Graphs (nœuds = cellules, arêtes = proximité spatiale) dominent en pathologie computationnelle, avec GCN (35\%) et GAT (30\%) comme architectures privilégiées. Les performances atteignent 85-95\% accuracy pour classification de sous-types tumoraux. Observation clé : les architectures équivariantes sont rarement utilisées car les tissus sont imagés dans des orientations canoniques. Les défis identifiés (construction de graphes, normalisation, déséquilibre de classes, interprétabilité, généralisation inter-cohortes) sont directement pertinents pour nos organoïdes.
+
+\textbf{Autres applications biologiques} : Neurosciences (graphes de connectivité cérébrale fMRI/DTI), analyse single-cell (graphes de similarité transcriptomique), biologie des réseaux (interactions protéine-protéine), chimie quantique (prédiction de propriétés moléculaires).
+
+\textbf{Spécificités des organoïdes} : Analyse comparative détaillée révélant des caractéristiques uniques qui justifient nos choix architecturaux :
+\begin{itemize}
+    \item \textbf{Géométrie 3D native} : Contrairement à l'histopathologie 2D, justifie pleinement les GNNs équivariants
+    \item \textbf{Orientation arbitraire} : En suspension, pas d'orientation canonique → équivariance E(3) indispensable
+    \item \textbf{Échelle intermédiaire} : 50-5000 cellules, entre molécules et tissus, idéale pour GNNs
+    \item \textbf{Features hybrides} : Morphologie + intensités multicanal, modérément dimensionnel (10-50 features)
+    \item \textbf{Dataset modeste} : 1311 échantillons → nécessite data augmentation et transfer learning
+    \item \textbf{Interprétabilité} : Cellules visuellement identifiables, patterns morphologiques validables biologiquement
+\end{itemize}
+
+\subsection*{Choix architecturaux justifiés pour les organoïdes}
+
+Cette revue extensive justifie notre stratégie expérimentale :
+\begin{itemize}
+    \item \textbf{Comparaison systématique} : Évaluation de GCN, GAT, GraphSAGE, GIN (standards) et EGNN (équivariant)
+    \item \textbf{EGNN comme architecture principale} : Équilibre optimal équivariance/complexité pour classification avec géométrie 3D
+    \item \textbf{Validation du paradigme Cell Graph} : Approche dominante en histopathologie, transposable aux organoïdes
+    \item \textbf{Écartement des architectures tensorielles} : Sur-ingénierie pour output scalaire (classe), coût prohibitif sur graphes de 1000+ nœuds, interprétabilité réduite
+\end{itemize}
+
+Ces fondements théoriques et cette analyse comparative seront mobilisés dans le Chapitre 4, où nous décrirons la construction concrète des graphes géométriques d'organoïdes, l'extraction des features cellulaires, l'implémentation des architectures GNN comparées, ainsi que les stratégies de génération de données synthétiques et de transfer learning pour pallier la limitation de nos données.

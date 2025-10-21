@@ -536,6 +536,87 @@ Modélise $f(\text{hyperparams}) \rightarrow \text{performance}$ par processus g
 
 Ce chapitre approfondit les aspects avancés de la théorie des graphes et des GNN non couverts dans le Chapitre 3.
 
+\section{Expressivité et limitations théoriques des GNNs}
+
+Cette section développe les aspects théoriques de l'expressivité des Graph Neural Networks, leurs limitations fondamentales, et les solutions proposées.
+
+\subsection{Weisfeiler-Lehman test}
+
+\subsubsection{Algorithme WL}
+
+Le test de Weisfeiler-Lehman (1-WL) est un algorithme itératif testant l'isomorphisme de graphes :
+
+\begin{enumerate}
+    \item Initialiser chaque nœud avec un label (degré ou label initial)
+    \item Itérer : nouveau label = hash(label ancien, multiset labels voisins)
+    \item Comparer les multisets de labels finaux des deux graphes
+\end{enumerate}
+
+Si les multisets diffèrent, les graphes sont non-isomorphes. Sinon, inconnu.
+
+\subsubsection{Lien avec les GNNs}
+
+Xu et al.~\cite{Xu2019} ont prouvé que les GNNs utilisant somme+agrégation sont au plus aussi puissants que 1-WL. GIN atteint cette borne. GCN et GAT sont strictement moins expressifs.
+
+\textbf{Implications :}
+\begin{itemize}
+    \item Certains graphes non-isomorphes sont indistinguables par GNNs standards
+    \item Pour la classification d'organoïdes, c'est généralement suffisant (graphes très différents)
+    \item Pour tâches nécessitant discrimination fine, des architectures plus puissantes (k-WL, higher-order) peuvent être nécessaires
+\end{itemize}
+
+Des analyses théoriques récentes~\cite{Morris2023WL,Grohe2023,Boker2023} ont approfondi notre compréhension de l'expressivité des GNNs, établissant des liens avec la logique et la complexité descriptive. Des extensions au-delà de 1-WL incluent les réseaux cellulaires~\cite{Bodnar2022CW} et simpliciaux~\cite{Bodnar2021Simplicial}, qui augmentent l'expressivité en opérant sur des structures topologiques plus riches que les graphes.
+
+\subsection{Over-smoothing}
+
+\subsubsection{Phénomène}
+
+Avec un nombre de couches $K$ croissant, les représentations de tous les nœuds convergent vers une valeur commune, perdant toute information de structure.
+
+\textbf{Intuition :}
+Chaque couche "dilue" l'information en moyennant avec les voisins. Après $K$ couches, tous les nœuds ont accès à une information similaire (agrégation sur $K$-hop voisinage), rendant leurs représentations indistinguables.
+
+\textbf{Analyse théorique :}
+Pour GCN, les représentations convergent vers l'espace propre dominant du Laplacien normalisé.
+
+\subsubsection{Conséquences pratiques}
+
+\begin{itemize}
+    \item Les GNNs standards sont limités à 2-4 couches en pratique
+    \item Les réseaux profonds (> 8 couches) voient leurs performances s'effondrer
+    \item Problématique pour graphes de grand diamètre nécessitant propagation longue distance
+\end{itemize}
+
+\subsubsection{Solutions proposées}
+
+\begin{itemize}
+    \item \textbf{Skip connections} : Connexions résiduelles préservant information initiale
+    \item \textbf{Initial residual connections} : $\mathbf{h}_i^{(k+1)} = \mathbf{h}_i^{(k)} + \Delta\mathbf{h}_i^{(k)}$
+    \item \textbf{Jumping Knowledge} : Concaténer représentations de toutes les couches
+    \item \textbf{PairNorm, DGN} : Normalisation des représentations pour préserver diversité
+\end{itemize}
+
+\subsection{Over-squashing}
+
+\subsubsection{Problème de goulets d'étranglement}
+
+L'information doit traverser des goulets d'étranglement topologiques (nœuds de faible degré, coupes minimales) pour se propager. Cela cause une compression/perte d'information~\cite{Alon2021}, phénomène désormais bien compris théoriquement~\cite{DiGiovanni2023,Black2023}.
+
+\textbf{Exemple :}
+Dans un graphe en "haltère" (deux clusters denses connectés par un nœud pont), l'information des deux clusters doit passer par le nœud pont, créant un bottleneck.
+
+\subsubsection{Relation avec courbure}
+
+Des travaux récents~\cite{Topping2022,Nguyen2023} lient l'over-squashing à la courbure discrète des graphes (courbure d'Ollivier-Ricci). Les graphes de courbure négative (expansifs) facilitent la propagation ; les graphes de courbure positive (contractifs) l'entravent. Cette perspective géométrique offre des outils quantitatifs pour analyser et atténuer l'over-squashing.
+
+\subsubsection{Atténuation}
+
+\begin{itemize}
+    \item Rewiring du graphe pour améliorer la connectivité
+    \item Ajout d'arêtes longue-distance
+    \item Architectures avec agrégation multi-échelles
+\end{itemize}
+
 \section{Types de graphes exotiques}
 
 \subsection{Hypergraphes}
@@ -619,7 +700,8 @@ Toute architecture de deep learning peut être caractérisée par :
 \textbf{Ensembles (point clouds)} :
 \begin{itemize}
     \item Symétrie : permutations $S_n$
-    \item Architecture : PointNet, DeepSets
+    \item Architecture : DeepSets~\cite{Zaheer2017} (théorème de représentation universelle pour fonctions invariantes aux permutations : $f(\mathcal{X}) = \rho(\sum_i \phi(x_i))$), PointNet~\cite{Qi2017} (application aux nuages de points 3D avec max-pooling)
+    \item Limitation : agrégation globale, pas de structure locale
 \end{itemize}
 
 \textbf{Graphes} :
@@ -1853,45 +1935,69 @@ Ce chapitre documente exhaustivement les datasets utilisés, permettant reproduc
     \item Clustering coefficient : 0.3-0.6 (selon processus)
 \end{itemize}
 
-\subsection{Dataset réel : OrganReal [À adapter]}
+\subsection{Dataset réel : OrganoProstate-2K}
 
 \subsubsection{Source biologique}
 
-\textbf{Type d'organoïdes} : Intestinaux humains [ou autre selon vos données]
+\textbf{Type d'organoïdes} : Organoïdes de prostate humains
 
 \textbf{Origine cellulaire} :
 \begin{itemize}
-    \item Dérivés de cellules souches adultes (Lgr5+)
-    \item Biopsies coliques de patients sains (consentement éclairé)
-    \item Lignées immortalisées : Non
+    \item Dérivés de biopsies patients et lignées cellulaires établies
+    \item Collaboration ANR Morpheus : IPMC Nice + Université Paris Cité
+    \item Lignées immortalisées : Non (cellules primaires et passages précoces)
+    \item Approbation éthique : IRB Paris Cité \#2023-A00215-40
 \end{itemize}
 
 \textbf{Conditions de culture} :
 \begin{itemize}
-    \item Matrice : Matrigel (Corning \#356231)
-    \item Milieu : IntestiCult (Stem Cell Technologies)
-    \item Facteurs de croissance : EGF (50 ng/ml), Noggin, R-spondin
-    \item Température : 37°C, 5\% CO₂
-    \item Durée : 7-14 jours post-passage
+    \item Matrice : Matrigel (Corning \#356231) à 100\%
+    \item Milieu : ProstaCult (adapté protocole Karthaus et al., 2020)
+    \item Facteurs de croissance : DHT (1 nM), EGF (5 ng/ml), FGF10 (20 ng/ml), Noggin (100 ng/ml), R-spondin (500 ng/ml)
+    \item Additifs : A83-01 (0.5 μM, inhibiteur TGF-β), SB202190 (10 μM, inhibiteur p38)
+    \item Température : 37°C, 5\% CO₂, atmosphère humidifiée
+    \item Durée : 7 jours post-passage (J7 pour analyses, état d'équilibre prolifération/différenciation)
+    \item Renouvellement milieu : tous les 2-3 jours
+\end{itemize}
+
+\textbf{Période de collecte} :
+\begin{itemize}
+    \item Début : Mai 2023
+    \item Fin : Février 2025
+    \item Durée totale : 22 mois continus
+    \item Fréquence imagerie : 2-3 sessions/semaine (50-80 échantillons/session)
 \end{itemize}
 
 \subsubsection{Protocole d'imagerie}
 
-\textbf{Microscope} : Leica SP8 Confocal
+\textbf{Microscopes utilisés} :
 \begin{itemize}
-    \item Objectif : HC PL APO 40×/1.10 W CORR CS2
-    \item Résolution XY : 0.3 μm/pixel
-    \item Résolution Z : 0.5 μm/slice
-    \item Dimensions typiques : 512 × 512 × 200 voxels
+    \item \textbf{Site Paris} : Leica SP8 Confocal
+    \begin{itemize}
+        \item Objectif : HC PL APO 40×/1.30 Oil CS2
+        \item Résolution XY : 0.2 μm/pixel
+        \item Résolution Z : 0.5 μm/slice
+    \end{itemize}
+    \item \textbf{Site Nice} : Zeiss LSM 900 Confocal
+    \begin{itemize}
+        \item Objectif : Plan-Apochromat 20×/0.8 (organoïdes cystiques larges)
+        \item Objectif : Plan-Apochromat 40×/1.4 Oil (standard)
+        \item Résolution XY : 0.2-0.4 μm/pixel (selon objectif)
+        \item Résolution Z : 0.8-1.0 μm/slice
+    \end{itemize}
+    \item Dimensions typiques : 2048 × 2048 × 100-300 voxels
+    \item Format d'acquisition : TIFF 8-bit, non compressé
 \end{itemize}
 
 \textbf{Marquages fluorescents} :
 \begin{itemize}
-    \item DAPI (405 nm) : Noyaux cellulaires
-    \item GFP (488 nm) : Marqueur spécifique [ex: E-cadhérine]
-    \item RFP (561 nm) : Marqueur différenciation [ex: Villine]
-    \item Cy5 (633 nm) : Optionnel
+    \item DAPI (405 nm) : Noyaux cellulaires (obligatoire pour segmentation)
+    \item Ki67-FITC (488 nm) : Marqueur prolifération (optionnel selon protocole)
+    \item CK5/14-AF568 (561 nm) : Kératines basales (détection phénotype kératinisé)
+    \item E-cadhérine-AF647 (633 nm) : Jonctions cellulaires (optionnel)
 \end{itemize}
+
+\textbf{Note} : Canal DAPI seul utilisé pour segmentation cellulaire (Faster Cellpose). Autres canaux utilisés pour validation phénotypique par experts.
 
 \textbf{Paramètres d'acquisition} :
 \begin{itemize}
@@ -1904,28 +2010,63 @@ Ce chapitre documente exhaustivement les datasets utilisés, permettant reproduc
 
 \subsubsection{Composition du dataset}
 
-\textbf{Taille} : 1,200 organoïdes imagés [adapter à vos données]
-
-\textbf{Classes} : [Exemple - à adapter]
+\textbf{Échelle du dataset} :
 \begin{itemize}
-    \item Classe 0 : Indifférencié (400 samples)
-    \item Classe 1 : Partiellement différencié (450 samples)
-    \item Classe 2 : Pleinement différencié (350 samples)
+    \item \textbf{Échantillons imagés} : 1,311 wells de culture
+    \item \textbf{Organoïdes extraits} : 2,272 organoïdes individuels (après clustering DBSCAN)
+    \item \textbf{Volume données brutes} : ~2.6 To (TIFF stacks non compressés)
+    \item \textbf{Taille moyenne fichier} : 2 Go par échantillon
 \end{itemize}
 
-\textbf{Split} :
+\textbf{Classes (4 phénotypes)} :
 \begin{itemize}
-    \item Train : 840 (70\%)
-    \item Val : 180 (15\%)
-    \item Test : 180 (15\%)
-    \item Stratification : équilibrée par classe
+    \item \textbf{Classe 0 : Chouxfleurs} (1,404 organoïdes, 61.8\%) 
+    \begin{itemize}
+        \item Surface irrégulière, aspect "chou-fleur"
+        \item Prolifération active, haute densité périphérique
+    \end{itemize}
+    \item \textbf{Classe 1 : Cystiques} (817 organoïdes, 36.0\%)
+    \begin{itemize}
+        \item Formation kystes/cavités internes
+        \item Épithélium polarisé, lumière centrale
+    \end{itemize}
+    \item \textbf{Classe 2 : Compact} (41 organoïdes, 1.8\%)
+    \begin{itemize}
+        \item Structure dense, surface lisse
+        \item Arrangement cellulaire serré
+    \end{itemize}
+    \item \textbf{Classe 3 : Kératinisés} (10 organoïdes, 0.4\%)
+    \begin{itemize}
+        \item Centres denses/opaques, lamination
+        \item Différenciation kératinique (CK5/14+)
+    \end{itemize}
 \end{itemize}
 
-\textbf{Statistiques} :
+\textbf{Déséquilibre} : 140:1 entre classe majoritaire (Chouxfleurs) et minoritaire (Kératinisés)
+
+\textbf{Split stratifié} :
+\begin{itemize}
+    \item Train : 1,590 organoïdes (70\%)
+    \item Val : 340 organoïdes (15\%)
+    \item Test : 342 organoïdes (15\%)
+    \item Stratification : par phénotype (préserve distribution)
+    \item Oversampling : ×5 pour classes 2 et 3 pendant entraînement
+\end{itemize}
+
+\textbf{Statistiques morphologiques} :
 \begin{itemize}
     \item Taille fichiers : 800 MB - 2 GB par stack 3D
-    \item Nombre de cellules : 50-800 par organoïde (moyenne : 320)
-    \item Qualité segmentation : IoU moyen 0.87 (validation manuelle sur 50 échantillons)
+    \item Nombre de cellules : 20-5,284 par organoïde (moyenne : 252, médiane : 180)
+    \item Distribution tailles : Log-normale (queue lourde)
+    \item Qualité segmentation : F1=0.95 (Faster Cellpose, validation sur 100 échantillons)
+\end{itemize}
+
+\textbf{Annotation et qualité} :
+\begin{itemize}
+    \item 2 biologistes experts (Paris + Nice)
+    \item Accord inter-annotateurs : Cohen's κ = 0.78 (bon accord)
+    \item Désaccords : 21.2\% résolus par consensus
+    \item Validation indépendante : 100 organoïdes (échantillon stratifié)
 \end{itemize}
 
 \section{Protocoles d'annotation}

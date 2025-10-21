@@ -1,6 +1,6 @@
 % !TEX root = ../sommaire.tex
 
-\chapter{État de l'art}
+\chapter{État de l'art : Organoïdes, Images et Graphes}
 
 \section{Organoïdes : biologie et applications}
 
@@ -10,33 +10,11 @@ Les organoïdes sont des structures tridimensionnelles auto-organisées cultivé
 
 \subsubsection{Classification par origine cellulaire}
 
-Les organoïdes peuvent être générés à partir de différentes sources cellulaires :
+Les organoïdes peuvent être classés selon l'origine des cellules utilisées pour leur génération. Les organoïdes dérivés de cellules souches pluripotentes (PSC, pour ``pluripotent stem cells'') sont produits à partir de cellules souches embryonnaires (ESC) ou de cellules souches pluripotentes induites (iPSC). Leur mise en culture requiert des protocoles de différenciation dirigée, souvent complexes, afin de reproduire les étapes du développement embryonnaire. Cette approche permet d'obtenir des organoïdes de tissus habituellement inaccessibles comme le cerveau ou la rétine. Elle offre l'avantage d'une source illimitée de matériel et autorise des manipulations génétiques aisées, mais elle est contrebalancée par l'immaturité fonctionnelle fréquente des organoïdes ainsi produits, ainsi que par la durée des protocoles, qui s'étendent souvent sur plusieurs semaines.
 
-\textbf{Organoïdes dérivés de cellules souches pluripotentes (PSC-derived) :}
-\begin{itemize}
-    \item Générés à partir d'ESC (cellules souches embryonnaires) ou d'iPSC (cellules souches pluripotentes induites)
-    \item Requièrent des protocoles de différenciation dirigée complexes mimant le développement embryonnaire
-    \item Permettent de générer des organoïdes de types non accessibles autrement (cerveau, rétine)
-    \item Avantage : génération illimitée, manipulation génétique possible
-    \item Inconvénient : immaturité fonctionnelle, protocoles longs (plusieurs semaines)
-\end{itemize}
+Les organoïdes issus de cellules souches adultes (ASC, pour ``adult stem cells'') sont générés à partir de cellules souches résidentes dans des tissus adultes, comme les cryptes intestinales ou les glandes gastriques. Leur croissance se fait typiquement dans une matrice extracellulaire telle que le Matrigel, enrichie en facteurs de croissance adaptés au tissu d'origine. Ces organoïdes conservent généralement une identité tissulaire fidèle et présentent une maturation fonctionnelle supérieure à celle des PSC-derived. De plus, les protocoles de culture sont souvent plus simples et rapides. Cependant, cette méthode reste limitée par l'accès parfois difficile à certains tissus et par une capacité d'expansion qui varie selon le type cellulaire.
 
-\textbf{Organoïdes dérivés de cellules souches adultes (ASC-derived) :}
-\begin{itemize}
-    \item Générés à partir de cellules souches résidentes dans les tissus adultes (cryptes intestinales, glandes gastriques, etc.)
-    \item Croissance en matrice extracellulaire (Matrigel) en présence de facteurs de croissance spécifiques
-    \item Maintiennent l'identité tissulaire de l'organe d'origine
-    \item Avantage : maturation fonctionnelle supérieure, protocoles plus simples
-    \item Inconvénient : accès limité à certains tissus, capacité d'expansion variable
-\end{itemize}
-
-\textbf{Organoïdes dérivés de patients (PDO - Patient-Derived Organoids) :}
-\begin{itemize}
-    \item Sous-catégorie des ASC-derived, générés directement à partir de biopsies de patients
-    \item Préservent le profil génétique et épigénétique du patient
-    \item Applications majeures en oncologie (tumoroïdes) pour médecine personnalisée
-    \item Biobanques constituées pour représenter la diversité des pathologies
-\end{itemize}
+Enfin, on distingue une catégorie particulière d'organoïdes, les PDO (``patient-derived organoids''), issus directement de biopsies de patients. Ceux-ci constituent en réalité une sous-catégorie des organoïdes ASC-derived. Ils préservent les profils génétiques et épigénétiques propres au patient, ce qui les rend particulièrement précieux pour des applications en oncologie personnalisée (notamment les tumoroïdes). La constitution de biobanques d'organoïdes de patients permet ainsi de représenter la diversité des pathologies et d'ouvrir la voie à des études fonctionnelles individuelles.
 
 \subsubsection{Classification par type d'organe}
 
@@ -49,16 +27,16 @@ Premier système organoïde développé~\cite{Sato2009}, ils reproduisent l'arch
 Structures complexes mimant le développement cérébral précoce~\cite{Lancaster2013}, contenant différentes régions cérébrales (cortex, hippocampe, plexus choroïde). Applications en neurobiologie du développement, modélisation de maladies neurologiques (microcéphalie, autisme, schizophrénie), et étude de l'impact de pathogènes (virus Zika).
 
 \textbf{Organoïdes hépatiques :}
-Reproduisent l'architecture lobulaire du foie avec hépatocytes fonctionnels. Applications en toxicologie (prédiction d'hépatotoxicité), métabolisme de drogues, modélisation d'hépatites virales et de maladies métaboliques.
+Reproduisent l'architecture lobulaire du foie avec hépatocytes fonctionnels~\cite{Huch2015}. Applications en toxicologie (prédiction d'hépatotoxicité), métabolisme de drogues, modélisation d'hépatites virales et de maladies métaboliques.
 
 \textbf{Organoïdes rénaux :}
-Contiennent des structures néphroniques avec tubules et podocytes. Utilisés pour modéliser les maladies rénales génétiques et acquises, tester la néphrotoxicité de composés.
+Contiennent des structures néphroniques avec tubules et podocytes~\cite{Takasato2015}. Utilisés pour modéliser les maladies rénales génétiques et acquises, tester la néphrotoxicité de composés.
 
 \textbf{Organoïdes pulmonaires :}
-Modèles des voies aériennes et des alvéoles. Applications pour SARS-CoV-2, mucoviscidose, cancer du poumon.
+Modèles des voies aériennes et des alvéoles~\cite{Sachs2019}. Applications pour SARS-CoV-2~\cite{Zhou2020COVID}, mucoviscidose~\cite{Dekkers2013}, cancer du poumon.
 
 \textbf{Autres organoïdes :}
-Pancréas, rétine, estomac, prostate, glandes salivaires, sein, etc. La diversité croissante reflète l'universalité de l'approche.
+Pancréas~\cite{Boj2015}, rétine~\cite{Lin2020}, estomac~\cite{Bartfeld2015}, prostate, glandes salivaires, sein~\cite{Sachs2018}, etc. La diversité croissante reflète l'universalité de l'approche.
 
 \subsection{Mécanismes de formation et auto-organisation}
 
@@ -129,60 +107,7 @@ Des biobanques nationales et internationales d'organoïdes (Hubrecht Organoid Te
 
 \subsubsection{Médecine régénérative : promesses futures}
 
-Bien qu'encore largement expérimentale, l'utilisation d'organoïdes pour la transplantation et la réparation tissulaire progresse :
-\begin{itemize}
-    \item Transplantation d'organoïdes de rétine pour restaurer la vision (essais précliniques)
-    \item Organoïdes de foie pour support fonctionnel temporaire en insuffisance hépatique
-    \item Organoïdes de peau pour greffes en cas de brûlures étendues
-\end{itemize}
-
-Les défis majeurs incluent la vascularisation (organoïdes > 1mm nécessitent apport sanguin), l'innervation, et l'intégration avec l'hôte.
-
-\subsection{Biomarqueurs et phénotypes d'intérêt}
-
-L'identification et la quantification de phénotypes dans les organoïdes reposent sur l'évaluation de multiples biomarqueurs.
-
-\subsubsection{Marqueurs de prolifération et de mort cellulaire}
-
-\begin{itemize}
-    \item \textbf{Ki67} : Protéine nucléaire présente dans toutes les phases actives du cycle cellulaire (G1, S, G2, M), absente en phase quiescente (G0). Marqueur de référence de l'activité proliférative.
-    \item \textbf{EdU/BrdU} : Analogues de thymidine incorporés pendant la phase S (réplication de l'ADN), marquant spécifiquement les cellules en division active.
-    \item \textbf{Caspase-3 clivée} : Marqueur d'apoptose (mort cellulaire programmée), augmenté dans les régions centrales d'organoïdes de grande taille où survient une hypoxie.
-    \item \textbf{Annexin V} : Détecte l'externalisation de phosphatidylsérine, événement précoce de l'apoptose.
-\end{itemize}
-
-\subsubsection{Marqueurs de différenciation et de lignage}
-
-\begin{itemize}
-    \item \textbf{Marqueurs de cellules souches} : LGR5, SOX2, OCT4, NANOG selon le type d'organoïde
-    \item \textbf{Marqueurs de différenciation} : Spécifiques au lignage et au type cellulaire
-    \begin{itemize}
-        \item Intestin : Lysozyme (cellules de Paneth), Chromogranine A (cellules entéroendocrines), Mucine 2 (cellules caliciformes)
-        \item Cerveau : DCX (neurones immatures), GFAP (astrocytes), MAP2 (neurones matures)
-        \item Foie : Albumine (hépatocytes), CK19 (cholangiocytes)
-    \end{itemize}
-\end{itemize}
-
-\subsubsection{Marqueurs fonctionnels}
-
-\begin{itemize}
-    \item \textbf{Métabolisme} : Activité enzymatique (CYP450 dans foie), transport (pompes ABC)
-    \item \textbf{Sécrétion} : Production de protéines spécifiques (albumine, mucus, hormones)
-    \item \textbf{Activité électrophysiologique} : Pour organoïdes neuronaux (calcium imaging)
-    \item \textbf{Barrière épithéliale} : Perméabilité, expression de jonctions serrées
-\end{itemize}
-
-\subsubsection{Phénotypes composites d'intérêt}
-
-Les phénotypes biologiquement significatifs combinent souvent plusieurs marqueurs et caractéristiques morphologiques :
-\begin{itemize}
-    \item \textbf{Maturation} : Ratio cellules souches/différenciées, expression de marqueurs tardifs, fonctionnalité
-    \item \textbf{Polarisation} : Orientation correcte apico-basale, localisation de marqueurs de polarité
-    \item \textbf{Réponse à traitement} : Changements de prolifération, apoptose, morphologie post-traitement
-    \item \textbf{Pathologique vs sain} : Signatures distinguant organoïdes normaux de tumoroïdes
-\end{itemize}
-
-L'identification automatisée et objective de ces phénotypes constitue un besoin crucial pour l'exploitation des organoïdes.
+L'application des organoïdes à la transplantation et à la réparation tissulaire, bien qu'encore largement expérimentale, connaît des avancées notables. Par exemple, des essais précliniques explorent l'utilisation d'organoïdes de rétine dans le but de restaurer la vision. D'autres travaux portent sur les organoïdes de foie, évalués comme support fonctionnel temporaire chez des patients en insuffisance hépatique, ainsi que sur les organoïdes de peau, qui pourraient offrir une solution innovante pour les greffes dans le cas de brûlures étendues. Néanmoins, plusieurs défis majeurs demeurent à surmonter afin de rendre ces approches cliniquement viables, notamment la vascularisation des organoïdes – essentielle pour les structures de diamètre supérieur à un millimètre afin d'assurer un apport sanguin adéquat –, leur innervation, ainsi que leur intégration fonctionnelle et immunologique avec l'organisme hôte.
 
 \section{Analyse d'images biomédicales 3D}
 
@@ -190,76 +115,23 @@ L'identification automatisée et objective de ces phénotypes constitue un besoi
 
 \subsubsection{Microscopie confocale}
 
-La microscopie confocale à balayage laser (CLSM) est la modalité la plus couramment utilisée pour l'imagerie d'organoïdes~\cite{Litjens2017}.
+La microscopie confocale à balayage laser (CLSM) constitue la méthode de référence pour l’imagerie des organoïdes~\cite{Litjens2017}. Son principe repose sur l’excitation point par point de la fluorescence par un faisceau laser focalisé. Un trou d’épingle (\textit{pinhole}) placé devant le détecteur permet de rejeter la lumière provenant des plans hors foyer, ce qui aboutit à une image optiquement sectionnée. En balayant le faisceau à travers l’échantillon et en déplaçant le plan focal selon l’axe Z, il est ainsi possible de collecter des séries d’images (stacks) permettant de reconstruire le volume 3D de l’échantillon.
 
-\textbf{Principe :}
-Un laser excite la fluorescence point par point, un trou d'épingle (\textit{pinhole}) rejette la lumière hors-foyer, construisant une image optiquement sectionnée. Le balayage du faisceau laser et le déplacement Z du plan focal permettent l'acquisition de stacks 3D.
+La CLSM présente plusieurs atouts majeurs : elle offre une résolution latérale élevée (200 à 300 nm) et une résolution axiale de l’ordre de 500 à 800 nm, un rejet efficace de la lumière hors-foyer, ainsi que la possibilité de réaliser des acquisitions multicanales sur plusieurs fluorophores (jusqu’à 4 à 6 simultanément). De plus, cette technique est largement disponible dans les laboratoires de biologie.
 
-\textbf{Avantages :}
-\begin{itemize}
-    \item Haute résolution latérale (200-300 nm) et axiale (500-800 nm)
-    \item Rejet efficace de la lumière hors-foyer
-    \item Imagerie multicanale (jusqu'à 4-6 fluorophores simultanés)
-    \item Disponibilité large dans les laboratoires
-\end{itemize}
-
-\textbf{Limitations :}
-\begin{itemize}
-    \item Acquisition lente (plusieurs minutes par organoïde)
-    \item Photoblanchiment important du fait de l'exposition répétée
-    \item Phototoxicité limitant l'imagerie live prolongée
-    \item Pénétration limitée en profondeur (< 100-150 μm en tissu dense)
-\end{itemize}
+En revanche, la microscopie confocale possède plusieurs limitations. L’acquisition d’un volume 3D est relativement lente et nécessite souvent plusieurs minutes par organoïde. La répétition des scans expose les échantillons à un risque important de photoblanchiment, et la phototoxicité reste un obstacle pour l’imagerie prolongée sur échantillon vivant. Enfin, la profondeur de pénétration de l’excitation est restreinte, particulièrement dans les tissus denses, et dépasse rarement 100 à 150 μm.
 
 \subsubsection{Microscopie light-sheet (LSFM)}
 
-La microscopie à feuillet de lumière illumine l'échantillon latéralement avec une nappe de lumière fine, tandis que la détection se fait perpendiculairement~\cite{Huisken2004}.
+La microscopie à feuillet de lumière (LSFM, pour Light-Sheet Fluorescence Microscopy) consiste à illuminer l’échantillon par le côté à l’aide d’un fin plan lumineux, tandis que la détection de la fluorescence s’effectue dans un axe perpendiculaire à celui de l’illumination~\cite{Huisken2004}. Cette disposition permet d’acquérir rapidement des images volumétriques tout en minimisant l’exposition globale de l’échantillon à la lumière. Grâce à ce principe, la LSFM atteint des vitesses d’acquisition très élevées, pouvant capturer plusieurs images par seconde, tout en limitant considérablement le photoblanchiment et la phototoxicité. Après une étape de clarification optique, elle permet aussi d’imager en profondeur des échantillons épais tels que les organoïdes, ce qui la rend particulièrement adaptée pour des expériences de type time-lapse sur de longues durées ou pour la visualisation de volumes importants, de l’ordre de plusieurs millimètres cubes.
 
-\textbf{Avantages :}
-\begin{itemize}
-    \item Vitesse d'acquisition élevée (plusieurs images par seconde)
-    \item Photoblanchiment et phototoxicité minimaux
-    \item Pénétration profonde après clarification optique
-    \item Idéale pour imagerie time-lapse prolongée
-    \item Imagerie de grands volumes (plusieurs mm$^3$)
-\end{itemize}
-
-\textbf{Limitations :}
-\begin{itemize}
-    \item Équipements spécialisés, moins répandus
-    \item Nécessite clarification optique pour tissus denses
-    \item Résolution légèrement inférieure à la confocale
-\end{itemize}
+Cependant, la mise en œuvre de la microscopie à feuillet de lumière requiert des équipements spécialisés qui restent encore relativement peu répandus dans les laboratoires de biologie. De plus, l’imagerie de tissus denses nécessite souvent une étape préalable de clarification optique, afin de garantir une pénétration adéquate de la lumière. Enfin, si la LSFM permet de couvrir de larges volumes, sa résolution demeure légèrement inférieure à celle offerte par la microscopie confocale classique.
 
 \subsubsection{Microscopie multiphoton}
 
-L'excitation multiphoton utilise des impulsions laser infrarouge intenses pour exciter les fluorophores via absorption simultanée de deux photons.
+La microscopie multiphoton repose sur l’utilisation d’impulsions laser infrarouges de forte intensité permettant d’exciter les fluorophores grâce à l’absorption simultanée de deux photons. Cette technique présente plusieurs atouts majeurs : la longueur d’onde infrarouge utilisée permet une pénétration plus profonde dans les tissus, jusqu’à environ 1 mm, ce qui est particulièrement avantageux pour l’imagerie d’échantillons épais. Par ailleurs, l’excitation étant confinée au seul point focal, le photoblanchiment des fluorophores est considérablement réduit dans les zones hors focus, limitant ainsi les effets secondaires indésirables sur l’échantillon. La microscopie multiphoton rend également possible l’imagerie \textit{in vivo}, une caractéristique précieuse pour l’étude d’échantillons vivants.
 
-\textbf{Avantages :}
-\begin{itemize}
-    \item Pénétration profonde (jusqu'à 1 mm) grâce à la longueur d'onde infrarouge
-    \item Réduction du photoblanchiment (excitation confinée au point focal)
-    \item Imagerie \textit{in vivo} possible
-\end{itemize}
-
-\textbf{Limitations :}
-\begin{itemize}
-    \item Lasers coûteux (femtoseconde Ti:Sapphire)
-    \item Acquisition plus lente que confocale standard
-    \item Fluorophores optimisés pour multiphoton requis
-\end{itemize}
-
-\subsubsection{Techniques de clarification optique}
-
-Pour améliorer la pénétration de la lumière dans les tissus épais, diverses techniques de clarification ont été développées~\cite{Chung2010} :
-\begin{itemize}
-    \item \textbf{CLARITY} : Remplacement des lipides par hydrogel polyacrylamide, rendant l'échantillon transparent
-    \item \textbf{iDISCO} : Délipidation par solvants organiques
-    \item \textbf{CUBIC} : Délipidation aqueuse plus douce
-    \item \textbf{Expansion microscopy} : Expansion physique de l'échantillon (4x) pour augmenter virtuellement la résolution~\cite{Chen2015}
-\end{itemize}
-
-Ces techniques, appliquées aux organoïdes, permettent l'imagerie de leur structure interne complète.
+Cependant, cette modalité comporte aussi des limitations importantes. Tout d’abord, l’équipement nécessaire est onéreux, les lasers femtoseconde Ti:Sapphire étant particulièrement coûteux à acquérir et à entretenir. L’acquisition des images s’avère également plus lente comparée à une microscopie confocale classique, ce qui peut représenter un frein pour des expériences à haut débit. Enfin, il est nécessaire d’utiliser des fluorophores spécifiquement adaptés à l’excitation multiphoton, ce qui peut restreindre le choix des marqueurs disponibles.
 
 \subsection{Défis spécifiques de l'imagerie d'organoïdes}
 
@@ -275,33 +147,19 @@ L'atténuation de la lumière crée des gradients d'intensité non-uniformes, co
 Les différences d'indice de réfraction entre milieu de montage, Matrigel et tissu créent des aberrations sphériques et chromatiques dégradant la qualité d'image.
 
 \textbf{Bruit photonique :}
-À faibles niveaux de lumière (imagerie live pour réduire phototoxicité), le bruit de photons (Poisson) devient significatif, dégradant le rapport signal/bruit.
+À faibles niveaux de lumière (imagerie live pour réduire la phototoxicité), le bruit de Poisson des photons devient significatif, dégradant le rapport signal/bruit.
 
 \subsubsection{Variabilité inter-acquisitions}
 
-Les conditions d'imagerie varient entre expériences :
-\begin{itemize}
-    \item Puissance laser, gain du détecteur, temps d'exposition
-    \item Performances optiques (alignement, vieillissement des lasers)
-    \item Orientation de l'échantillon (organoïdes non fixés peuvent bouger)
-    \item Protocoles de marquage (efficacité de pénétration des anticorps, photoblanchiment différentiel)
-\end{itemize}
-
-Ces variations rendent difficile le développement de méthodes d'analyse universellement applicables sans stratégies de normalisation robustes.
+Les conditions d'imagerie présentent une grande variabilité d'une expérience à l'autre. Parmi les sources majeures de variation, on compte la puissance du laser, le gain appliqué au détecteur ou encore le temps d’exposition, qui peuvent fluctuer selon la configuration de l’appareillage et les réglages opérateurs. Les performances optiques elles-mêmes évoluent dans le temps avec l’alignement régulier requis des composants et le vieillissement des lasers, pouvant affecter la qualité des acquisitions. L’orientation de l’échantillon représente aussi un facteur non négligeable, d’autant plus que les organoïdes non fixés peuvent se déplacer lors de la manipulation ou au cours de l’imagerie. Enfin, les protocoles de marquage présentent une efficacité variable en fonction de la pénétration des anticorps, et le phénomène de photoblanchiment n’affecte pas toujours l’ensemble du volume de manière homogène. L’ensemble de ces variations complexifie le développement de méthodes d’analyse robustes et universellement applicables, à moins de recourir à des stratégies de normalisation adaptées et performantes.
 
 \subsection{Contraintes computationnelles}
 
 \subsubsection{Volumes de données}
 
-Un organoïde imagé en haute résolution (objectif 40×, voxel 0.3×0.3×1 μm) génère typiquement :
-\begin{itemize}
-    \item Taille : 2048×2048×150-300 slices
-    \item Canaux : 3-4 fluorophores (DAPI + marqueurs)
-    \item Profondeur : 16 bits par voxel
-    \item \textbf{Volume total} : 2-4 Go par organoïde
-\end{itemize}
+Un organoïde imagé en haute résolution (objectif 40×, voxel 0.3×0.3×1 μm) génère typiquement 2048×2048x200 voxels, soit ~2 Go par organoïde.
 
-Pour une étude de criblage pharmacologique testant 100 composés × 10 concentrations × 5 réplicats × 3 temps = 15,000 organoïdes, le volume total atteint 30-60 To.
+Par exemple, pour une étude de criblage pharmacologique testant 100 composés × 10 concentrations × 5 réplicats × 3 temps = 15,000 organoïdes, le volume total atteint 30-60 To.
 
 \subsubsection{Défis de traitement}
 
@@ -321,25 +179,7 @@ Ces contraintes motivent le développement de représentations compactes et effi
 
 \subsubsection{Protocoles d'analyse experte}
 
-L'analyse manuelle typique implique :
-\begin{enumerate}
-    \item Visualisation 3D de l'organoïde (rendus volumiques, projections maximum intensity)
-    \item Évaluation qualitative de la morphologie globale
-    \item Inspection de sections 2D à différentes profondeurs
-    \item Quantification semi-manuelle de marqueurs (comptage de cellules positives)
-    \item Classification selon des critères prédéfinis ou une échelle ordinale
-\end{enumerate}
-
-\subsubsection{Performances et limites quantifiées}
-
-Études sur l'accord inter-annotateurs pour classification d'organoïdes :
-\begin{itemize}
-    \item Phénotypes binaires (sain/pathologique) : Cohen's κ = 0.7-0.85 (accord substantiel)
-    \item Phénotypes multi-classes subtils : κ = 0.5-0.7 (accord modéré)
-    \item Quantifications continues (taille, intensités) : coefficient de corrélation intra-classe ICC = 0.6-0.8
-\end{itemize}
-
-Ces valeurs, bien que respectables, révèlent une variabilité non négligeable même entre experts, soulignant la subjectivité inhérente et la difficulté de ces tâches.
+L'analyse manuelle se déroule généralement selon plusieurs étapes complémentaires. L'observateur commence par explorer l'organoïde dans sa globalité à l'aide de dispositifs de visualisation 3D, tels que les rendus volumiques ou les projections en intensité maximale, afin d'appréhender l'architecture générale de l'échantillon. Il procède ensuite à une évaluation qualitative de la morphologie globale, repérant d'éventuelles anomalies ou caractéristiques saillantes. L'étude se poursuit par une inspection attentive de différentes sections 2D extraites à diverses profondeurs, ce qui permet de mieux caractériser l'organisation interne. La quantification des marqueurs d'intérêt, comme le comptage des cellules positives à un signal fluorescent donné, s'effectue de façon semi-manuelle via des logiciels spécialisés. Enfin, l'organoïde est classé d'après des critères prédéfinis ou bien positionné sur une échelle ordinale, selon le protocole établi pour l'étude.
 
 \subsubsection{Coûts et contraintes pratiques}
 
@@ -371,13 +211,13 @@ Des contours évoluent sous l'influence de forces internes (régularité) et ext
 \subsubsection{Approches par deep learning}
 
 \textbf{U-Net et variantes :}
-L'architecture U-Net~\cite{Ronneberger2015}, introduite pour segmentation biomédicale 2D, a été étendue en 3D~\cite{Cicek2016}. L'architecture encoder-decoder avec skip connections permet la segmentation sémantique dense. Limitations : nécessite annotations pixel-level coûteuses, empreinte mémoire importante en 3D.
+L'architecture U-Net~\cite{Ronneberger2015}, introduite pour segmentation biomédicale 2D, a été étendue en 3D~\cite{Cicek2016}. L'architecture encoder-decoder avec skip connections permet la segmentation sémantique dense. Cependant, elle nécessite des annotations pixel-level coûteuses, ainsi qu'une empreinte mémoire importante en 3D.
 
 \textbf{Mask R-CNN et détection d'instances :}
-Détection et segmentation simultanées d'instances d'objets. Applicable aux noyaux cellulaires mais difficultés pour gérer les chevauchements en 3D.
+Détection et segmentation simultanées d'instances d'objets. Applicable aux noyaux cellulaires mais présente des difficultés pour gérer les chevauchements en 3D.
 
 \textbf{StarDist :}
-Approche innovante représentant chaque cellule par son centroïde et un champ de distances radiales (star-convex polygons)~\cite{Schmidt2018}. Très performant pour noyaux de forme convexe. Implémentation 2D et 3D disponible. Limitation : formes non-convexes mal gérées.
+Approche innovante représentant chaque cellule par son centroïde et un champ de distances radiales (star-convex polygons)~\cite{Schmidt2018}. Très performant pour les noyaux de forme convexe. Implémentation 2D et 3D disponible. Limitation : formes non-convexes mal gérées.
 
 \textbf{Cellpose :}
 État de l'art actuel~\cite{Stringer2021}, basé sur la prédiction de champs de gradients où chaque pixel/voxel "pointe" vers le centre de sa cellule. Le suivi de ces gradients permet de regrouper les pixels en cellules. Avantages majeurs :
@@ -385,11 +225,39 @@ Approche innovante représentant chaque cellule par son centroïde et un champ d
     \item Robuste aux variations de taille cellulaire
     \item Gère bien les morphologies irrégulières et les cellules denses
     \item Version 3D efficace
-    \item Modèles pré-entraînés généralist es performants
-    \item Possibilité de fine-tuning sur données spécifiques
+    \item Modèles pré-entraînés généralistes performants
+    \item Possibilité de fine-tuning sur des données spécifiques
 \end{itemize}
 
 Cellpose représente actuellement le meilleur compromis précision/généralisation pour la segmentation de noyaux et de cellules en 3D.
+
+Performances typiques de Cellpose sur les organoïdes (validation sur 50 coupes annotées) :
+\begin{itemize}
+    \item Précision : 0.99
+    \item Rappel : 0.96
+    \item F1-score : 0.98
+    \item Temps : ~30 secondes/coupe (GPU)
+\end{itemize}
+
+\subsubsection{Bilan des méthodes de segmentation existantes}
+
+L'état de l'art montre un trade-off fondamental entre précision et vitesse :
+
+\textbf{Pour une précision maximale :}
+\begin{itemize}
+    \item Cellpose : F1=0.98, mais 30 sec/coupe (lent pour grand débit)
+    \item StarDist : F1=0.85, 5 sec/coupe (compromis intéressant)
+\end{itemize}
+
+\textbf{Pour la rapidité :}
+\begin{itemize}
+    \item Watershed : Rapide mais imprécis (F1=0.70-0.75)
+    \item Seuillage simple : Très rapide mais inadapté (cellules collées)
+\end{itemize}
+
+Pour l'analyse de milliers d'organoïdes nécessaire à notre étude, Cellpose standard (30 sec/coupe × 200 coupes/organoïde × 1500 organoïdes = 2500 heures ≈ 104 jours) est prohibitivement lent.
+
+Cette limitation motive le développement de méthodes de segmentation optimisées, présentées au Chapitre 4 comme contributions méthodologiques de la thèse.
 
 \subsubsection{Évaluation et benchmarking}
 
@@ -407,16 +275,13 @@ Les compétitions internationales (Cell Tracking Challenge~\cite{Ulman2017}, Dat
 
 \subsubsection{Descripteurs de texture}
 
-Les organoïdes présentent des textures caractéristiques (distributions d'intensités, arrangements spatiaux) qu capturées par divers descripteurs.
+Les organoïdes se distinguent par des textures spécifiques, telles que des profils d’intensité et des arrangements spatiaux particuliers, qui peuvent être quantifiés à l’aide de différents types de descripteurs.
 
-\textbf{Matrices de co-occurrence de Haralick :}
-Calculent des statistiques de second ordre sur les paires de pixels à distance et orientation données. Features extraites : contraste, corrélation, énergie, homogénéité, entropie. Extension 3D possible mais coûteuse. Limitation : perte de l'information spatiale globale, descripteurs génériques peu spécifiques.
+Parmi les descripteurs de texture classiques en vision par ordinateur, on retrouve notamment les matrices de co-occurrence de Haralick, les Local Binary Patterns (LBP) et les filtres de Gabor~\cite{Haralick1973, Ojala2002, Fogel1989}. Les matrices de Haralick consistent à analyser la fréquence des paires de niveaux de gris à une distance et une orientation données dans l’image, ce qui permet d’extraire des attributs tels que le contraste, la corrélation, l’énergie, l’homogénéité ou l’entropie. Bien qu’une extension tridimensionnelle soit possible et parfois appliquée aux volumes d’organoïdes, elle reste coûteuse en temps de calcul, et ces descripteurs tendent à perdre l’information spatiale globale tout en restant assez génériques.
 
-\textbf{Local Binary Patterns (LBP) :}
-Codent localement les relations d'intensité entre pixel central et voisins. LBP 3D capturent des micro-textures tridimensionnelles. Robustes aux variations d'illumination mais sensibles au bruit.
+Les Local Binary Patterns offrent une approche complémentaire en codant, pour chaque pixel, les relations d’intensité entre celui-ci et ses voisins immédiats. Cette description locale, étendue en 3D, permet de capturer les micro-textures fréquentes dans certaines images biologiques. Les LBP sont appréciés pour leur invariance aux variations d’illumination, mais demeurent sensibles au bruit.
 
-\textbf{Filtres de Gabor :}
-Convolutions avec des noyaux orientés à différentes fréquences et orientations. Capturent des patterns directionnels et des textures répétitives. Banques de filtres 3D computationnellement coûteuses.
+Les filtres de Gabor, enfin, sont utilisés pour détecter des structures directionnelles et des motifs texturés grâce à des convolutions avec des noyaux paramétrés en fréquence et en orientation. Appliqués en 2D ou en 3D, ils sont particulièrement adaptés à la caractérisation de textures périodiques et de patrons directionnels, au prix toutefois d’une charge computationnelle significative lorsque l’on considère des banques de filtres tridimensionnelles~\cite{Fogel1989}.
 
 \subsubsection{Descripteurs géométriques et morphologiques}
 
@@ -445,31 +310,42 @@ Ensembles d'arbres de décision, robustes, gèrent bien les features hétérogè
 Avec noyaux non-linéaires (RBF), performants pour classification avec données limitées. Sensibles au scaling des features.
 
 \textbf{Gradient Boosting (XGBoost, LightGBM) :}
-État de l'art pour données tabulaires, souvent supérieurs à Random Forest. Nécessitent tuning d'hyperparamètres.
-
-\textbf{Résultats typiques :}
-Sur des tâches de classification d'organoïdes avec descripteurs handcrafted, les performances atteignent typiquement 70-85\% d'accuracy selon la difficulté du problème et la qualité des descripteurs.
+État de l'art pour données tabulaires, souvent supérieurs aux Random Forest, mais ils nécessitent le tuning d'hyperparamètres.
 
 \textbf{Limitations principales :}
 \begin{itemize}
     \item Plafond de performance limité par l'expressivité des features
-    \item Nécessité d'expertise domaine pour feature engineering
-    \item Perte d'information relationnelle (relations entre cellules non capturées)
+    \item Nécessité d'expertise domaine pour le feature engineering
+    \item Perte d'information relationnelle (les relations entre les cellules ne sont pas capturées)
     \item Peu de généralisation à d'autres types d'organoïdes
 \end{itemize}
 
-\subsection{Deep learning pour images biomédicales}
+\subsection{Approches récentes spécifiques aux organoïdes}
+
+Plusieurs travaux récents ont abordé spécifiquement l'analyse automatisée d'organoïdes par apprentissage profond.
+
+\subsubsection{Outils de deep learning pour organoïdes}
+
+Park et al.~\cite{Park2023} ont développé un outil de traitement d'images basé sur le deep learning pour une analyse améliorée d'organoïdes, démontrant l'utilité de l'apprentissage profond pour la quantification automatisée. De même, Haja et al.~\cite{Haja2023} ont proposé une approche de deep learning pour localiser et quantifier automatiquement les organoïdes dans des images, adressant le problème de passage à l'échelle.
+
+Pour les organoïdes rénaux spécifiquement, Wilson et al.~\cite{Wilson2022} ont développé DevKidCC, un outil permettant une classification robuste et des comparaisons directes entre différents datasets d'organoïdes de rein, illustrant l'importance de la standardisation pour la reproductibilité.
+
+Au-delà des approches purement basées sur l'apprentissage, Laussu et al.~\cite{Laussu2024} ont proposé un modèle d'éléments finis centré sur les cellules pour l'analyse de la forme d'organoïdes intestinaux, reliant architecture tissulaire et mécanique, démontrant la complémentarité entre approches physiques et computationnelles.
+
+Ces travaux pionniers, bien que prometteurs, présentent des limitations : ils sont souvent spécifiques à un type d'organoïde, n'exploitent pas pleinement la structure relationnelle 3D, ou nécessitent des annotations manuelles importantes. Notre approche vise à adresser ces limitations via des représentations par graphes et du transfer learning.
+
+\subsection{Deep learning pour les images biomédicales}
 
 \subsubsection{CNN 2D : approches par slices}
 
 \textbf{Max/Mean intensity projections :}
-Projeter le volume 3D en 2D (maximum ou moyenne selon Z) puis appliquer un CNN 2D standard (ResNet, EfficientNet). Perte massive d'information 3D, mais computationnellement abordable.
+Une approche courante consiste à projeter le volume 3D en une image 2D en calculant, par exemple, la valeur maximale (maximum intensity projection) ou la moyenne (mean intensity projection) le long de l’axe Z, avant d’appliquer un réseau de neurones convolutifs 2D classique, comme ResNet ou EfficientNet. Cette méthode présente l’avantage d’être peu coûteuse en ressources de calcul, mais elle s’accompagne d’une perte importante d’information tridimensionnelle, car la structure 3D complexe n’est plus accessible à l’analyse.
 
 \textbf{Multi-slice analysis :}
-Extraire plusieurs slices 2D à différentes profondeurs, classifier chaque slice, puis agréger les prédictions (vote majoritaire, moyenne). Meilleur que projection mais cohérence spatiale 3D non exploitée.
+Une approche dite "multi-slice" consiste à extraire plusieurs coupes bidimensionnelles à différentes profondeurs du volume, puis à appliquer un classifieur à chacune de ces images individuelles. Les résultats obtenus pour chaque coupe sont ensuite agrégés, typiquement par un vote majoritaire ou une moyenne des scores de prédiction, afin d’obtenir une décision globale sur le volume analysé. Cette méthode permet de récupérer plus d’informations que les simples projections 2D puisqu’elle exploite la diversité des plans à travers l’organoïde, mais elle ne prend pas réellement en compte la continuité spatiale et les relations entre coupes, la cohérence tridimensionnelle n’étant donc pas modélisée.
 
 \textbf{2.5D approaches :}
-Créer des pseudo-images RGB en stackant 3 slices adjacentes, exploitant l'architecture CNN 2D standard. Compromis entre information 3D et efficacité.
+Une approche dite « 2.5D » consiste à empiler trois coupes adjacentes d’un volume pour former une image pseudo-RGB, qui peut alors être traitée par un réseau de neurones convolutifs 2D standard. Cette méthode permet de capturer une partie de l’information tridimensionnelle tout en conservant l’efficacité computationnelle des architectures 2D, constituant ainsi un compromis entre richesse spatiale et coût de calcul.
 
 \subsubsection{CNN 3D : extension naturelle mais coûteuse}
 
@@ -483,49 +359,93 @@ Les CNN 3D étendent les opérations de convolution et pooling à trois dimensio
 \end{itemize}
 
 \textbf{Contraintes pratiques :}
-Pour fitter en mémoire GPU (16-32 Go), il faut :
-\begin{itemize}
-    \item Downsampler drastiquement (64×64×64 ou 128×128×128 max)
-    \item Traiter par patches/crops avec recombinaison
-    \item Réduire la profondeur du réseau
-    \item Limiter le batch size (souvent 1-2 échantillons)
-\end{itemize}
+L’utilisation de réseaux de neurones convolutifs 3D se heurte à des contraintes mémoire importantes sur les GPU standards (16 à 32 Go), ce qui impose plusieurs ajustements pour pouvoir entraîner ces modèles. Il est généralement nécessaire de réduire fortement la taille des volumes en appliquant un downsampling drastique (par exemple, à 64×64×64 ou 128×128×128 voxels au maximum). Par ailleurs, il faut souvent traiter les données sous forme de patchs ou de sous-volumes extraits du volume initial, puis recombiner les résultats. La profondeur du réseau lui-même doit être limitée afin de réduire l’empreinte mémoire, et la taille des lots (batch size) pendant l’entraînement doit fréquemment être extrêmement réduite, parfois à seulement un ou deux échantillons par itération.
 
 Le downsampling détruit les détails fins (cellules individuelles non résolues), limitant la capacité à capturer l'information biologique subtile.
 
 \textbf{Résultats et limitations :}
-Bien que les CNN 3D obtiennent de bonnes performances sur certaines tâches de classification d'organoïdes (85-90\%), ils :
+Bien que les CNN 3D puissent obtenir de bonnes performances sur certaines tâches de classification d'organoïdes, ils :
 \begin{itemize}
     \item Nécessitent de larges datasets annotés (milliers d'exemples)
     \item Sont sensibles aux variations d'acquisition (domain shift)
     \item Manquent d'interprétabilité (boîte noire)
-    \item Requièrent augmentation extensive pour invariances géométriques
+    \item Requièrent une augmentation extensive pour tenir compte des invariances géométriques
 \end{itemize}
+
+\subsubsection{Approches ensemblistes : DeepSets et PointNet}
+
+Une alternative aux CNN pour traiter les données 3D consiste à représenter chaque organoïde comme un nuage de points (point cloud), où chaque cellule est représentée par sa position 3D et ses features morphologiques, et à appliquer des architectures invariantes aux permutations.
+
+\textbf{DeepSets : fondements théoriques}
+
+Zaheer et al.~\cite{Zaheer2017} établissent les fondements théoriques du traitement d'ensembles non ordonnés en démontrant un théorème de représentation universelle. Toute fonction invariante aux permutations peut s'écrire sous la forme :
+\[
+f(\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}) = \rho\left(\text{AGG}\left(\{\phi(\mathbf{x}_i)\}\right)\right)
+\]
+où $\phi$ est un encodeur (MLP) appliqué indépendamment à chaque élément, AGG est une agrégation symétrique (somme, moyenne, max), et $\rho$ est un décodeur (MLP).
+
+Cette architecture garantit l'invariance aux permutations : l'ordre dans lequel les cellules sont traitées n'affecte pas le résultat, ce qui est biologiquement pertinent.
+
+\textbf{PointNet : application aux nuages de points 3D}
+
+PointNet~\cite{Qi2017}, proposé par Qi et al. la même année, applique ce principe aux nuages de points 3D avec max-pooling comme agrégation :
+\[
+f(\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}) = \text{MLP}_{\rho}\left(\max_{i=1}^n \text{MLP}_{\phi}(\mathbf{x}_i)\right)
+\]
+
+PointNet a été initialement conçu pour la segmentation et classification de scans 3D (LiDAR, objets scannés) et présente plusieurs avantages :
+\begin{itemize}
+    \item Traitement direct des nuages de points sans voxelisation
+    \item Invariance stricte aux permutations
+    \item Complexité linéaire $\mathcal{O}(n)$ en nombre de points
+    \item Robustesse aux points manquants et au bruit
+\end{itemize}
+
+\textbf{Application potentielle aux organoïdes}
+
+Pour les organoïdes, on pourrait représenter chaque cellule par son centroïde 3D et ses features (volume, sphéricité, intensité), formant un nuage de points. Une architecture DeepSets ou PointNet pourrait alors classifier l'organoïde entier.
+
+\textbf{Limitations fondamentales pour notre contexte}
+
+Malgré leur élégance théorique, ces approches présentent des limitations majeures pour l'analyse d'organoïdes :
+\begin{itemize}
+    \item \textbf{Perte d'information structurelle locale :} Chaque cellule est traitée indépendamment par $\phi$ avant l'agrégation globale. Les relations de voisinage spatial (contacts cellule-cellule, organisation en couches) ne sont pas explicitement capturées
+    \item \textbf{Agrégation globale unique :} Une seule opération d'agrégation sur toutes les cellules. Pas de propagation progressive d'information locale comme dans les GNNs
+    \item \textbf{Expressivité limitée :} Pour les organoïdes où la structure spatiale locale est biologiquement cruciale (ex: formation de lumens, stratification épithéliale), ignorer la topologie du voisinage limite la capacité prédictive
+    \item \textbf{Pas d'équivariance géométrique :} PointNet utilise des T-Nets pour une quasi-invariance aux transformations, mais n'offre pas de garanties théoriques formelles d'équivariance E(3) comme les GNNs géométriques
+\end{itemize}
+
+\textbf{PointNet++ et rapprochement vers les graphes}
+
+PointNet++~\cite{Qi2017b} adresse partiellement ces limitations en introduisant une hiérarchie multi-échelles avec des agrégations locales (set abstraction layers) sur des boules spatiales. Cette approche se rapproche conceptuellement des GNNs mais reste limitée :
+\begin{itemize}
+    \item Les voisinages sont définis par distance euclidienne fixe, pas par structure de graphe adaptative
+    \item Coût computationnel élevé pour la recherche de voisinages à chaque couche
+    \item Toujours pas d'équivariance E(3) formelle
+\end{itemize}
+
+\textbf{Relation avec les GNNs}
+
+Les GNNs peuvent être vus comme une généralisation de DeepSets où l'agrégation globale $\sum_{i=1}^n \phi(x_i)$ est remplacée par des agrégations locales structurées : $\sum_{j \in \mathcal{N}(i)} \psi(x_j)$ pour chaque nœud $i$. Cette structure permet de capturer explicitement la topologie spatiale via la construction du graphe (K-NN, distance-seuil), ce qui est essentiel pour notre application.
 
 \subsection{Approches basées graphes en histopathologie}
 
 \subsubsection{Contexte : graphes cellulaires en pathologie numérique}
 
-Quelques travaux pionniers ont exploré l'utilisation de graphes pour l'analyse de tissus en histopathologie 2D~\cite{Zhou2019,Jaume2021,Pati2022}, anticipant notre approche.
+Des travaux pionniers ont exploré l'utilisation de graphes pour l'analyse de tissus en histopathologie 2D~\cite{Zhou2019,Jaume2021,Pati2022}, anticipant notre approche.
 
-\textbf{Cell graphs pour classification de cancers :}
+\textbf{Graphes de cellules pour la classification de cancers :}
 Les cellules dans une coupe histologique 2D sont représentées comme nœuds d'un graphe, connectées selon la proximité spatiale. Les features incluent morphologie nucléaire, texture, intensité de coloration. Des GNNs sont entraînés pour prédire le grade tumoral, le sous-type histologique, ou le pronostic.
 
-\textbf{Tissue graphs multi-échelles :}
+\textbf{Graphes de tissus multi-échelles :}
 Représentations hiérarchiques où les nœuds peuvent être des cellules individuelles, des régions tissulaires, ou des glandes entières. Capture d'informations multi-échelles pertinentes pour le diagnostic.
 
-\textbf{Spatial transcriptomics :}
+\textbf{Transcriptomique spatiale :}
 Avec les technologies de transcriptomique spatiale, chaque "spot" (région de ~50 μm) est un nœud avec comme features le profil d'expression génique. Les GNNs intègrent l'information spatiale pour identifier des niches cellulaires, prédire des états cellulaires.
 
 \subsubsection{Résultats prometteurs}
 
-Ces approches ont démontré :
-\begin{itemize}
-    \item Performances supérieures ou comparables aux CNN sur certaines tâches
-    \item Meilleure interprétabilité (cellules/régions importantes identifiables)
-    \item Robustesse aux variations de taille d'image
-    \item Capacité à capturer des patterns topologiques (clustering, arrangement spatial)
-\end{itemize}
+Ces approches ont montré des performances supérieures ou, du moins, comparables à celles des CNN classiques sur certaines tâches. Elles offrent également une meilleure interprétabilité, puisqu’il est possible d’identifier les cellules ou les régions tissulaires qui contribuent le plus à la décision. De plus, les méthodes basées sur les graphes se révèlent robustes face aux variations de taille d’image et permettent de capturer des motifs topologiques comme le regroupement cellulaire ou l’arrangement spatial, difficiles à appréhender avec des approches purement convolutionnelles.
 
 \subsubsection{Limitations et extension aux organoïdes 3D}
 
@@ -547,13 +467,7 @@ Notre revue de la littérature révèle plusieurs lacunes majeures :
 
 \subsubsection{Absence de méthodes automatisées spécifiques aux organoïdes 3D}
 
-À notre connaissance, aucune méthode publiée ne propose un framework complet et automatisé spécifiquement conçu pour l'analyse d'organoïdes 3D. Les outils existants sont soit :
-\begin{itemize}
-    \item Génériques (ImageJ, CellProfiler) nécessitant une expertise utilisateur importante
-    \item Spécifiques à d'autres types de données (histopathologie 2D, cultures 2D)
-    \item Fragmentés (segmentation séparée de l'analyse)
-    \item Non validés rigoureusement sur organoïdes
-\end{itemize}
+À ce jour, il n’existe, à notre connaissance, aucune méthode publiée qui décrive un cadre complet et automatisé spécifiquement adapté à l’analyse d’organoïdes en trois dimensions. Les solutions actuellement disponibles présentent plusieurs limites : certaines, comme ImageJ ou CellProfiler, sont des outils généralistes qui requièrent une expertise technique importante de la part de l'utilisateur ; d’autres se concentrent sur des types de données différents, notamment l’histopathologie ou les cultures en deux dimensions ; certains pipelines proposent uniquement des modules isolés, tels que la segmentation sans analyse subséquente intégrée ; enfin, la plupart de ces outils n’ont pas fait l’objet de validations rigoureuses sur des jeux de données propres aux organoïdes 3D.
 
 \subsubsection{Sous-exploitation de la structure relationnelle}
 
@@ -565,7 +479,7 @@ La rareté de données annotées est un verrou reconnu mais peu adressé. Aucune
 
 \subsubsection{Absence de prise en compte des invariances géométriques}
 
-Les symétries naturelles des organoïdes (invariance aux rotations) sont généralement traitées via augmentation de données extensive plutôt que garanties architecturalement. Cela allonge l'entraînement et ne garantit pas parfaitement l'invariance.
+Les symétries naturelles des organoïdes (invariance aux translations et rotations) sont généralement traitées via une augmentation des données extensive plutôt que garanties par l'architecture. Cela allonge l'entraînement et ne garantit pas parfaitement l'invariance.
 
 \subsection{Originalité de l'approche proposée}
 
@@ -573,29 +487,23 @@ Notre approche se distingue par plusieurs aspects originaux qui adressent direct
 
 \subsubsection{Premier framework GNN pour organoïdes 3D}
 
-À notre connaissance, cette thèse propose la première application systématique de Graph Neural Networks géométriques à l'analyse d'organoïdes 3D. Alors que les GNNs sont établis en chimie (prédiction de propriétés moléculaires) et émergent en histopathologie 2D, leur application aux structures biologiques 3D complexes comme les organoïdes est inédite.
+À notre connaissance, cette thèse propose la première application systématique de Graph Neural Networks géométriques à l'analyse d'organoïdes 3D. Alors que les GNNs sont établis pour l'étude des molécules et des protéines (prédiction de propriétés) et émergent en histopathologie 2D, leur application aux structures biologiques 3D complexes comme les organoïdes est inédite.
 
 \subsubsection{Représentation explicite de la structure relationnelle}
 
-Contrairement aux CNN qui traitent l'organoïde comme une grille de voxels, notre approche :
-\begin{itemize}
-    \item Identifie explicitement les cellules individuelles comme entités discrètes
-    \item Modélise leurs relations de voisinage via un graphe
-    \item Capture la topologie et la structure relationnelle
-    \item Permet l'interprétation au niveau cellulaire
-\end{itemize}
+Contrairement aux approches CNN qui considèrent l’organoïde comme une simple grille de voxels, notre méthode repose sur une représentation explicite des cellules individuelles en tant qu’entités discrètes. Nous construisons un graphe dans lequel chaque cellule est identifiée et reliée à ses voisines, ce qui permet de modéliser précisément la topologie et la structure relationnelle de l’organoïde. Cette modélisation rend possible une interprétation fine des mécanismes au niveau cellulaire, ouvrant la voie à une meilleure compréhension des interactions et des comportements collectifs au sein de la structure.
 
 \subsubsection{Équivariance géométrique par construction}
 
 L'utilisation d'architectures EGNN garantit l'invariance aux transformations eucliennes par design architectural, sans nécessiter d'augmentation de données extensive. Cela améliore l'efficacité d'apprentissage et la robustesse.
 
-\subsubsection{Génération synthétique basée processus ponctuels}
+\subsubsection{Génération synthétique basée sur les processus ponctuels}
 
-Notre approche de génération de données synthétiques via processus ponctuels sur la sphère est, à notre connaissance, inédite. Elle diffère des approches de data augmentation classiques en créant des organoïdes entièrement nouveaux avec propriétés statistiques contrôlées, permettant une validation rigoureuse et un pré-entraînement ciblé.
+Notre approche de génération de données synthétiques via les processus ponctuels sur la sphère est, à notre connaissance, inédite. Elle diffère des approches de data augmentation classiques en créant des organoïdes entièrement nouveaux avec des propriétés statistiques contrôlées, permettant une validation rigoureuse et un pré-entraînement ciblé.
 
 \subsubsection{Pipeline intégré de bout en bout}
 
-Plutôt qu'un ensemble d'outils dispersés, nous proposons un pipeline cohérent, optimisable conjointement, avec interfaces claires entre étapes, facilitant l'adoption et la reproduction.
+Plutôt qu'un ensemble d'outils dispersés, nous proposons un pipeline cohérent, optimisable conjointement, avec des interfaces claires entre les étapes, facilitant l'adoption et la reproduction.
 
 \subsection{Verrous scientifiques et techniques adressés}
 
@@ -608,9 +516,8 @@ Cette thèse s'attaque à quatre verrous majeurs, formant les contributions prin
 \textbf{Notre réponse :}
 \begin{itemize}
     \item Modélisation par graphes géométriques (cellules = nœuds, voisinage = arêtes)
-    \item Features multi-modales (position, morphologie, intensités)
+    \item Features multi-modales (position, morphologie)
     \item Compression drastique tout en préservant l'information structurelle
-    \item Validation : comparaison performances graphes vs images brutes vs descripteurs
 \end{itemize}
 
 \subsubsection{Verrou 2 : Apprentissage avec données limitées}
@@ -621,7 +528,6 @@ Cette thèse s'attaque à quatre verrous majeurs, formant les contributions prin
 \begin{itemize}
     \item Génération de données synthétiques via processus ponctuels
     \item Pré-entraînement sur synthétiques puis fine-tuning sur réels (transfer learning)
-    \item Validation : courbes d'apprentissage, data efficiency, analyse ablative
 \end{itemize}
 
 \subsubsection{Verrou 3 : Interprétabilité biologiquement significative}
@@ -630,10 +536,8 @@ Cette thèse s'attaque à quatre verrous majeurs, formant les contributions prin
 
 \textbf{Notre réponse :}
 \begin{itemize}
-    \item Mécanismes d'attention identifiant cellules importantes
+    \item Mécanismes d'attention identifiant les cellules et les interactions importantes
     \item Visualisation 3D des contributions cellulaires
-    \item Corrélation avec biomarqueurs biologiques connus
-    \item Validation qualitative avec experts
 \end{itemize}
 
 \subsubsection{Verrou 4 : Robustesse et généralisation}
@@ -644,8 +548,6 @@ Cette thèse s'attaque à quatre verrous majeurs, formant les contributions prin
 \begin{itemize}
     \item Invariances géométriques garanties par architecture équivariante
     \item Normalisation multi-niveau (features, graphes, prédictions)
-    \item Évaluation de généralisation inter-batches expérimentaux
-    \item Validation croisée rigoureuse
 \end{itemize}
 
 \subsection{Positionnement par rapport aux approches concurrentes}
@@ -675,10 +577,10 @@ Notre approche combine les avantages du deep learning (apprentissage de features
 
 Notre approche n'est pas exclusive mais complémentaire :
 \begin{itemize}
-    \item Elle \textbf{dépend} d'une segmentation cellulaire préalable (Cellpose)
-    \item Elle peut être \textbf{combinée} avec des descripteurs handcrafted (features additionnelles)
-    \item Elle peut être \textbf{comparée} aux CNN 3D pour validation
-    \item Elle sera \textbf{évaluée} par rapport à l'analyse manuelle (gold standard)
+    \item Elle dépend d'une segmentation cellulaire préalable (Cellpose)
+    \item Elle peut être combinée avec des descripteurs handcrafted (features additionnelles)
+    \item Elle peut être comparée aux CNN 3D pour validation
+    \item Elle peut être évaluée par rapport à l'analyse manuelle
 \end{itemize}
 
 \subsection{Questions de recherche principales}
@@ -698,5 +600,3 @@ Cette thèse cherche à répondre aux questions suivantes :
     
     \item \textbf{Q6 - Généralisation} : L'approche est-elle robuste aux variations expérimentales et généralisable à différents types d'organoïdes ?
 \end{enumerate}
-
-Le Chapitre 5 (Résultats) répondra empiriquement à chacune de ces questions via des expériences ciblées.

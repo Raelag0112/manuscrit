@@ -35,12 +35,16 @@
 
 ---
 
-### Q3. Pourquoi des graphes et pas des point clouds (PointNet) ?
+### Q3. Pourquoi des graphes et pas des point clouds (PointNet/DeepSets) ?
 **Réponse :**
-- Point clouds ignorent les relations de voisinage
-- Les graphes encodent explicitement les interactions cellule-cellule
-- Biological plausibility : les cellules interagissent avec leurs voisines
-- Message passing permet propagation d'information locale→globale
+- **DeepSets/PointNet** : agrégation globale sur tous les points, ignore les relations de voisinage spatial
+  - Théorème de Zaheer : $f(\mathcal{X}) = \rho(\sum_i \phi(x_i))$ - une seule agrégation globale
+  - Perte d'information structurelle locale (organisation en couches, contacts cellulaires)
+- **Graphes/GNN** : agrégations locales structurées par la topologie
+  - Encodent explicitement les interactions cellule-cellule (voisinages K-NN)
+  - Message passing itératif : propagation d'information locale→globale sur K couches
+  - Biological plausibility : les cellules interagissent principalement avec leurs voisines directes
+- **Avantage empirique** : structure spatiale locale biologiquement cruciale pour classification des organoïdes
 
 ---
 

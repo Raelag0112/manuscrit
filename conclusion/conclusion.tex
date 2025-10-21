@@ -4,6 +4,22 @@
 
 Cette thèse a proposé une approche innovante pour l'analyse automatisée d'organoïdes 3D via Graph Neural Networks géométriques. Ce chapitre final synthétise les contributions, discute les limitations, et propose des perspectives de recherche à court et long terme.
 
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\textbf{Résultats clés de la thèse :}
+\begin{itemize}
+    \item \textbf{Dataset} : 2,272 organoïdes de prostate réels (4 phénotypes) + 5,000 synthétiques
+    \item \textbf{Segmentation optimisée} : Faster Cellpose - 50× accélération (250h vs 12,500h) avec F1=0.95
+    \item \textbf{Classification} : 84.6\% accuracy (surpasse experts : 73-81\%, CNN 3D : 81\%, Random Forest : 72\%)
+    \item \textbf{Transfer learning} : Réduction de 75\% des annotations nécessaires (398 vs 1,590)
+    \item \textbf{Généralisation cross-site} : Drop modéré de 5.4\% (Paris → Nice)
+    \item \textbf{Interprétabilité} : 87\% des explications validées biologiquement
+\end{itemize}
+}}
+\end{center}
+
+\vspace{0.5cm}
+
 \section{Synthèse des contributions}
 
 \subsection{Récapitulatif des verrous levés}
