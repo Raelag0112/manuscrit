@@ -10,10 +10,10 @@ Ce chapitre établit les fondements mathématiques et algorithmiques des Graph N
 
 \subsubsection{Graphe non-orienté}
 
-Un graphe non-orienté $G = (V, E)$ est défini par :
+Un \textbf{graphe} non-orienté $G = (V, E)$ est défini par :
 \begin{itemize}
-    \item Un ensemble fini de nœuds (ou sommets) : $V = \{v_1, v_2, \ldots, v_N\}$ avec $|V| = N$
-    \item Un ensemble d'arêtes : $E \subseteq \{\{v_i, v_j\} : v_i, v_j \in V, i \neq j\}$
+    \item Un ensemble fini de \textbf{nœuds} (ou sommets) : $V = \{v_1, v_2, \ldots, v_N\}$ avec $|V| = N$
+    \item Un ensemble d'\textbf{arêtes} : $E \subseteq \{\{v_i, v_j\} : v_i, v_j \in V, i \neq j\}$
 \end{itemize}
 
 Pour un graphe non-orienté, $(v_i, v_j) \in E \Leftrightarrow (v_j, v_i) \in E$. Dans cette thèse, nous travaillons exclusivement avec des graphes non-orientés simples (sans boucles ni arêtes multiples).
@@ -209,21 +209,7 @@ Le choix de la stratégie influe sur la structure du graphe résultant et donc l
 
 \subsubsection{Limitations des réseaux classiques}
 
-Les architectures de deep learning standard (par exemple les perceptrons multicouches MLP, les convolutions CNN) ne sont pas adaptées aux graphes :
-
-\textbf{Perceptrons multicouches (MLP) :}
-\begin{itemize}
-    \item Requièrent des entrées de taille fixe (vecteur de dimension fixe)
-    \item Les graphes ont des tailles variables ($N$ varie)
-    \item Pas de notion de localité ou de structure
-\end{itemize}
-
-\textbf{CNN :}
-\begin{itemize}
-    \item Conçus pour grilles régulières (images, vidéos)
-    \item Les graphes ont des topologies irrégulières (voisinages de tailles variables)
-    \item Les convolutions classiques ne se généralisent pas directement aux graphes
-\end{itemize}
+Les architectures de deep learning standard ne sont pas adaptées aux graphes. Les perceptrons multicouches (MLP) requièrent des entrées de taille fixe sous forme de vecteurs de dimension prédéterminée, alors que les graphes ont des tailles variables où le nombre de nœuds $N$ change d'un exemple à l'autre. De plus, les MLP n'intègrent pas de notion de localité ou de structure relationnelle. Les réseaux de neurones convolutifs (CNN), quant à eux, sont conçus pour traiter des grilles régulières telles que les images ou les vidéos. Or, les graphes présentent des topologies irrégulières avec des voisinages de tailles variables d'un nœud à l'autre, ce qui empêche une application directe des convolutions classiques qui reposent sur une structure de grille uniforme.
 
 \subsubsection{Propriétés désirées}
 
@@ -518,7 +504,7 @@ Il suffit d'utiliser des MLPs pour $\phi$ et $\rho$ pour obtenir un approximateu
 
 \subsubsection{Définition formelle}
 
-L'architecture DeepSets pour ensembles de taille variable s'écrit :
+L'architecture DeepSets pour des ensembles de taille variable s'écrit :
 \[
 f(\mathcal{X}) = \rho\left(\text{AGG}\left(\{\phi(\mathbf{x}_i) : \mathbf{x}_i \in \mathcal{X}\}\right)\right)
 \]
@@ -585,19 +571,10 @@ Un second T-Net dans l'espace des features (dim 64) pour alignement dans l'espac
 \subsubsection{Performances et limitations}
 
 \textbf{Avantages de PointNet :}
-\begin{itemize}
-    \item Traite directement les nuages de points sans voxelisation ni projection
-    \item Invariance stricte aux permutations
-    \item Rapide : $\mathcal{O}(n)$ complexité
-    \item Robustesse aux points manquants et au bruit
-\end{itemize}
+PointNet présente plusieurs atouts importants. Cette architecture traite directement les nuages de points sans nécessiter de voxelisation ni de projection sur une grille régulière. Elle garantit une invariance stricte aux permutations, assurant que l'ordre de traitement des points n'affecte pas le résultat. De plus, elle offre une complexité computationnelle linéaire en $\mathcal{O}(n)$ par rapport au nombre de points, la rendant particulièrement rapide. Enfin, PointNet se montre robuste face aux points manquants et au bruit dans les données.
 
 \textbf{Limitations fondamentales :}
-\begin{itemize}
-    \item \textbf{Pas de contexte local :} Chaque point est traité indépendamment par $\phi$ avant agrégation globale. Les structures locales (surfaces, arêtes) ne sont pas explicitement capturées
-    \item \textbf{Agrégation globale unique :} Une seule max-pooling sur tous les points. Perd l'information sur les relations spatiales locales
-    \item \textbf{Limité pour scènes complexes :} Difficulté à capturer les patterns géométriques fins
-\end{itemize}
+Malgré ces avantages, PointNet souffre de limitations importantes. D'abord, l'absence de contexte local constitue un problème majeur : chaque point est traité indépendamment par la fonction $\phi$ avant l'agrégation globale, ce qui empêche de capturer explicitement les structures locales telles que les surfaces ou les arêtes. Ensuite, l'utilisation d'une agrégation globale unique via max-pooling sur l'ensemble des points entraîne une perte d'information sur les relations spatiales locales entre points voisins. Ces limitations rendent PointNet peu adapté aux scènes complexes où la capture de patterns géométriques fins est essentielle.
 
 PointNet++~\cite{Qi2017b} adresse ces limitations en introduisant une hiérarchie multi-échelles avec agrégations locales (set abstraction layers), se rapprochant conceptuellement des GNNs.
 
@@ -749,12 +726,13 @@ Les nœuds de haut degré dominent, généralement instable.
 
 \subsubsection{Propriétés}
 
-\begin{itemize}
-    \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot D_h^2)$ par couche, linéaire en nombre d'arêtes. Pour graphes sparse ($|E| \ll N^2$), très efficace.
-    \item \textbf{Localité} : Une couche GCN agrège information du voisinage à 1-hop. $K$ couches élargissent le champ récepteur à $K$-hops.
-    \item \textbf{Permutation-équivariance} : Garantie par la formulation matricielle : $f(P \cdot G) = P \cdot f(G)$ pour toute permutation $P$.
-    \item \textbf{Scalabilité} : Peut s'appliquer à des graphes de millions de nœuds avec techniques de mini-batching.
-\end{itemize}
+\textbf{Complexité} : $\mathcal{O}(|E| \cdot D_h^2)$ par couche, linéaire en nombre d'arêtes. Pour graphes sparse ($|E| \ll N^2$), très efficace.
+
+\textbf{Localité} : Une couche GCN agrège information du voisinage à 1-hop. $K$ couches élargissent le champ récepteur à $K$-hops.
+
+\textbf{Permutation-équivariance} : Garantie par la formulation matricielle : $f(P \cdot G) = P \cdot f(G)$ pour toute permutation $P$.
+
+\textbf{Scalabilité} : Peut s'appliquer à des graphes de millions de nœuds avec techniques de mini-batching.
 
 \subsubsection{Implémentation pratique}
 
@@ -770,12 +748,13 @@ Une architecture GCN typique pour classification de graphes :
 
 \subsubsection{Limitations}
 
-\begin{itemize}
-    \item \textbf{Over-smoothing} : Avec de nombreuses couches ($K > 4$), les features de nœuds convergent vers des valeurs similaires, perdant l'information structurelle locale.
-    \item \textbf{Traitement uniforme du voisinage} : Tous les voisins contribuent également (après normalisation), pas de mécanisme d'attention.
-    \item \textbf{Expressivité limitée} : Au mieux équivalent au 1-WL test (Weisfeiler-Lehman), ne peut distinguer certains graphes non-isomorphes.
-    \item \textbf{Sensibilité à la structure} : Performance dépend fortement de la topologie du graphe et du choix de construction pour graphes géométriques.
-\end{itemize}
+\textbf{Over-smoothing} : Avec de nombreuses couches ($K > 4$), les features de nœuds convergent vers des valeurs similaires, perdant l'information structurelle locale.
+    
+\textbf{Traitement uniforme du voisinage} : Tous les voisins contribuent également (après normalisation), pas de mécanisme d'attention.
+
+\textbf{Expressivité limitée} : Au mieux équivalent au 1-WL test (Weisfeiler-Lehman), ne peut distinguer certains graphes non-isomorphes.
+
+\textbf{Sensibilité à la structure} : Performance dépend fortement de la topologie du graphe et du choix de construction pour graphes géométriques.
 
 \subsubsection{Variantes et améliorations}
 
@@ -851,14 +830,17 @@ La moyenne évite l'explosion de dimensionnalité en couche finale.
 
 \subsubsection{Propriétés et avantages}
 
-\begin{itemize}
-    \item \textbf{Pondération adaptative} : Voisins importants reçoivent plus d'attention. Par exemple, dans un organoïde, les cellules structurellement similaires peuvent recevoir plus de poids.
-    \item \textbf{Parallélisation} : Le calcul des coefficients d'attention est parallélisable sur les arêtes.
-    \item \textbf{Localité} : L'attention est calculée uniquement sur le voisinage local (contrairement à l'attention globale des Transformers).
-    \item \textbf{Inductive} : Peut généraliser à de nouveaux nœuds non vus pendant l'entraînement.
-    \item \textbf{Interprétabilité} : Les coefficients $\alpha_{ij}$ révèlent quelles connexions sont importantes pour la prédiction.
-    \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot D' \cdot D + |E| \cdot D')$, reste linéaire en nombre d'arêtes.
-\end{itemize}
+\textbf{Pondération adaptative} : Voisins importants reçoivent plus d'attention. Par exemple, dans un organoïde, les cellules structurellement similaires peuvent recevoir plus de poids.
+
+\textbf{Parallélisation} : Le calcul des coefficients d'attention est parallélisable sur les arêtes.
+
+\textbf{Localité} : L'attention est calculée uniquement sur le voisinage local (contrairement à l'attention globale des Transformers).
+
+\textbf{Inductive} : Peut généraliser à de nouveaux nœuds non vus pendant l'entraînement.
+
+\textbf{Interprétabilité} : Les coefficients $\alpha_{ij}$ révèlent quelles connexions sont importantes pour la prédiction.
+
+\textbf{Complexité} : $\mathcal{O}(|E| \cdot D' \cdot D + |E| \cdot D')$, reste linéaire en nombre d'arêtes.
 
 \subsubsection{GATv2 : amélioration du mécanisme d'attention}
 
@@ -878,11 +860,11 @@ L'activation non-linéaire est appliquée après la transformation, permettant u
 
 \subsubsection{Limitations}
 
-\begin{itemize}
-    \item \textbf{Coût mémoire} : Stockage des coefficients d'attention pour $M$ têtes.
-    \item \textbf{Over-smoothing} : Toujours présent avec de nombreuses couches.
-    \item \textbf{Attention locale uniquement} : Pas d'attention globale sur tout le graphe (par design, pour scalabilité).
-\end{itemize}
+\textbf{Coût mémoire} : Stockage des coefficients d'attention pour $M$ têtes.
+
+\textbf{Over-smoothing} : Toujours présent avec de nombreuses couches.
+
+\textbf{Attention locale uniquement} : Pas d'attention globale sur tout le graphe (par design, pour scalabilité).
 
 \subsection{GraphSAGE : sampling et agrégation}
 
@@ -989,11 +971,11 @@ Pour grands graphes avec $|E| \gg S \cdot |V|$, gain substantiel.
 
 \subsubsection{Limitations}
 
-\begin{itemize}
-    \item \textbf{Variance due au sampling} : Différents échantillons donnent différents résultats, nécessite moyenne sur plusieurs forward passes pour stabilité
-    \item \textbf{Choix de $S$} : Hyperparamètre critique affectant trade-off précision/vitesse
-    \item \textbf{Explosion de voisinage} : Avec $K$ couches, $S^K$ nœuds échantillonnés, peut exploser pour $K$ grand
-\end{itemize}
+\textbf{Variance due au sampling} : Différents échantillons donnent différents résultats, nécessite moyenne sur plusieurs forward passes pour stabilité
+
+\textbf{Choix de $S$} : Hyperparamètre critique affectant trade-off précision/vitesse
+
+\textbf{Explosion de voisinage} : Avec $K$ couches, $S^K$ nœuds échantillonnés, peut exploser pour $K$ grand
 
 \subsection{Graph Isomorphism Network (GIN)}
 
@@ -1096,12 +1078,13 @@ GIN obtient typiquement des performances state-of-the-art sur benchmarks de clas
 
 \subsubsection{Limitations}
 
-\begin{itemize}
-    \item \textbf{Over-smoothing} : Toujours présent, même avec expressivité maximale
-    \item \textbf{Limitation 1-WL} : Ne peut distinguer certains graphes non-isomorphes (ex: graphes réguliers fortement réguliers)
-    \item \textbf{Pas d'information géométrique} : Ne tire pas parti des coordonnées 3D (pour nos organoïdes)
-    \item \textbf{Complexité du MLP} : Plus de paramètres que GCN simple, risque de sur-apprentissage sur petits datasets
-\end{itemize}
+\textbf{Over-smoothing} : Toujours présent, même avec expressivité maximale
+
+\textbf{Limitation 1-WL} : Ne peut distinguer certains graphes non-isomorphes (ex: graphes réguliers fortement réguliers)
+
+\textbf{Pas d'information géométrique} : Ne tire pas parti des coordonnées 3D (pour nos organoïdes)
+
+\textbf{Complexité du MLP} : Plus de paramètres que GCN simple, risque de sur-apprentissage sur petits datasets
 
 \subsection{Autres architectures notables}
 
@@ -1119,7 +1102,7 @@ GIN atteint l'expressivité 1-WL mais n'exploite qu'un seul type d'agrégation (
 
 où $\bigoplus$ dénote la concaténation, et :
 
-\textbf{Agrégateurs $A$} :
+\textbf{Agrégateur $a$} :
 \begin{itemize}
     \item $\text{mean}(\cdot)$ : Moyenne
     \item $\text{max}(\cdot)$ : Maximum element-wise
@@ -1128,7 +1111,7 @@ où $\bigoplus$ dénote la concaténation, et :
     \item $\text{sum}(\cdot)$ : Somme
 \end{itemize}
 
-\textbf{Scalers $S$} :
+\textbf{Scaler $s$} :
 \begin{itemize}
     \item Identité : $s(\mathbf{x}) = \mathbf{x}$
     \item Amplification : $s(\mathbf{x}) = \log(|\mathcal{N}(i)| + 1) \cdot \mathbf{x}$
@@ -1252,11 +1235,12 @@ Les graphes géométriques (nuages de points 3D, organoïdes) nécessitent des a
 \subsubsection{Groupe euclidien E(n)}
 
 Le groupe euclidien $E(n)$ en dimension $n$ contient :
-\begin{itemize}
-    \item \textbf{Translations} : $T_{\mathbf{t}}(\mathbf{x}) = \mathbf{x} + \mathbf{t}$
-    \item \textbf{Rotations} : $R_{\mathbf{R}}(\mathbf{x}) = \mathbf{R}\mathbf{x}$ où $\mathbf{R} \in SO(n)$ (matrices orthogonales de déterminant +1)
-    \item \textbf{Réflexions} : Symétries miroir
-\end{itemize}
+
+\textbf{Translations} : $T_{\mathbf{t}}(\mathbf{x}) = \mathbf{x} + \mathbf{t}$
+
+\textbf{Rotations} : $R_{\mathbf{R}}(\mathbf{x}) = \mathbf{R}\mathbf{x}$ où $\mathbf{R} \in SO(n)$ (matrices orthogonales de déterminant +1)
+
+\textbf{Réflexions} : Symétries miroir
 
 Pour les organoïdes 3D, $n = 3$ : le groupe est $E(3)$.
 
@@ -1296,24 +1280,20 @@ pour tout $\mathbf{X}$.
 
 \subsubsection{Quand utiliser quoi ?}
 
-\textbf{Invariance} est désirée pour :
+\textbf{L'invariance} est désirée pour :
 \begin{itemize}
-    \item Classification de graphes (le label du graphe ne change pas si on lui applique une transformation)
-    \item Prédiction de propriétés globales scalaires (exemple : déformation d'un organoïde)
+    \item La classification de graphes (le label du graphe ne change pas si on lui applique une transformation)
+    \item La prédiction de propriétés globales scalaires (exemple : déformation d'un organoïde)
 \end{itemize}
 
-\textbf{Équivariance} est désirée pour :
+\textbf{L'équivariance} est désirée pour :
 \begin{itemize}
-    \item Prédiction de features de nœuds (positions, vecteurs) (exemple : prédiction des forces atomiques)
-    \item Génération de structures géométriques
-    \item es couches intermédiaires (composition d'équivariances)
+    \item La prédiction de features de nœuds (positions, vecteurs) (exemple : prédiction des forces atomiques)
+    \item La génération de structures géométriques
+    \item Les couches intermédiaires (composition d'équivariances)
 \end{itemize}
 
-Pour la classification d'organoïdes, nous voulons :
-\begin{itemize}
-    \item Couches intermédiaires \textbf{équivariantes} (features de nœuds transformées correctement)
-    \item Couche finale \textbf{invariante} (prédiction de classe invariante)
-\end{itemize}
+Pour la classification d'organoïdes, nous souhaitons une architecture hybride combinant des couches intermédiaires \textbf{équivariantes} qui transforment correctement les features de nœuds, et une couche finale \textbf{invariante} qui produit une prédiction de classe invariante aux transformations géométriques.
 
 \subsection{Architectures GNN géométriques principales}
 
@@ -1422,7 +1402,7 @@ où :
 
 \subsubsection{DimeNet : intégration directionnelle}
 
-DimeNet~\cite{Klicpera2020,Gasteiger2020} (Directional Message Passing Neural Network) étend SchNet en intégrant les angles de liaison en plus des distances, capturant la géométrie locale 3D plus finement.
+DimeNet~\cite{Gasteiger2020} (Directional Message Passing Neural Network) étend SchNet en intégrant les angles de liaison en plus des distances, capturant la géométrie locale 3D plus finement.
 
 \textbf{Motivation :}
 Les propriétés moléculaires dépendent non seulement des distances mais aussi des angles (ex: angles de liaison dans les molécules organiques). SchNet ignore cette information directionnelle.
@@ -1566,15 +1546,15 @@ où $\otimes$ est le produit tensoriel de Clebsch-Gordan, $Y^{(l'')}$ sont les h
 \textbf{Limitations :}
 \begin{itemize}
     \item \textbf{Complexité} : $\mathcal{O}(|E| \cdot L_{\max}^6)$ pour les produits de Clebsch-Gordan
-    \item \textbf{Implémentation} : Nécessite bibliothèques spécialisées (e3nn)
+    \item \textbf{Implémentation} : Nécessite des bibliothèques spécialisées (e3nn)
     \item \textbf{Interprétabilité} : Représentations tensorielles abstraites
 \end{itemize}
 
 \textbf{Autres architectures tensorielles :}
 \begin{itemize}
-    \item \textbf{TFN (Tensor Field Networks)~\cite{Thomas2018}} : Première architecture utilisant harmoniques sphériques pour réseaux équivariants à la rotation et translation sur nuages de points 3D
+    \item \textbf{TFN (Tensor Field Networks)~\cite{Thomas2018}} : Première architecture utilisant les harmoniques sphériques pour les réseaux équivariants à la rotation et translation sur nuages de points 3D
     \item \textbf{Cormorant~\cite{Anderson2019}} : Réseaux moléculaires covariants utilisant convolutions de Clebsch-Gordan pour combinaison de représentations irréductibles
-    \item \textbf{SE(3)-Transformers~\cite{Fuchs2020}} : Combine mécanisme d'attention des Transformers avec équivariance tensorielle pour rotations et translations 3D
+    \item \textbf{SE(3)-Transformers~\cite{Fuchs2020}} : Combine le mécanisme d'attention des Transformers avec l'équivariance tensorielle pour les rotations et translations 3D
 \end{itemize}
 
 \textbf{Pertinence pour les organoïdes :}
@@ -1583,8 +1563,8 @@ Pour notre application (classification d'organoïdes), ces architectures tensori
 \begin{itemize}
     \item La géométrie des organoïdes est moins contrainte que celle des molécules
     \item Output scalaire (classe) ne nécessite pas équivariance complète
-    \item Coût computationnel prohibitif pour graphes de 1000+ nœuds
-    \item Difficulté d'interprétation biologique
+    \item Coût computationnel prohibitif pour de grands graphes de 1000+ nœuds
+    \item Difficulté d'interpréter les représentations tensorielles abstraites
 \end{itemize}
 
 Des architectures plus simples (EGNN, variantes de SchNet) offrent un meilleur compromis pour notre cas d'usage.
@@ -1665,8 +1645,8 @@ Les deux surveys identifient des compromis clés :
 
 \textbf{Invariance vs Équivariance :}
 \begin{itemize}
-    \item \textbf{Invariance} : Suffisante pour prédiction de scalaires (énergie), plus simple
-    \item \textbf{Équivariance} : Nécessaire pour prédiction vectorielle (forces), plus général
+    \item \textbf{Invariance} : Suffisante pour la prédiction de scalaires (énergie), plus simple
+    \item \textbf{Équivariance} : Nécessaire pour la prédiction vectorielle (forces), plus générale
 \end{itemize}
 
 \subsubsection{Leçons pour les organoïdes}
@@ -1674,16 +1654,16 @@ Les deux surveys identifient des compromis clés :
 Ces surveys suggèrent plusieurs directions pour notre application aux organoïdes :
 
 \textbf{1. Choix d'architecture :}
-Pour classification (output scalaire), des modèles invariants simples (type EGNN avec features scalaires) suffisent. L'équivariance complète avec features vectorielles est sur-ingénierie.
+Pour classification (output scalaire), des modèles invariants simples (type EGNN avec features scalaires) suffisent. L'équivariance complète avec features vectorielles est de la sur-ingénierie.
 
 \textbf{2. Information géométrique :}
 Les organoïdes ont une géométrie moins contrainte que les molécules (pas d'angles de liaison fixes). Les distances et vecteurs directionnels suffisent, pas besoin d'angles explicites.
 
 \textbf{3. Scalabilité :}
-Avec 50-5000 cellules, la complexité $\mathcal{O}(|E|)$ est critique. Favoriser approches simples (EGNN, SchNet-like) plutôt que tenseurs d'ordre élevé.
+Avec 50-5000 cellules, la complexité $\mathcal{O}(|E|)$ est critique. Il est préférable de favoriser des approches simples (EGNN, SchNet-like) plutôt que des tenseurs d'ordre élevé.
 
 \textbf{4. Interprétabilité :}
-Les features scalaires sont plus faciles à interpréter biologiquement que des représentations tensorielles abstraites.
+Les features scalaires sont plus faciles à interpréter biologiquement que les représentations tensorielles abstraites.
 
 \subsubsection{État de l'art : performances comparées}
 
@@ -1716,11 +1696,11 @@ Prédiction de propriétés moléculaires (énergie, forces, dipôles) à partir
 
 \subsubsection{Biologie structurale}
 
-\begin{itemize}
-    \item \textbf{Prédiction de structure de protéines} : GNNs pour prédire angles dièdres, contacts, structure 3D (bien qu'AlphaFold2 utilise des Transformers)
-    \item \textbf{Prédiction d'affinité ligand-protéine} : Graphes 3D pour drug design
-    \item \textbf{Dynamique moléculaire} : GNNs équivariants pour simuler des trajectoires
-\end{itemize}
+\textbf{Prédiction de structure de protéines} : GNNs pour prédire angles dièdres, contacts, structure 3D (bien qu'AlphaFold2 utilise des Transformers)
+
+\textbf{Prédiction d'affinité ligand-protéine} : Graphes 3D pour le design de molécules
+
+\textbf{Dynamique moléculaire} : GNNs équivariants pour simuler des trajectoires
 
 \subsubsection{Physique et science des matériaux}
 
@@ -1728,7 +1708,7 @@ Prédiction de propriétés de cristaux, simulation de fluides, prédiction de f
 
 \subsubsection{Vision par ordinateur 3D}
 
-Segmentation et classification de nuages de points (LiDAR, scans 3D). Architectures comme PointNet++, bien que non formellement équivariantes, capturent des structures géométriques.
+Segmentation et classification de nuages de points (LiDAR, scans 3D). Les architectures comme PointNet++, bien que non formellement équivariantes, capturent des structures géométriques.
 
 \subsection{Adaptation aux données biologiques cellulaires}
 
@@ -1776,7 +1756,7 @@ Enfin, la \textit{généralisation inter-cohortes} représente un défi récurre
 
 Cette analyse détaillée de l'état de l'art histopathologique apporte plusieurs enseignements directement exploitables pour notre recherche. D'abord, elle valide fondamentalement notre approche : les Cell Graphs, représentation exacte que nous utilisons, sont l'approche dominante et la plus efficace en pathologie computationnelle pour capturer l'organisation spatiale cellulaire. Ensuite, concernant les architectures, les GNN standards (GCN, GAT, GIN) ont démontré leur suffisance pour les tâches de classification tissulaire, mais notre choix d'EGNN apporte une équivariance géométrique justifiée par la nature 3D et l'orientation arbitraire des organoïdes en suspension — un avantage absent en histopathologie 2D.
 
-Le choix de nos features (morphologie cellulaire + intensités multicanal) s'aligne avec les standards établis en histopathologie, confortant notre pipeline d'extraction. L'interprétabilité doit être intégrée dès la conception via des outils comme GNNExplainer, non pas comme ajout cosmétique mais comme composante essentielle pour la validation biologique et l'acceptabilité des résultats. Enfin, nos 1311 échantillons d'organoïdes, bien que substantiels pour un dataset de recherche académique, restent modestes comparés aux 1000-10000 slides typiques des études histopathologiques à large échelle ; cela souligne l'importance critique de la data augmentation et potentiellement du transfert d'apprentissage depuis des données synthétiques ou pré-entraînées.
+Le choix de nos features (morphologie cellulaire + intensités multicanal) s'aligne avec les standards établis en histopathologie, confortant notre pipeline d'extraction. L'interprétabilité doit être intégrée dès la conception via des outils comme GNNExplainer, non pas comme ajout cosmétique mais comme composante essentielle pour la validation biologique et l'acceptabilité des résultats. Enfin, nos 2272 organoïdes, bien que substantiels pour un dataset de recherche académique, restent modestes comparés aux 10000-100000 slides typiques des études histopathologiques à large échelle ; cela souligne l'importance critique de la data augmentation et potentiellement du transfert d'apprentissage depuis des données synthétiques ou pré-entraînées.
 
 \subsubsection{Autres applications biologiques des GNNs}
 
@@ -1786,7 +1766,7 @@ L'analyse single-cell~\cite{Shahir2024} représente un autre domaine d'applicati
 
 Enfin, en biologie des réseaux~\cite{Zhang2021GNN}, les GNNs analysent des réseaux d'interactions moléculaires : réseaux protéine-protéine où chaque protéine est un nœud et les interactions physiques ou fonctionnelles forment les arêtes, réseaux métaboliques, ou réseaux de régulation génique. Ces modèles permettent de prédire des fonctions géniques inconnues par propagation d'annotations dans le réseau, ou d'identifier des cibles thérapeutiques potentielles en analysant les interactions drogue-protéine. Ces applications illustrent la polyvalence des GNNs au-delà des graphes spatiaux, mais s'éloignent conceptuellement de notre problématique d'analyse morphologique d'organoïdes.
 
-\subsubsection{Spécificités des organoïdes vs autres données biologiques}
+\subsubsection{Spécificités des organoïdes vis-à-vis des autres données biologiques}
 
 Notre application aux organoïdes présente des caractéristiques uniques qui justifient certains choix architecturaux et méthodologiques, tout en s'inscrivant dans un continuum d'approches GNN pour données biologiques.
 
@@ -1796,71 +1776,8 @@ La \textit{géométrie 3D native} constitue sans doute la spécificité la plus 
 
 Concernant les \textit{features}, les organoïdes combinent des descripteurs morphologiques cellulaires (aires, volumes, excentricités) et des intensités multicanal continues provenant de marqueurs fluorescents. Cette nature hybride est similaire à l'histopathologie (couleur RGB, marqueurs immunohistochimiques), mais contraste avec les graphes single-cell où les features sont des vecteurs d'expression génique de très haute dimension (2000-5000 dimensions, souvent sparse). Notre espace de features est donc modérément dimensionnel (typiquement 10-50 features par cellule) et dense, facilitant l'apprentissage avec des architectures GNN standards.
 
-La \textit{taille du dataset} représente une contrainte importante. Nos 1311 échantillons d'organoïdes, bien que substantiels pour un dataset académique de biologie, demeurent modestes comparés aux études histopathologiques à large échelle (typiquement 100 à 10000 slides) ou même aux datasets single-cell (10 à 100 échantillons mais contenant chacun des milliers de cellules analysables indépendamment). Cette limitation souligne la nécessité de stratégies de data augmentation efficaces et suggère l'intérêt du pré-entraînement sur données synthétiques — une approche que nous explorons dans ce travail.
+La \textit{taille du dataset} représente une contrainte importante. Nos 2272 organoïdes, bien que substantiels pour un dataset académique de biologie, demeurent modestes comparés aux études histopathologiques à large échelle (typiquement 10000 à 100000 slides) ou même aux datasets single-cell (10 à 100 échantillons mais contenant chacun des milliers de cellules analysables indépendamment). Cette limitation souligne la nécessité de stratégies de data augmentation efficaces et suggère l'intérêt du pré-entraînement sur données synthétiques — une approche que nous explorons dans ce travail.
 
 L'\textit{orientation arbitraire} des organoïdes en suspension 3D constitue un différentiateur clé par rapport à l'histopathologie. Les lames histologiques sont montées selon des conventions anatomiques standardisées, éliminant le besoin d'invariance aux rotations. Les organoïdes, eux, sont imagés dans des orientations aléatoires dictées par leur position dans le milieu de culture. Cette variabilité orientationnelle inhérente rend l'équivariance E(3) non seulement utile mais pratiquement indispensable pour des performances robustes, sans recourir à une augmentation de données exhaustive par rotations.
 
 Enfin, l'\textit{interprétabilité biologique} des résultats revêt une importance capitale. Pour les organoïdes comme en histopathologie, les cellules individuelles sont identifiables visuellement, et les patterns morphologiques appris par le réseau peuvent être interprétés et validés par des biologistes. Cette interprétabilité directe contraste avec les graphes single-cell, où l'interprétation passe par des voies biologiques abstraites et des ontologies géniques. La possibilité de visualiser quelles cellules ou quelles régions de l'organoïde contribuent le plus à la prédiction (via GNNExplainer ou attention maps) offre une validation biologique indispensable et renforce la confiance dans les modèles.
-
-\section{Récapitulatif}
-
-Ce chapitre a établi les fondements théoriques des Graph Neural Networks et leurs applications aux données biologiques géométriques, depuis les principes mathématiques jusqu'aux architectures de pointe.
-
-\subsection*{Fondements théoriques}
-
-\textbf{Théorie des graphes} : Nous avons introduit les définitions formelles des graphes, leurs représentations matricielles (adjacence, Laplacien), et les propriétés spécifiques aux graphes géométriques où les nœuds possèdent des coordonnées spatiales. Les métriques topologiques (degré, clustering, centralité) et les stratégies de construction (K-NN, rayon fixe, Delaunay) ont été présentées, constituant la base de nos graphes cellulaires d'organoïdes.
-
-\textbf{Paradigme Message Passing Neural Network} : Le framework unifié MPNN formalise la plupart des architectures GNN via deux opérations fondamentales : l'agrégation de messages des voisins et la mise à jour des états de nœuds. Nous avons distingué les approches spectrales (convolutions via décomposition propre du Laplacien) des approches spatiales (agrégation directe sur le graphe), avec une attention particulière portée aux \textit{filtres de Chebyshev} qui approximent efficacement les filtres spectraux par des polynômes, réduisant la complexité de $\mathcal{O}(N^3)$ à $\mathcal{O}(K|E|)$ tout en localisant spatialement les opérations.
-
-\subsection*{Architectures GNN standards}
-
-Nous avons présenté les architectures majeures pour graphes généraux :
-
-\textbf{GCN} (Graph Convolutional Networks) avec sa dérivation détaillée depuis les filtres de Chebyshev d'ordre 1 : l'approximation $\lambda_{\max} \approx 2$, la réduction des paramètres, et l'ajout de self-loops conduisent à l'opération de convolution normalisée symétrique qui définit GCN. Cette architecture offre un excellent équilibre simplicité/efficacité.
-
-\textbf{GAT} (Graph Attention Networks) introduit un mécanisme d'attention permettant de pondérer dynamiquement l'importance des voisins, avec des extensions multi-têtes et GATv2 corrigeant certaines limitations. \textbf{GraphSAGE} privilégie la scalabilité via l'échantillonnage de voisinage et l'apprentissage inductif. \textbf{GIN} (Graph Isomorphism Networks) atteint l'expressivité maximale théorique (test de Weisfeiler-Lehman 1-WL) grâce à une agrégation injective. \textbf{PNA} (Principal Neighbourhood Aggregation) combine plusieurs agrégateurs et scalers adaptatifs pour améliorer l'expressivité. Les \textbf{Graph Transformers} généralisent l'attention des Transformers aux graphes avec encodages structurels, et \textbf{Jumping Knowledge} permet d'agréger l'information de multiples couches.
-
-\subsection*{GNNs géométriques équivariants}
-
-Cette section centrale couvre les architectures exploitant explicitement les coordonnées 3D :
-
-\textbf{Concepts fondamentaux} : Nous avons formalisé les groupes de symétries E(n) (euclidien), SE(3) (euclidien spécial), O(3) (orthogonal) et la distinction cruciale entre invariance (output inchangé) et équivariance (output transformé de manière cohérente). L'équivariance permet de construire des architectures intrinsèquement robustes aux transformations géométriques sans augmentation de données exhaustive.
-
-\textbf{Architectures principales} présentées dans un ordre croissant de complexité :
-\begin{itemize}
-    \item \textbf{EGNN} : Messages construits avec invariants (distances), mise à jour équivariante des coordonnées via vecteurs directionnels, simplicité d'implémentation avec garanties théoriques E(n)
-    \item \textbf{SchNet} : Convolutions continues via RBF expansion des distances, filtres radiaux, invariance E(3) mais pas équivariance
-    \item \textbf{DimeNet} : Intègre angles en plus des distances via triplets de nœuds, SBF expansion, expressivité géométrique accrue
-    \item \textbf{PaiNN} : Features scalaires + vectorielles, équivariance partielle permettant prédiction de forces
-    \item \textbf{Architectures tensorielles} : NequIP, TFN, Cormorant, SE(3)-Transformers utilisent représentations via harmoniques sphériques pour expressivité maximale mais complexité $\mathcal{O}(L^3)$
-\end{itemize}
-
-\textbf{Panorama des surveys récents} (Duval et al. 2024, Han et al. 2024) : Nous avons synthétisé les taxonomies proposées (niveau d'équivariance, représentation des features, information géométrique), les design patterns récurrents (invariants comme messages, décomposition en produits directs, frames locaux, harmoniques sphériques), et les trade-offs fondamentaux (expressivité vs complexité, information géométrique vs biais inductif, invariance vs équivariance). Un tableau comparatif des performances sur QM9 et MD17 illustre ces compromis.
-
-\subsection*{Adaptation aux données biologiques cellulaires}
-
-\textbf{Histopathologie} (survey Brussee et al. 2024) : Analyse détaillée révélant que les Cell Graphs (nœuds = cellules, arêtes = proximité spatiale) dominent en pathologie computationnelle, avec GCN (35\%) et GAT (30\%) comme architectures privilégiées. Les performances atteignent 85-95\% accuracy pour classification de sous-types tumoraux. Observation clé : les architectures équivariantes sont rarement utilisées car les tissus sont imagés dans des orientations canoniques. Les défis identifiés (construction de graphes, normalisation, déséquilibre de classes, interprétabilité, généralisation inter-cohortes) sont directement pertinents pour nos organoïdes.
-
-\textbf{Autres applications biologiques} : Neurosciences (graphes de connectivité cérébrale fMRI/DTI), analyse single-cell (graphes de similarité transcriptomique), biologie des réseaux (interactions protéine-protéine), chimie quantique (prédiction de propriétés moléculaires).
-
-\textbf{Spécificités des organoïdes} : Analyse comparative détaillée révélant des caractéristiques uniques qui justifient nos choix architecturaux :
-\begin{itemize}
-    \item \textbf{Géométrie 3D native} : Contrairement à l'histopathologie 2D, justifie pleinement les GNNs équivariants
-    \item \textbf{Orientation arbitraire} : En suspension, pas d'orientation canonique → équivariance E(3) indispensable
-    \item \textbf{Échelle intermédiaire} : 50-5000 cellules, entre molécules et tissus, idéale pour GNNs
-    \item \textbf{Features hybrides} : Morphologie + intensités multicanal, modérément dimensionnel (10-50 features)
-    \item \textbf{Dataset modeste} : 1311 échantillons → nécessite data augmentation et transfer learning
-    \item \textbf{Interprétabilité} : Cellules visuellement identifiables, patterns morphologiques validables biologiquement
-\end{itemize}
-
-\subsection*{Choix architecturaux justifiés pour les organoïdes}
-
-Cette revue extensive justifie notre stratégie expérimentale :
-\begin{itemize}
-    \item \textbf{Comparaison systématique} : Évaluation de GCN, GAT, GraphSAGE, GIN (standards) et EGNN (équivariant)
-    \item \textbf{EGNN comme architecture principale} : Équilibre optimal équivariance/complexité pour classification avec géométrie 3D
-    \item \textbf{Validation du paradigme Cell Graph} : Approche dominante en histopathologie, transposable aux organoïdes
-    \item \textbf{Écartement des architectures tensorielles} : Sur-ingénierie pour output scalaire (classe), coût prohibitif sur graphes de 1000+ nœuds, interprétabilité réduite
-\end{itemize}
-
-Ces fondements théoriques et cette analyse comparative seront mobilisés dans le Chapitre 4, où nous décrirons la construction concrète des graphes géométriques d'organoïdes, l'extraction des features cellulaires, l'implémentation des architectures GNN comparées, ainsi que les stratégies de génération de données synthétiques et de transfer learning pour pallier la limitation de nos données.

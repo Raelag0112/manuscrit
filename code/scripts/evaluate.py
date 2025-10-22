@@ -78,7 +78,7 @@ def main():
     
     # Load model
     logger.info(f"Loading model from {args.model_path}")
-    checkpoint = torch.load(args.model_path, map_location=args.device)
+    checkpoint = torch.load(args.model_path, map_location=args.device, weights_only=False)
     
     # Create model (you'll need to save model config in checkpoint)
     # For now, assume we can infer from checkpoint

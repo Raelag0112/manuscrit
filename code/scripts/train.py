@@ -37,11 +37,13 @@ class Trainer:
         lr=0.001,
         weight_decay=1e-4,
         scheduler_type='plateau',
+        model_config=None,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.device = device
+        self.model_config = model_config or {}
         
         # Optimizer
         self.optimizer = AdamW(
@@ -208,6 +210,7 @@ class Trainer:
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'metrics': metrics,
+            'model_config': self.model_config,
         }
         torch.save(checkpoint, path)
 
@@ -294,14 +297,15 @@ def main():
     
     # Create model
     logger.info(f"Creating {args.model.upper()} model")
-    model = OrganoidClassifier.create(
-        model_type=args.model,
-        in_channels=in_channels,
-        num_classes=num_classes,
-        hidden_channels=args.hidden_channels,
-        num_layers=args.num_layers,
-        dropout=args.dropout,
-    )
+    model_config = {
+        'model_type': args.model,
+        'in_channels': in_channels,
+        'num_classes': num_classes,
+        'hidden_channels': args.hidden_channels,
+        'num_layers': args.num_layers,
+        'dropout': args.dropout,
+    }
+    model = OrganoidClassifier.create(**model_config)
     
     # Create trainer
     trainer = Trainer(
@@ -312,6 +316,7 @@ def main():
         lr=args.lr,
         weight_decay=args.weight_decay,
         scheduler_type=args.scheduler,
+        model_config=model_config,
     )
     
     # Train

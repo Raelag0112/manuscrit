@@ -6,7 +6,7 @@ import numpy as np
 from scipy import ndimage
 from skimage import measure
 import torch
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 import logging
 
 logger = logging.getLogger(__name__)

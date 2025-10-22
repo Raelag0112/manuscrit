@@ -69,22 +69,52 @@ class OrganoidClassifier:
         return model
     
     @staticmethod
-    def load_from_checkpoint(checkpoint_path: str, device='cpu') -> nn.Module:
+    def load_from_checkpoint(checkpoint_path: str, device='cpu', model_type='gcn', **kwargs) -> nn.Module:
         """
         Load model from checkpoint
         
         Args:
             checkpoint_path: Path to .pth checkpoint file
             device: Device to load model on
+            model_type: Model type (used if not in checkpoint)
+            **kwargs: Additional model config (in_channels, num_classes, etc.)
         
         Returns:
             Loaded model
         """
-        checkpoint = torch.load(checkpoint_path, map_location=device)
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
         
         # Get model configuration
-        model_config = checkpoint.get('model_config', {})
-        model_type = model_config.get('model_type', 'gcn')
+        model_config = checkpoint.get('model_config', None)
+        
+        if model_config is None:
+            # Old checkpoint format - infer config from state dict and args
+            state_dict = checkpoint['model_state_dict']
+            
+            # Infer num_classes from the final layer
+            if 'fc.weight' in state_dict:
+                num_classes = state_dict['fc.weight'].shape[0]
+            else:
+                num_classes = kwargs.get('num_classes', 2)
+            
+            # Infer in_channels from the first layer
+            # Try different first layer keys depending on model type
+            in_channels = kwargs.get('in_channels', 8)
+            for key in state_dict.keys():
+                if 'weight' in key and len(state_dict[key].shape) >= 2:
+                    if 'conv' in key.lower() or 'lin' in key.lower():
+                        in_channels = state_dict[key].shape[-1]
+                        break
+            
+            # Build config
+            model_config = {
+                'model_type': model_type,
+                'in_channels': in_channels,
+                'num_classes': num_classes,
+                'hidden_channels': kwargs.get('hidden_channels', 128),
+                'num_layers': kwargs.get('num_layers', 3),
+                'dropout': kwargs.get('dropout', 0.5),
+            }
         
         # Create model
         model = OrganoidClassifier.create(**model_config)

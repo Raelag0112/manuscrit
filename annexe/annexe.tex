@@ -1801,7 +1801,7 @@ Ce chapitre documente exhaustivement les datasets utilisés, permettant reproduc
 
 \section{Description détaillée des datasets}
 
-\subsection{Dataset synthétique : OrganoSynth-5K}
+\subsection{Dataset synthétique}
 
 \subsubsection{Statistiques globales}
 
@@ -2067,104 +2067,6 @@ Ce chapitre documente exhaustivement les datasets utilisés, permettant reproduc
     \item Accord inter-annotateurs : Cohen's κ = 0.78 (bon accord)
     \item Désaccords : 21.2\% résolus par consensus
     \item Validation indépendante : 100 organoïdes (échantillon stratifié)
-\end{itemize}
-
-\section{Protocoles d'annotation}
-
-\subsection{Équipe d'annotation}
-
-\textbf{Annotateurs} :
-\begin{itemize}
-    \item 3 biologistes experts (PhD, 5+ ans expérience organoïdes)
-    \item 1 pathologiste senior (supervision, cas difficiles)
-\end{itemize}
-
-\subsection{Critères de classification}
-
-\textbf{Pour organoïdes intestinaux [exemple]} :
-
-\textbf{Classe 0 (Indifférencié)} :
-\begin{itemize}
-    \item Morphologie : sphérique, homogène
-    \item Marqueurs : forte expression stem markers (Lgr5)
-    \item Pas de structures polarisées
-    \item Pas de lumen clairement défini
-\end{itemize}
-
-\textbf{Classe 1 (Partiellement différencié)} :
-\begin{itemize}
-    \item Morphologie : début de bourgeonnement
-    \item Marqueurs : mix stem + différenciation
-    \item Polarisation apico-basale émergente
-    \item Lumen en formation
-\end{itemize}
-
-\textbf{Classe 2 (Pleinement différencié)} :
-\begin{itemize}
-    \item Morphologie : bourgeonnements multiples, architecture complexe
-    \item Marqueurs : forte expression marqueurs différenciation (Villine, Mucine)
-    \item Polarisation claire
-    \item Lumen bien défini
-\end{itemize}
-
-\subsection{Processus d'annotation}
-
-\subsubsection{Workflow}
-
-\begin{enumerate}
-    \item \textbf{Formation} : Session de 2h, 50 exemples gold-standard
-    \item \textbf{Annotation indépendante} : Chaque annotateur classe tous les organoïdes
-    \item \textbf{Confrontation} : Réunion hebdomadaire pour désaccords
-    \item \textbf{Consensus} : Vote majoritaire (2/3), expert senior pour égalité
-    \item \textbf{Documentation} : Rationale pour cas difficiles
-\end{enumerate}
-
-\subsubsection{Interface d'annotation}
-
-Outil custom développé :
-\begin{itemize}
-    \item Visualisation 3D interactive (rotation, zoom, slicing)
-    \item Multi-canal avec ajustement intensité
-    \item Shortcuts clavier (1-5 pour classes)
-    \item Historique et undo
-    \item Export CSV automatique
-\end{itemize}
-
-\subsection{Fiabilité inter-annotateurs}
-
-\subsubsection{Métriques calculées}
-
-\textbf{Kappa de Cohen} : $\kappa = 0.78$ (accord substantiel)
-
-\textbf{Matrice de confusion inter-annotateurs} :
-\begin{verbatim}
-         Ann2
-Ann1    C0   C1   C2
-  C0    385   12    3
-  C1     15  420   15
-  C2      2   18  330
-\end{verbatim}
-
-\textbf{Précision par classe} :
-\begin{itemize}
-    \item Classe 0 : 96\% accord
-    \item Classe 1 : 93\% accord (confusion avec C0 et C2)
-    \item Classe 2 : 94\% accord
-\end{itemize}
-
-\subsubsection{Gestion des désaccords}
-
-\textbf{Désaccords majeurs (>1 classe)} : 23 cas (1.9\%)
-\begin{itemize}
-    \item Révision en équipe
-    \item Décision collégiale
-    \item Exclusion si pas de consensus (8 organoïdes retirés)
-\end{itemize}
-
-\textbf{Désaccords mineurs (1 classe)} : 187 cas (15.6\%)
-\begin{itemize}
-    \item Vote majoritaire
-    \item Documentation de l'ambiguïté
 \end{itemize}
 
 \section{Statistiques descriptives complètes}

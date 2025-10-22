@@ -43,16 +43,16 @@ segmentation:
 # Graph construction
 graph:
   edge_method: "knn"  # knn, radius, delaunay, combined
-  k_neighbors: 8
+  k_neighbors: 10
   radius: 50.0
   include_self_loops: false
   
 # Synthetic generation
 synthetic:
-  num_train: 3000
-  num_val: 500
-  num_test: 500
-  num_cells_min: 100
+  num_train: 70000
+  num_val: 15000
+  num_test: 15000
+  num_cells_min: 50
   num_cells_max: 500
   feature_dim: 10
   processes:

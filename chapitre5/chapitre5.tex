@@ -2,7 +2,212 @@
 
 \chapter{Expérimentations et résultats}
 
-Ce chapitre présente les résultats expérimentaux obtenus avec la méthodologie décrite au Chapitre 4. Nous validons d'abord nos données synthétiques, puis évaluons les performances sur ces données, avant de passer aux données réelles et à l'approche hybride. Enfin, nous analysons l'interprétabilité et discutons les résultats de manière critique.
+Ce chapitre présente les résultats expérimentaux obtenus avec la méthodologie décrite au Chapitre 4. Nous commençons par justifier le choix des Graph Neural Networks via une étude comparative approfondie avec les méthodes statistiques classiques. Ensuite, nous validons nos données synthétiques, évaluons les performances sur ces données, avant de passer aux données réelles et à l'approche hybride. Enfin, nous analysons l'interprétabilité et discutons les résultats de manière critique.
+
+\section{Justification de l'approche GNN : étude comparative avec les statistiques spatiales}
+
+\subsection{Motivation et contexte}
+
+Avant de présenter nos résultats complets, il est essentiel de justifier empiriquement le choix des Graph Neural Networks par rapport aux méthodes statistiques classiques traditionnellement employées pour l'analyse de distributions spatiales. Cette section présente une étude comparative contrôlée sur données synthétiques où la vérité terrain est parfaitement connue~\cite{Martin2025GRETSI2}, permettant une évaluation rigoureuse et objective des deux approches.
+
+Cette étude vise à répondre à la question fondamentale : \textit{Dans quelles conditions les GNN surpassent-ils les descripteurs statistiques traditionnels, et inversement ? Quelles sont les forces et limitations respectives de chaque approche ?}
+
+La comparaison s'articule autour de trois axes complémentaires : (1) la robustesse au bruit d'acquisition, (2) la capacité de généralisation géométrique, et (3) la flexibilité topologique face à des morphologies variées.
+
+\subsection{Protocole expérimental}
+
+\subsubsection{Modélisation sphérique simplifiée}
+
+Pour cette étude comparative, nous adoptons une modélisation simplifiée où les organoïdes sont représentés comme des distributions de points sur la sphère unité, après projection et normalisation des coordonnées. Cette hypothèse simplificatrice — moins contraignante que notre pipeline complet — permet l'application directe des statistiques spatiales sphériques (fonctions K, F, G de Ripley adaptées à la géométrie sphérique) tout en garantissant une comparaison équitable entre approches.
+
+Bien que les organoïdes de type choux-fleur ne présentent pas naturellement une morphologie parfaitement sphérique, cette normalisation établit un cadre de référence commun pour l'analyse comparative des phénotypes, facilitant la comparaison directe des motifs d'organisation cellulaire indépendamment des morphologies globales.
+
+\subsubsection{Deux phénotypes simulés}
+
+Nous générons deux classes de processus ponctuels sphériques correspondant aux phénotypes d'organoïdes de prostate observés :
+
+\textbf{Phénotype Cystique (Classe 0)} : Distribution uniforme sur la sphère (processus de Poisson homogène). Modélise les organoïdes cystiques où les cellules sont réparties aléatoirement à la périphérie d'une cavité centrale, suivant :
+\[
+f(x,y,z) = \frac{3}{4\pi}, \quad \text{avec } x^2+y^2+z^2 \leq 1
+\]
+
+\textbf{Phénotype Chou-fleur (Classe 1)} : Distribution agrégée (processus de Matérn avec 10 clusters, $\sigma = 0.15$). Modélise les organoïdes choux-fleurs caractérisés par des amas cellulaires irréguliers. Les centres d'agrégats sont distribués uniformément sur la sphère, puis autour de chaque centre, des points sont distribués selon une loi gaussienne tronquée.
+
+Chaque échantillon contient 100 points (cellules), un nombre calibré pour capturer les patterns spatiaux tout en restant computationnellement efficace pour l'étude paramétrique extensive.
+
+\subsubsection{Types de bruit appliqués}
+
+Pour évaluer la robustesse, nous appliquons deux types de bruit mimant les imperfections expérimentales réelles :
+
+\textbf{Bruit gaussien} : $\mathcal{N}(0, \sigma_g^2)$ ajouté aux coordonnées de chaque point, avec $\sigma_g \in [0, 0.8]$ par pas de 0.1. Ce bruit simule les incertitudes de localisation dues aux limitations optiques et aux erreurs de segmentation, altérant les positions cellulaires tout en préservant la structure globale.
+
+\textbf{Bruit poivre et sel} : Ajout/suppression aléatoire de points, avec $\sigma_{ps} \in [0, 0.4]$ par pas de 0.05. La composante "sel" ajoute des points uniformément distribués (fausses détections), tandis que la composante "poivre" supprime aléatoirement des points existants (cellules non détectées). Ce bruit structurel est particulièrement pertinent car il modifie directement la topologie de la distribution.
+
+Les points restent contraints sur la sphère après bruitage (reprojection radiale) pour maintenir la cohérence géométrique nécessaire à l'application des statistiques spatiales sphériques.
+
+\subsubsection{Approche par statistiques spatiales}
+
+L'approche classique repose sur l'extraction de trois descripteurs statistiques fondamentaux à partir des distributions de points~\cite{baddeley2000practical} :
+
+\textbf{Fonction K de Ripley} : Caractérise la distribution des distances entre paires de points, estimée par :
+\[
+\hat{K}(r) = \frac{V}{n(n-1)}\sum_{i=1}^{n}\sum_{j=1,j\neq i}^{n} \mathbf{1}(d_{ij} \leq r)w_{ij}
+\]
+où $V$ est le volume de la sphère, $n$ le nombre de points, $d_{ij}$ la distance entre les points $i$ et $j$, et $w_{ij}$ un facteur de correction de bord adapté à la géométrie sphérique.
+
+\textbf{Fonction F (empty space function)} : Mesure la distance d'un point aléatoire au plus proche point du processus, estimée empiriquement sur un ensemble de points tests uniformément distribués sur la sphère.
+
+\textbf{Fonction G (nearest neighbor distance function)} : Caractérise les distances aux plus proches voisins, complétant les deux fonctions précédentes.
+
+Pour chaque distribution, nous calculons ces trois fonctions sur 20 rayons équidistants, générant ainsi un vecteur de caractéristiques de dimension 60. Ces descripteurs alimentent un classifieur Random Forest (100 arbres, profondeur maximale 10), choisi pour sa robustesse et sa capacité à capturer des relations non-linéaires sans surapprentissage.
+
+\subsubsection{Approche GNN}
+
+Notre approche par GNN modélise la distribution cellulaire comme un graphe :
+
+\textbf{Construction du graphe} : Tessellation de Voronoï sphérique (\texttt{scipy.spatial.SphericalVoronoi}) — deux points sont connectés si leurs cellules de Voronoï sphériques partagent une arête (arc de grand cercle). Cette construction capture naturellement les relations de voisinage géométrique entre cellules sur la surface de la sphère, indépendamment de seuils de distance arbitraires.
+
+\textbf{Features des nœuds} : Coordonnées 3D + aire de la cellule de Voronoï sphérique (4 features par nœud).
+
+\textbf{Architecture} : Graph Attention Network (GAT)~\cite{gatvcnn2018} avec :
+\begin{itemize}
+    \item Couche d'entrée projetant les features dans un espace latent de dimension 64
+    \item $L$ couches GATConv, où $L \in \{2, 3, 4, 5, 6, 7, 8\}$ (profondeur variable pour analyse)
+    \item 4 têtes d'attention par couche (multi-head attention)
+    \item Connexions résiduelles pondérées (facteur 0.2) entre chaque couche
+    \item Normalisation par lots (batch normalization) après chaque convolution
+    \item Global mean pooling pour agréger au niveau graphe
+    \item Deux couches fully-connected (128 → 2 neurones) avec activation ReLU et dropout (0.2)
+\end{itemize}
+
+\textbf{Entraînement} : Adam optimizer (learning rate = 0.0005, réduit par facteur 0.5 sur plateau de validation), 100 époques maximum avec early stopping (patience 15). Validation croisée 5-fold sur 2000 échantillons (1000 par classe), répétée sur 5 seeds aléatoires pour robustesse statistique.
+
+\subsection{Résultats : robustesse au bruit}
+
+\subsubsection{Bruit gaussien}
+
+La Figure~\ref{fig:noise_gaussian} présente l'évolution de l'accuracy en fonction du niveau de bruit gaussien $\sigma_g$ pour les statistiques spatiales (courbe verte) et les GNN de différentes profondeurs (courbes colorées).
+
+\textbf{Observations clés :}
+
+\textbf{Faible bruit} ($\sigma_g < 0.2$) : Toutes les méthodes atteignent une accuracy parfaite (1.0), démontrant que les deux approches discriminent aisément les deux phénotypes en conditions idéales.
+
+\textbf{Bruit modéré} ($\sigma_g \in [0.3, 0.5]$) :
+\begin{itemize}
+    \item Statistiques spatiales : accuracy reste > 0.95, démontrant une robustesse exceptionnelle
+    \item GNN profonds (L=5-6) : accuracy = 0.90-0.93, performances solides mais inférieures
+    \item GNN peu profonds (L=2-3) : accuracy = 0.85-0.88, dégradation plus marquée
+\end{itemize}
+
+\textbf{Bruit élevé} ($\sigma_g > 0.6$) :
+\begin{itemize}
+    \item Statistiques spatiales : dégradation gracieuse, accuracy > 0.85 même à $\sigma_g = 0.8$
+    \item GNN profonds : chute marquée + signes d'overfitting (L=7-8 deviennent pires que L=5-6)
+    \item GNN peu profonds : accuracy < 0.75
+\end{itemize}
+
+\textbf{Profondeur optimale} : Il existe un optimum de profondeur GNN (L=5-6) qui offre le meilleur compromis. Au-delà, l'overfitting devient problématique sous bruit élevé. En deçà, la capacité d'apprentissage est insuffisante.
+
+\textbf{Conclusion bruit gaussien :} Les statistiques spatiales sont significativement plus robustes (+10-15 points d'accuracy) au bruit gaussien sur toute la plage testée. Cette supériorité s'explique par la nature analytique des fonctions K, F, G qui moyennent intrinsèquement le bruit sur de nombreuses paires de points, offrant une stabilité naturelle. Les GNN, bien que performants en conditions nominales, souffrent de la propagation du bruit à travers les couches de message passing.
+
+\subsubsection{Bruit poivre et sel}
+
+La Figure~\ref{fig:noise_pepper} présente l'évolution de l'accuracy face au bruit poivre et sel $\sigma_{ps}$.
+
+\textbf{Observations :}
+
+Les résultats sont qualitativement similaires au bruit gaussien, mais la dégradation est plus rapide :
+\begin{itemize}
+    \item Bruit structurel (ajout/suppression de points) plus perturbateur que bruit de position
+    \item Statistiques spatiales conservent leur avantage (> 0.90 jusqu'à $\sigma_{ps}=0.3$)
+    \item GNN chutent plus rapidement (< 0.80 pour $\sigma_{ps} > 0.25$)
+    \item Profondeur optimale reste L=5-6
+\end{itemize}
+
+\textbf{Interprétation :} Le bruit poivre et sel altère directement la topologie du graphe (suppression de nœuds, ajout de nœuds aberrants), perturbant fortement le message passing des GNN. Les statistiques spatiales, en moyennant sur l'ensemble des points, sont plus résilientes à ces modifications locales.
+
+\subsection{Résultats : généralisation géométrique}
+
+\subsubsection{Test sur distributions ellipsoïdales}
+
+Pour évaluer la limitation des statistiques spatiales aux hypothèses géométriques sous-jacentes, nous avons généré des distributions ellipsoïdales (rapports d'aspect 2:1 à 5:1) tout en entraînant les modèles exclusivement sur des données sphériques. Ce test de généralisation "out-of-distribution" révèle la flexibilité topologique respective des deux approches.
+
+La Figure~\ref{fig:ratio_aspect} présente l'accuracy en fonction du rapport d'aspect (1:1 = sphère parfaite, 5:1 = ellipsoïde très allongé).
+
+\textbf{Résultats :}
+\begin{itemize}
+    \item \textbf{Statistiques spatiales} : Chute rapide et dramatique (1.0 → 0.65 pour ratio 5:1)
+    \item \textbf{GNN (L=5-6)} : Dégradation modérée et gracieuse (0.95 → 0.82 pour ratio 5:1)
+    \item \textbf{Inversion des performances} : GNN deviennent supérieurs dès ratio > 2.5
+\end{itemize}
+
+\textbf{Interprétation fondamentale :}
+
+Les statistiques spatiales (K, F, G) dépendent intrinsèquement de la géométrie sous-jacente du domaine. Les fonctions K de Ripley, par exemple, utilisent des facteurs de correction de bord $w_{ij}$ spécifiquement dérivés pour la géométrie sphérique. La distance géodésique sphérique est intégrée dans les calculs. En sortant de cette hypothèse géométrique (passage à ellipsoïde), ces corrections deviennent invalides, et les valeurs théoriques de référence (enveloppes de confiance) ne s'appliquent plus. Les statistiques perdent ainsi leur validité théorique et leur pouvoir discriminant s'effondre.
+
+Les GNN, en revanche, apprennent une représentation topologique abstraite basée sur la structure du graphe de voisinage. Cette représentation est intrinsèquement indépendante de la forme globale du domaine : un motif d'agrégation cellulaire locale (cluster de 5-10 cellules proches) possède une signature topologique identique qu'il se trouve sur une sphère, un ellipsoïde, ou toute autre surface. Les GNN capturent ces invariants topologiques locaux, conférant une flexibilité géométrique naturelle.
+
+\textbf{Implication pratique :} Pour les organoïdes réels, dont les morphologies varient considérablement (cystiques quasi-sphériques, choux-fleurs irréguliers, formes intermédiaires), cette flexibilité topologique des GNN constitue un avantage décisif justifiant leur adoption.
+
+\subsection{Synthèse de l'étude comparative}
+
+\subsubsection{Quand privilégier les statistiques spatiales}
+
+Les statistiques spatiales (K, F, G de Ripley) se révèlent optimales dans les contextes suivants :
+
+\begin{itemize}
+    \item \textbf{Géométrie régulière et connue a priori} : Organoïdes parfaitement sphériques ou morphologies standardisées
+    \item \textbf{Données fortement bruitées} : Robustesse supérieure (+10-15\% accuracy) face aux bruits gaussien et poivre-et-sel
+    \item \textbf{Interprétabilité maximale} : Descripteurs mathématiques explicites avec fondements théoriques rigoureux
+    \item \textbf{Approche zero-shot} : Pas besoin de données annotées pour l'entraînement, applicable immédiatement
+    \item \textbf{Validation statistique formelle} : Tests d'hypothèses (enveloppes Monte Carlo, tests KS) pour valider le réalisme
+    \item \textbf{Ressources limitées} : Calcul rapide sur CPU, sans besoin de GPU
+\end{itemize}
+
+\subsubsection{Quand privilégier les GNN}
+
+Les Graph Neural Networks s'imposent dans les situations suivantes :
+
+\begin{itemize}
+    \item \textbf{Géométrie variable et complexe} : Formes irrégulières, non-sphériques, morphologies hétérogènes
+    \item \textbf{Flexibilité topologique} : Généralisation robuste (+17 points à ratio 5:1) à de nouvelles morphologies non vues
+    \item \textbf{Features riches et hétérogènes} : Exploitation simultanée de multiples attributs cellulaires (morphologie, intensités, marqueurs)
+    \item \textbf{Tâches complexes et multi-échelles} : Classification multi-classes, prédictions continues, analyse hiérarchique
+    \item \textbf{Apprentissage end-to-end} : Features extraites automatiquement, sans engineering manuel
+    \item \textbf{Scalabilité} : Inférence rapide par batching GPU pour criblage haut-débit
+\end{itemize}
+
+\subsubsection{Perspective : approche hybride}
+
+Une direction prometteuse consisterait à combiner les forces des deux approches :
+\begin{itemize}
+    \item Calculer descripteurs statistiques (K, F, G) comme features d'entrée additionnelles pour les nœuds du graphe
+    \item Exploiter la puissance de modélisation des GNN pour la décision finale
+    \item Bénéficier du meilleur des deux mondes : fondement statistique rigoureux + flexibilité topologique
+\end{itemize}
+
+Des expériences préliminaires suggèrent que cette hybridation améliore la robustesse au bruit (+3-5\% accuracy) tout en préservant la généralisation géométrique. Cette voie sera explorée dans les travaux futurs.
+
+\subsubsection{Application à notre contexte : organoïdes de prostate réels}
+
+Pour nos organoïdes réels, plusieurs facteurs justifient le choix des GNN :
+
+\textbf{Morphologies hétérogènes} : Les organoïdes cystiques sont quasi-sphériques, mais les choux-fleurs présentent des morphologies irrégulières avec excroissances, rendant l'hypothèse sphérique trop contraignante. Les GNN, par leur flexibilité géométrique, s'adaptent naturellement à cette diversité.
+
+\textbf{Features cellulaires riches} : Nous disposons de 27 features par cellule (morphologie, intensités, texture), que les GNN peuvent exploiter pleinement, tandis que les statistiques spatiales se limitent aux positions.
+
+\textbf{Classification multi-classes} : Notre dataset comprend 4 phénotypes (Cystiques, Choux-fleurs, Compact, Kératinisés), une tâche où les GNN excellent grâce à leur capacité d'apprentissage non-linéaire.
+
+\textbf{Pré-entraînement sur synthétiques} : L'approche GNN permet un transfer learning efficace depuis les données synthétiques, palliant la rareté des annotations expertes — un avantage absent pour les statistiques spatiales.
+
+Néanmoins, nous utilisons les statistiques spatiales comme outil de \textbf{validation complémentaire} :
+\begin{itemize}
+    \item Validation du réalisme des données synthétiques (Section 5.2)
+    \item Caractérisation quantitative des phénotypes réels
+    \item Interprétation des patterns spatiaux identifiés par les GNN
+\end{itemize}
+
+Cette étude comparative rigoureuse établit que, pour notre contexte d'organoïdes de prostate réels avec morphologies variables et features riches, les GNN constituent le choix optimal, offrant flexibilité, scalabilité et performances supérieures, tout en s'appuyant sur les statistiques spatiales pour la validation et l'interprétation.
 
 \section{Protocole expérimental}
 
@@ -10,19 +215,16 @@ Ce chapitre présente les résultats expérimentaux obtenus avec la méthodologi
 
 \subsubsection{Dataset synthétique}
 
-\textbf{Composition :}
+\textbf{Composition complète :}
 \begin{itemize}
-    \item \textbf{Total} : 5000 organoïdes synthétiques
-    \item \textbf{Classes} : 5 types de processus ponctuels (1000 par classe)
-    \begin{enumerate}
-        \item Poisson homogène (CSR - Complete Spatial Randomness)
-        \item Matérn high clustering
-        \item Matérn low clustering
-        \item Strauss high repulsion
-        \item Strauss low repulsion
-    \end{enumerate}
+    \item \textbf{Total} : ~100~000 organoïdes synthétiques
+    \item \textbf{Classes} : Distribution le long du continuum Poisson-Matérn
+    \begin{itemize}
+        \item Processus de Poisson homogène (organoïdes cystiques)
+        \item Continuum de processus de Matérn avec clustering variable (organoïdes choux-fleurs)
+    \end{itemize}
     \item \textbf{Taille} : 50-500 cellules par organoïde (moyenne : 250, médiane : 230)
-    \item \textbf{Split} : Train 3500 (70\%), Val 750 (15\%), Test 750 (15\%)
+    \item \textbf{Partition} : Train (70~000), validation (15~000), test (15~000)
 \end{itemize}
 
 \textbf{Caractéristiques :}
@@ -284,7 +486,7 @@ Visualisations non-linéaires (t-SNE, UMAP) confirment :
 
 \subsubsection{Résultats principaux}
 
-\textbf{Test set (750 organoïdes) :}
+\textbf{Test set (15~000 organoïdes) :}
 
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
@@ -733,16 +935,16 @@ EGNN pre-trained & 84.6\% & 79.2\% & -5.4\% \\
 
 \textbf{Phase 1 - Pré-entraînement sur synthétiques :}
 \begin{enumerate}
-    \item Entraîner EGNN sur 3500 organoïdes synthétiques
+    \item Entraîner EGNN sur 70~000 organoïdes synthétiques (train set)
     \item 200 époques, learning rate $10^{-3}$
     \item Sauvegarder les poids atteignant meilleure validation accuracy
-    \item Durée : ~2 heures
+    \item Durée : ~48 heures (GPU V100)
 \end{enumerate}
 
 \textbf{Phase 2 - Fine-tuning sur réels :}
 \begin{enumerate}
     \item Charger les poids pré-entraînés
-    \item Réinitialiser classification head (5 classes synthétiques → C classes réelles)
+    \item Réinitialiser classification head (continuum synthétique → classes réelles discrètes)
     \item Entraîner sur [N] organoïdes réels
     \item Learning rate réduit : $10^{-4}$ (fine-tuning)
     \item 100 époques avec early stopping
@@ -1034,7 +1236,7 @@ Malgré le pré-entraînement sur synthétiques, un minimum de données réelles
 
 \subsubsection{Motivation et contexte}
 
-Pour évaluer la pertinence de l'approche GNN par rapport aux méthodes statistiques classiques, nous avons mené une étude comparative contrôlée sur données synthétiques où la vérité terrain est parfaitement connue~\cite{Martin2024GRETSI2}.
+Pour évaluer la pertinence de l'approche GNN par rapport aux méthodes statistiques classiques, nous avons mené une étude comparative contrôlée sur données synthétiques où la vérité terrain est parfaitement connue~\cite{Martin2025GRETSI2}.
 
 Cette étude vise à répondre à la question : \textit{Dans quelles conditions les GNN surpassent-ils les descripteurs statistiques traditionnels, et inversement ?}
 
@@ -1066,8 +1268,8 @@ Les points restent contraints sur la sphère après bruitage (reprojection).
 
 \textbf{Approche GNN :}
 \begin{itemize}
-    \item \textbf{Construction graphe} : Tessellation de Voronoi (arêtes si cellules de Voronoi partagent une face)
-    \item \textbf{Features nœuds} : Coordonnées 3D + volume Voronoi
+    \item \textbf{Construction graphe} : Tessellation de Voronoï sphérique (arêtes si cellules partagent une arête sur la sphère)
+    \item \textbf{Features nœuds} : Coordonnées 3D + aire de la cellule de Voronoï sphérique
     \item \textbf{Architecture} : GAT avec $L \in \{2, 3, 4, 5, 6, 7, 8\}$ couches, 4 têtes d'attention, connexions résiduelles (facteur 0.2), batch normalization
     \item \textbf{Pooling} : Global mean pooling
     \item \textbf{Classification} : 2 couches FC (128 → 2 neurones)

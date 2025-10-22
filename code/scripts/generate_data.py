@@ -19,13 +19,13 @@ def main():
     
     parser.add_argument('--output_dir', type=str, required=True,
                         help='Output directory for generated data')
-    parser.add_argument('--num_train', type=int, default=3000,
+    parser.add_argument('--num_train', type=int, default=70000,
                         help='Number of training samples')
-    parser.add_argument('--num_val', type=int, default=500,
+    parser.add_argument('--num_val', type=int, default=15000,
                         help='Number of validation samples')
-    parser.add_argument('--num_test', type=int, default=500,
+    parser.add_argument('--num_test', type=int, default=15000,
                         help='Number of test samples')
-    parser.add_argument('--num_cells_min', type=int, default=100,
+    parser.add_argument('--num_cells_min', type=int, default=50,
                         help='Minimum number of cells per organoid')
     parser.add_argument('--num_cells_max', type=int, default=500,
                         help='Maximum number of cells per organoid')
@@ -36,7 +36,7 @@ def main():
     parser.add_argument('--edge_method', type=str, default='knn',
                         choices=['knn', 'radius', 'delaunay'],
                         help='Graph edge construction method')
-    parser.add_argument('--k_neighbors', type=int, default=8,
+    parser.add_argument('--k_neighbors', type=int, default=10,
                         help='Number of neighbors for KNN')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed')

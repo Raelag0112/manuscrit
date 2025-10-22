@@ -21,7 +21,7 @@ Enfin, on distingue une catégorie particulière d'organoïdes, les PDO (``patie
 Différents types d'organoïdes ont été développés avec succès :
 
 \textbf{Organoïdes intestinaux :}
-Premier système organoïde développé~\cite{Sato2009}, ils reproduisent l'architecture des villosités intestinales avec cryptes et cellules différenciées (entérocytes, cellules de Paneth, cellules entéroendocrines, cellules caliciformes). Utilisés pour étudier l'homéostasie intestinale, les maladies inflammatoires, les infections, et pour le criblage de drogues.
+Premier système organoïde développé~\cite{Sato2009}, ils reproduisent l'architecture des villosités intestinales avec cryptes et cellules différenciées (entérocytes, cellules de Paneth, cellules entéroendocrines, cellules caliciformes). Utilisés pour étudier l'homéostasie intestinale, les maladies inflammatoires, les infections (SARS-CoV-2~\cite{Zhou2020COVID}), les pathologies génétiques (mucoviscidose~\cite{Dekkers2013}), et pour le criblage de drogues.
 
 \textbf{Organoïdes cérébraux :}
 Structures complexes mimant le développement cérébral précoce~\cite{Lancaster2013}, contenant différentes régions cérébrales (cortex, hippocampe, plexus choroïde). Applications en neurobiologie du développement, modélisation de maladies neurologiques (microcéphalie, autisme, schizophrénie), et étude de l'impact de pathogènes (virus Zika).
@@ -33,10 +33,12 @@ Reproduisent l'architecture lobulaire du foie avec hépatocytes fonctionnels~\ci
 Contiennent des structures néphroniques avec tubules et podocytes~\cite{Takasato2015}. Utilisés pour modéliser les maladies rénales génétiques et acquises, tester la néphrotoxicité de composés.
 
 \textbf{Organoïdes pulmonaires :}
-Modèles des voies aériennes et des alvéoles~\cite{Sachs2019}. Applications pour SARS-CoV-2~\cite{Zhou2020COVID}, mucoviscidose~\cite{Dekkers2013}, cancer du poumon.
+Modèles des voies aériennes et des alvéoles~\cite{Sachs2019}. Applications pour les infections respiratoires, la mucoviscidose, et le cancer du poumon.
 
 \textbf{Autres organoïdes :}
 Pancréas~\cite{Boj2015}, rétine~\cite{Lin2020}, estomac~\cite{Bartfeld2015}, prostate, glandes salivaires, sein~\cite{Sachs2018}, etc. La diversité croissante reflète l'universalité de l'approche.
+
+Les organoïdes étudiés dans cette thèse sont des organoïdes de prostate.
 
 \subsection{Mécanismes de formation et auto-organisation}
 
@@ -164,12 +166,14 @@ Par exemple, pour une étude de criblage pharmacologique testant 100 composés �
 \subsubsection{Défis de traitement}
 
 Le traitement de ces volumes pose plusieurs défis :
-\begin{itemize}
-    \item \textbf{Mémoire} : Charger une image complète en mémoire peut dépasser la RAM disponible (64-128 Go typiques)
-    \item \textbf{Temps de calcul} : L'analyse naïve voxel-par-voxel est prohibitivement lente
-    \item \textbf{Parallélisation} : Nécessité de stratégies de traitement par blocs (tiling) ou de streaming
-    \item \textbf{Stockage} : Coûts de stockage et de backup importants, nécessité de compression
-\end{itemize}
+
+\textbf{Mémoire} : Charger une image complète en mémoire peut dépasser la RAM disponible (64-128 Go typiques)
+
+\textbf{Temps de calcul} : L'analyse naïve voxel-par-voxel est prohibitivement lente
+
+\textbf{Parallélisation} : Nécessité de stratégies de traitement par blocs (tiling) ou de streaming
+
+\textbf{Stockage} : Coûts de stockage et de backup importants, nécessité de compression
 
 Ces contraintes motivent le développement de représentations compactes et efficaces, comme les graphes cellulaires proposés dans cette thèse.
 
@@ -184,14 +188,10 @@ L'analyse manuelle se déroule généralement selon plusieurs étapes complémen
 \subsubsection{Coûts et contraintes pratiques}
 
 \textbf{Coûts temporels :}
-\begin{itemize}
-    \item Analyse simple : 5-10 min/organoïde
-    \item Analyse détaillée : 15-30 min/organoïde
-    \item Pour 1000 organoïdes : 250-500 heures = 1-2 mois temps plein
-\end{itemize}
+Pour une analyse détaillée comptant 15-30 min par organoïde, cela représente 250-500 heures, soit 1-2 mois de travail temps plein.
 
 \textbf{Coûts financiers :}
-À 50€/heure de temps expert, l'analyse de 1000 organoïdes coûte 12,500-25,000€, motivant l'automatisation.
+À 50€/heure de travail d'un expert, l'analyse de 1000 organoïdes coûte 12,500-25,000€, motivant l'automatisation.
 
 \subsection{Segmentation cellulaire : état de l'art}
 
@@ -214,46 +214,19 @@ Des contours évoluent sous l'influence de forces internes (régularité) et ext
 L'architecture U-Net~\cite{Ronneberger2015}, introduite pour segmentation biomédicale 2D, a été étendue en 3D~\cite{Cicek2016}. L'architecture encoder-decoder avec skip connections permet la segmentation sémantique dense. Cependant, elle nécessite des annotations pixel-level coûteuses, ainsi qu'une empreinte mémoire importante en 3D.
 
 \textbf{Mask R-CNN et détection d'instances :}
-Détection et segmentation simultanées d'instances d'objets. Applicable aux noyaux cellulaires mais présente des difficultés pour gérer les chevauchements en 3D.
+Détection et segmentation simultanées d'instances d'objets. Cette approche est applicable aux noyaux cellulaires mais présente des difficultés pour gérer les chevauchements en 3D.
 
 \textbf{StarDist :}
-Approche innovante représentant chaque cellule par son centroïde et un champ de distances radiales (star-convex polygons)~\cite{Schmidt2018}. Très performant pour les noyaux de forme convexe. Implémentation 2D et 3D disponible. Limitation : formes non-convexes mal gérées.
+Une approche innovante représentant chaque cellule par son centroïde et un champ de distances radiales (star-convex polygons)~\cite{Schmidt2018}, très performante pour les noyaux de forme convexe. Une implémentation 2D et 3D est disponible. Cependant, elle ne gère pas bien les formes non-convexes.
 
 \textbf{Cellpose :}
-État de l'art actuel~\cite{Stringer2021}, basé sur la prédiction de champs de gradients où chaque pixel/voxel "pointe" vers le centre de sa cellule. Le suivi de ces gradients permet de regrouper les pixels en cellules. Avantages majeurs :
-\begin{itemize}
-    \item Robuste aux variations de taille cellulaire
-    \item Gère bien les morphologies irrégulières et les cellules denses
-    \item Version 3D efficace
-    \item Modèles pré-entraînés généralistes performants
-    \item Possibilité de fine-tuning sur des données spécifiques
-\end{itemize}
+État de l'art actuel~\cite{Stringer2021}, basé sur la prédiction de champs de gradients où chaque pixel/voxel "pointe" vers le centre de sa cellule. Le suivi de ces gradients permet de regrouper les pixels en cellules. Cette méthode présente plusieurs avantages majeurs qui en font un outil de référence. Elle se montre robuste aux variations de taille cellulaire et gère efficacement les morphologies irrégulières ainsi que les cellules denses. La version 3D est particulièrement efficace pour le traitement de volumes complets. De plus, Cellpose propose des modèles pré-entraînés généralistes offrant d'excellentes performances, avec la possibilité de réaliser un fine-tuning sur des données spécifiques pour améliorer encore les résultats sur des types cellulaires particuliers.
 
 Cellpose représente actuellement le meilleur compromis précision/généralisation pour la segmentation de noyaux et de cellules en 3D.
 
-Performances typiques de Cellpose sur les organoïdes (validation sur 50 coupes annotées) :
-\begin{itemize}
-    \item Précision : 0.99
-    \item Rappel : 0.96
-    \item F1-score : 0.98
-    \item Temps : ~30 secondes/coupe (GPU)
-\end{itemize}
-
 \subsubsection{Bilan des méthodes de segmentation existantes}
 
-L'état de l'art montre un trade-off fondamental entre précision et vitesse :
-
-\textbf{Pour une précision maximale :}
-\begin{itemize}
-    \item Cellpose : F1=0.98, mais 30 sec/coupe (lent pour grand débit)
-    \item StarDist : F1=0.85, 5 sec/coupe (compromis intéressant)
-\end{itemize}
-
-\textbf{Pour la rapidité :}
-\begin{itemize}
-    \item Watershed : Rapide mais imprécis (F1=0.70-0.75)
-    \item Seuillage simple : Très rapide mais inadapté (cellules collées)
-\end{itemize}
+L'état de l'art montre un trade-off fondamental entre précision et vitesse. Pour une précision maximale, Cellpose offre d'excellentes performances mais nécessite environ 30 secondes par coupe, ce qui le rend lent pour le criblage à haut débit. StarDist offre un compromis intéressant avec une précision moindre mais un temps de calcul de seulement 5 secondes par coupe. À l'opposé du spectre, les méthodes privilégiant la rapidité incluent le watershed, qui est rapide mais imprécis, et le seuillage simple, très rapide mais inadapté aux configurations où les cellules sont collées les unes aux autres.
 
 Pour l'analyse de milliers d'organoïdes nécessaire à notre étude, Cellpose standard (30 sec/coupe × 200 coupes/organoïde × 1500 organoïdes = 2500 heures ≈ 104 jours) est prohibitivement lent.
 
@@ -262,12 +235,14 @@ Cette limitation motive le développement de méthodes de segmentation optimisé
 \subsubsection{Évaluation et benchmarking}
 
 Les méthodes de segmentation sont typiquement évaluées via :
-\begin{itemize}
-    \item \textbf{Métriques pixel-level} : Dice coefficient, Intersection over Union (IoU)
-    \item \textbf{Métriques objet-level} : Précision, rappel, F1-score sur détection d'instances
-    \item \textbf{Average Precision (AP)} : Métrique standard des défis de segmentation (issu de détection d'objets)
-    \item \textbf{Segmentation Covering} : Mesure de recouvrement entre segmentation prédite et vérité terrain
-\end{itemize}
+
+\textbf{Métriques pixel-level} : Dice coefficient, Intersection over Union (IoU)
+
+\textbf{Métriques objet-level} : Précision, rappel, F1-score sur détection d'instances
+
+\textbf{Average Precision (AP)} : Métrique standard des défis de segmentation (issu de détection d'objets)
+
+\textbf{Segmentation Covering} : Mesure de recouvrement entre segmentation prédite et vérité terrain
 
 Les compétitions internationales (Cell Tracking Challenge~\cite{Ulman2017}, Data Science Bowl~\cite{Caicedo2019}) ont poussé l'état de l'art avec des datasets de référence annotés.
 
@@ -313,12 +288,7 @@ Avec noyaux non-linéaires (RBF), performants pour classification avec données 
 État de l'art pour données tabulaires, souvent supérieurs aux Random Forest, mais ils nécessitent le tuning d'hyperparamètres.
 
 \textbf{Limitations principales :}
-\begin{itemize}
-    \item Plafond de performance limité par l'expressivité des features
-    \item Nécessité d'expertise domaine pour le feature engineering
-    \item Perte d'information relationnelle (les relations entre les cellules ne sont pas capturées)
-    \item Peu de généralisation à d'autres types d'organoïdes
-\end{itemize}
+Ces approches souffrent cependant de plusieurs limitations importantes. Le plafond de performance est limité par l'expressivité des features extraites, et la conception de ces descripteurs nécessite une expertise domaine approfondie pour le feature engineering. De plus, ces méthodes entraînent une perte d'information relationnelle, car les relations spatiales entre les cellules ne sont pas capturées par des statistiques globales. Enfin, elles offrent peu de généralisation à d'autres types d'organoïdes, chaque type nécessitant souvent un ensemble de features spécifiques.
 
 \subsection{Approches récentes spécifiques aux organoïdes}
 
@@ -364,69 +334,7 @@ L’utilisation de réseaux de neurones convolutifs 3D se heurte à des contrain
 Le downsampling détruit les détails fins (cellules individuelles non résolues), limitant la capacité à capturer l'information biologique subtile.
 
 \textbf{Résultats et limitations :}
-Bien que les CNN 3D puissent obtenir de bonnes performances sur certaines tâches de classification d'organoïdes, ils :
-\begin{itemize}
-    \item Nécessitent de larges datasets annotés (milliers d'exemples)
-    \item Sont sensibles aux variations d'acquisition (domain shift)
-    \item Manquent d'interprétabilité (boîte noire)
-    \item Requièrent une augmentation extensive pour tenir compte des invariances géométriques
-\end{itemize}
-
-\subsubsection{Approches ensemblistes : DeepSets et PointNet}
-
-Une alternative aux CNN pour traiter les données 3D consiste à représenter chaque organoïde comme un nuage de points (point cloud), où chaque cellule est représentée par sa position 3D et ses features morphologiques, et à appliquer des architectures invariantes aux permutations.
-
-\textbf{DeepSets : fondements théoriques}
-
-Zaheer et al.~\cite{Zaheer2017} établissent les fondements théoriques du traitement d'ensembles non ordonnés en démontrant un théorème de représentation universelle. Toute fonction invariante aux permutations peut s'écrire sous la forme :
-\[
-f(\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}) = \rho\left(\text{AGG}\left(\{\phi(\mathbf{x}_i)\}\right)\right)
-\]
-où $\phi$ est un encodeur (MLP) appliqué indépendamment à chaque élément, AGG est une agrégation symétrique (somme, moyenne, max), et $\rho$ est un décodeur (MLP).
-
-Cette architecture garantit l'invariance aux permutations : l'ordre dans lequel les cellules sont traitées n'affecte pas le résultat, ce qui est biologiquement pertinent.
-
-\textbf{PointNet : application aux nuages de points 3D}
-
-PointNet~\cite{Qi2017}, proposé par Qi et al. la même année, applique ce principe aux nuages de points 3D avec max-pooling comme agrégation :
-\[
-f(\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}) = \text{MLP}_{\rho}\left(\max_{i=1}^n \text{MLP}_{\phi}(\mathbf{x}_i)\right)
-\]
-
-PointNet a été initialement conçu pour la segmentation et classification de scans 3D (LiDAR, objets scannés) et présente plusieurs avantages :
-\begin{itemize}
-    \item Traitement direct des nuages de points sans voxelisation
-    \item Invariance stricte aux permutations
-    \item Complexité linéaire $\mathcal{O}(n)$ en nombre de points
-    \item Robustesse aux points manquants et au bruit
-\end{itemize}
-
-\textbf{Application potentielle aux organoïdes}
-
-Pour les organoïdes, on pourrait représenter chaque cellule par son centroïde 3D et ses features (volume, sphéricité, intensité), formant un nuage de points. Une architecture DeepSets ou PointNet pourrait alors classifier l'organoïde entier.
-
-\textbf{Limitations fondamentales pour notre contexte}
-
-Malgré leur élégance théorique, ces approches présentent des limitations majeures pour l'analyse d'organoïdes :
-\begin{itemize}
-    \item \textbf{Perte d'information structurelle locale :} Chaque cellule est traitée indépendamment par $\phi$ avant l'agrégation globale. Les relations de voisinage spatial (contacts cellule-cellule, organisation en couches) ne sont pas explicitement capturées
-    \item \textbf{Agrégation globale unique :} Une seule opération d'agrégation sur toutes les cellules. Pas de propagation progressive d'information locale comme dans les GNNs
-    \item \textbf{Expressivité limitée :} Pour les organoïdes où la structure spatiale locale est biologiquement cruciale (ex: formation de lumens, stratification épithéliale), ignorer la topologie du voisinage limite la capacité prédictive
-    \item \textbf{Pas d'équivariance géométrique :} PointNet utilise des T-Nets pour une quasi-invariance aux transformations, mais n'offre pas de garanties théoriques formelles d'équivariance E(3) comme les GNNs géométriques
-\end{itemize}
-
-\textbf{PointNet++ et rapprochement vers les graphes}
-
-PointNet++~\cite{Qi2017b} adresse partiellement ces limitations en introduisant une hiérarchie multi-échelles avec des agrégations locales (set abstraction layers) sur des boules spatiales. Cette approche se rapproche conceptuellement des GNNs mais reste limitée :
-\begin{itemize}
-    \item Les voisinages sont définis par distance euclidienne fixe, pas par structure de graphe adaptative
-    \item Coût computationnel élevé pour la recherche de voisinages à chaque couche
-    \item Toujours pas d'équivariance E(3) formelle
-\end{itemize}
-
-\textbf{Relation avec les GNNs}
-
-Les GNNs peuvent être vus comme une généralisation de DeepSets où l'agrégation globale $\sum_{i=1}^n \phi(x_i)$ est remplacée par des agrégations locales structurées : $\sum_{j \in \mathcal{N}(i)} \psi(x_j)$ pour chaque nœud $i$. Cette structure permet de capturer explicitement la topologie spatiale via la construction du graphe (K-NN, distance-seuil), ce qui est essentiel pour notre application.
+Bien que les CNN 3D puissent obtenir de bonnes performances sur certaines tâches de classification d'organoïdes, ils présentent plusieurs limitations importantes. Ils nécessitent de larges datasets annotés comptant plusieurs milliers d'exemples pour atteindre de bonnes performances. De plus, ils sont sensibles aux variations d'acquisition (domain shift), ce qui limite leur capacité de généralisation entre différents protocoles expérimentaux. Ces modèles manquent également d'interprétabilité, fonctionnant comme des boîtes noires qui ne permettent pas d'identifier les caractéristiques biologiques discriminantes. Enfin, ils requièrent une augmentation extensive des données pour tenir compte des invariances géométriques, notamment les rotations et les symétries en 3D.
 
 \subsection{Approches basées graphes en histopathologie}
 
@@ -450,12 +358,14 @@ Ces approches ont montré des performances supérieures ou, du moins, comparable
 \subsubsection{Limitations et extension aux organoïdes 3D}
 
 Cependant, ces travaux présentent des limites importantes :
-\begin{itemize}
-    \item \textbf{Limitation 2D} : Les coupes histologiques sont intrinsèquement 2D, perdant l'information 3D cruciale des organoïdes
-    \item \textbf{Tissus plans} : Les approches sont conçues pour des architectures planaires, pas pour des structures sphéroïdales 3D
-    \item \textbf{Features simples} : Les graphes utilisés n'exploitent généralement pas les coordonnées spatiales 3D explicitement
-    \item \textbf{Pas d'équivariance géométrique} : Les architectures ne respectent pas les symétries 3D naturelles
-\end{itemize}
+
+\textbf{Limitation 2D} : Les coupes histologiques sont intrinsèquement 2D, perdant l'information 3D cruciale des organoïdes
+
+\textbf{Tissus plans} : Les approches sont conçues pour des architectures planaires, pas pour des structures sphéroïdales 3D
+
+\textbf{Features simples} : Les graphes utilisés n'exploitent généralement pas les coordonnées spatiales 3D explicitement
+
+\textbf{Pas d'équivariance géométrique} : Les architectures ne respectent pas les symétries 3D naturelles
 
 L'extension de ces approches aux organoïdes 3D avec graphes géométriques équivariants constitue une contribution originale de notre travail.
 

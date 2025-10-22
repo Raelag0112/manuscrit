@@ -159,12 +159,62 @@ class SyntheticOrganoidGenerator:
         
         return features.astype(np.float32)
     
+    def apply_spatial_transformation(
+        self,
+        positions: np.ndarray,
+        alpha: float = 0.35,
+        radius: float = 20.0,
+    ) -> np.ndarray:
+        """
+        Apply radial extension transformation based on local density
+        
+        Extends points beyond the sphere proportionally to neighborhood density,
+        simulating cauliflower-like protrusions while preserving initial areas.
+        
+        This transformation implements the equation from Chapter 4:
+        p'_i = p_i * (1 + alpha * |N_r(i)| / |N_r^ref|)
+        
+        Args:
+            positions: Cell positions (N, 3)
+            alpha: Extension amplitude parameter, typically in [0.2, 0.5]
+            radius: Neighborhood radius for density computation
+            
+        Returns:
+            transformed_positions: Extended positions (N, 3)
+        """
+        from scipy.spatial import distance_matrix
+        
+        num_cells = len(positions)
+        
+        # Compute distance matrix
+        dist_matrix = distance_matrix(positions, positions)
+        
+        # Count neighbors within radius for each cell
+        neighbor_counts = np.sum(dist_matrix < radius, axis=1) - 1  # exclude self
+        
+        # Reference neighborhood size (median)
+        ref_count = np.median(neighbor_counts)
+        
+        if ref_count == 0:
+            ref_count = 1.0  # Avoid division by zero
+        
+        # Compute extension factors
+        extension_factors = 1.0 + alpha * (neighbor_counts / ref_count)
+        
+        # Apply radial extension
+        transformed_positions = positions * extension_factors[:, np.newaxis]
+        
+        logger.info(f"Applied spatial transformation: mean extension factor = {extension_factors.mean():.3f}")
+        
+        return transformed_positions
+    
     def generate_organoid(
         self,
         num_cells: int,
         process_type: str,
         label: int,
         feature_dim: int = 10,
+        apply_transformation: bool = True,
         **process_kwargs
     ) -> Data:
         """
@@ -175,17 +225,23 @@ class SyntheticOrganoidGenerator:
             process_type: Point process type
             label: Class label
             feature_dim: Feature dimension
+            apply_transformation: Whether to apply spatial transformation beyond sphere
             **process_kwargs: Process parameters
         
         Returns:
             PyG Data object
         """
-        # Generate positions
+        # Generate positions on sphere
         positions = self.generate_cell_positions(
             num_cells,
             process_type,
             **process_kwargs
         )
+        
+        # Apply spatial transformation for GNN training (extending beyond sphere)
+        # This simulates cauliflower-like protrusions in clustered regions
+        if apply_transformation:
+            positions = self.apply_spatial_transformation(positions)
         
         # Generate features
         features = self.generate_cell_features(positions, feature_dim)
@@ -308,9 +364,9 @@ class SyntheticOrganoidGenerator:
     def generate_and_save(
         self,
         output_dir: str,
-        num_train: int = 3000,
-        num_val: int = 500,
-        num_test: int = 500,
+        num_train: int = 70000,
+        num_val: int = 15000,
+        num_test: int = 15000,
         **generation_kwargs
     ) -> None:
         """
@@ -344,10 +400,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate synthetic organoid dataset')
     parser.add_argument('--output_dir', type=str, required=True,
                         help='Output directory')
-    parser.add_argument('--num_train', type=int, default=3000)
-    parser.add_argument('--num_val', type=int, default=500)
-    parser.add_argument('--num_test', type=int, default=500)
-    parser.add_argument('--num_cells_min', type=int, default=100)
+    parser.add_argument('--num_train', type=int, default=70000)
+    parser.add_argument('--num_val', type=int, default=15000)
+    parser.add_argument('--num_test', type=int, default=15000)
+    parser.add_argument('--num_cells_min', type=int, default=50)
     parser.add_argument('--num_cells_max', type=int, default=500)
     parser.add_argument('--feature_dim', type=int, default=10)
     parser.add_argument('--seed', type=int, default=42)

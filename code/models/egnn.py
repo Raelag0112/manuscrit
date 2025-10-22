@@ -137,7 +137,11 @@ class EGNN(nn.Module):
 
 
 class EGNNClassifier(nn.Module):
-    """EGNN with classification head"""
+    """EGNN with classification head
+    
+    Note: This implementation uses the first 3 features as positions if available,
+    or creates dummy positions if data has no explicit 3D coordinates.
+    """
     
     def __init__(
         self,
@@ -149,8 +153,23 @@ class EGNNClassifier(nn.Module):
     ):
         super(EGNNClassifier, self).__init__()
         
+        # If in_channels >= 3, use first 3 as positions, rest as features
+        # Otherwise, create a position encoder
+        self.use_position_encoding = in_channels < 3
+        
+        if self.use_position_encoding:
+            # Create learnable position embeddings
+            self.pos_encoder = nn.Linear(in_channels, 3)
+            feature_dim = in_channels
+        else:
+            # Use first 3 features as positions, rest as node features
+            feature_dim = max(in_channels - 3, 1)  # At least 1 feature
+            if in_channels == 3:
+                # If only 3 features, use them both as pos and features
+                feature_dim = 3
+        
         self.encoder = EGNN(
-            in_channels, hidden_channels, num_layers, hidden_channels
+            feature_dim, hidden_channels, num_layers, hidden_channels, edge_dim=0
         )
         
         self.classifier = nn.Sequential(
@@ -160,13 +179,43 @@ class EGNNClassifier(nn.Module):
             nn.Linear(hidden_channels // 2, num_classes)
         )
     
-    def forward(self, h, pos, edge_index, batch, edge_attr=None):
+    def forward(self, x, edge_index, batch, edge_attr=None):
+        """
+        Unified interface compatible with other GNN models
+        
+        Args:
+            x: Node features (N, in_channels)
+            edge_index: Edge indices (2, E)
+            batch: Batch assignment (N,)
+            edge_attr: Edge attributes (optional)
+        
+        Returns:
+            logits: Class logits (batch_size, num_classes)
+        """
+        # Extract or create positions
+        if self.use_position_encoding:
+            # Create positions from features
+            pos = self.pos_encoder(x)
+            h = x  # Use all features
+        else:
+            # Split features into positions and node features
+            if x.size(1) == 3:
+                # Only 3 features: use them as both pos and features
+                pos = x
+                h = x
+            else:
+                # Split: first 3 as positions, rest as features
+                pos = x[:, :3]
+                h = x[:, 3:]
+        
+        # Get graph embedding
         graph_emb = self.encoder.get_graph_embedding(
             h, pos, edge_index, batch, edge_attr
         )
         return self.classifier(graph_emb)
     
-    def predict(self, h, pos, edge_index, batch, edge_attr=None):
-        logits = self.forward(h, pos, edge_index, batch, edge_attr)
+    def predict(self, x, edge_index, batch, edge_attr=None):
+        """Prediction with unified interface"""
+        logits = self.forward(x, edge_index, batch, edge_attr)
         return torch.argmax(logits, dim=1)
 
