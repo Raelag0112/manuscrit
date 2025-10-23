@@ -5,6 +5,7 @@ from .gat import GAT
 from .graphsage import GraphSAGE
 from .gin import GIN
 from .egnn import EGNN
+from .deepsets import DeepSets, DeepSetsClassifier
 from .classifier import OrganoidClassifier
 
 __all__ = [
@@ -13,6 +14,8 @@ __all__ = [
     'GraphSAGE',
     'GIN',
     'EGNN',
+    'DeepSets',
+    'DeepSetsClassifier',
     'OrganoidClassifier',
 ]
 

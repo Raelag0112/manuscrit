@@ -1,10 +1,13 @@
 # Organoid Analysis Pipeline
 
-Complete implementation of the methodology described in Chapter 4.
+Complete implementation of the methodology described in **Chapter 4** and experimental baselines from **Chapter 5**.
 
 ## Pipeline Coverage
 
-✅ **100% Complete** - All components from Chapter 4 are implemented.
+✅ **Chapter 4: 100% Complete** - All pipeline components implemented  
+✅ **Chapter 5: DeepSets Integrated** - Baseline for graph structure validation
+
+> **📊 To reproduce Chapter 5 results**, see [README_CHAPTER5.md](README_CHAPTER5.md)
 
 ### Components
 
@@ -43,9 +46,10 @@ Complete implementation of the methodology described in Chapter 4.
    - Spatial transformation (p'_i = p_i * (1 + α|N_r(i)|/|N_r^ref|))
    - Dataset: 70k/15k/15k split
 
-7. **GNN Models** (`models/`)
-   - EGNN (E(n)-equivariant, 5 layers, 256 dim)
-   - GCN, GAT, GraphSAGE, GIN baselines
+7. **Models** (`models/`)
+   - **EGNN** (E(n)-equivariant, 5 layers, 256 dim) - Main model
+   - **GCN, GAT, GraphSAGE, GIN** - GNN baselines
+   - **DeepSets** - Permutation-invariant baseline (Chapter 5)
 
 8. **Training** (`scripts/train.py`)
    - AdamW optimizer
@@ -76,11 +80,28 @@ python scripts/generate_data.py \
 ```
 
 ### Train Model
+
+**EGNN (main model)**:
 ```bash
 python scripts/train.py \
     --data_dir data/synthetic \
-    --output_dir results/ \
+    --output_dir results/egnn \
     --model egnn \
+    --hidden_channels 256 \
+    --num_layers 5 \
+    --epochs 200 \
+    --batch_size 32 \
+    --lr 0.001
+```
+
+**DeepSets (baseline for comparison)**:
+```bash
+python scripts/train.py \
+    --data_dir data/synthetic \
+    --output_dir results/deepsets \
+    --model deepsets \
+    --hidden_channels 128 \
+    --num_layers 3 \
     --epochs 200 \
     --batch_size 32 \
     --lr 0.001

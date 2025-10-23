@@ -226,8 +226,8 @@ def main():
     
     # Model
     parser.add_argument('--model', type=str, default='gcn',
-                        choices=['gcn', 'gat', 'graphsage', 'gin', 'egnn'],
-                        help='GNN architecture')
+                        choices=['gcn', 'gat', 'graphsage', 'gin', 'egnn', 'deepsets'],
+                        help='Model architecture (GNN or DeepSets baseline)')
     parser.add_argument('--hidden_channels', type=int, default=128,
                         help='Hidden dimension')
     parser.add_argument('--num_layers', type=int, default=3,

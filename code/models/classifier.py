@@ -9,11 +9,13 @@ from .gat import GATClassifier
 from .graphsage import GraphSAGEClassifier
 from .gin import GINClassifier
 from .egnn import EGNNClassifier
+from .deepsets import DeepSetsClassifier
 
 
 class OrganoidClassifier:
     """
-    Factory for creating organoid classifiers with different GNN architectures
+    Factory for creating organoid classifiers with different architectures
+    Supports GNNs (GCN, GAT, GraphSAGE, GIN, EGNN) and DeepSets baseline
     """
     
     MODELS = {
@@ -22,6 +24,7 @@ class OrganoidClassifier:
         'graphsage': GraphSAGEClassifier,
         'gin': GINClassifier,
         'egnn': EGNNClassifier,
+        'deepsets': DeepSetsClassifier,
     }
     
     @staticmethod
@@ -38,13 +41,13 @@ class OrganoidClassifier:
         Create organoid classifier
         
         Args:
-            model_type: Type of GNN ('gcn', 'gat', 'graphsage', 'gin', 'egnn')
+            model_type: Type of model ('gcn', 'gat', 'graphsage', 'gin', 'egnn', 'deepsets')
             in_channels: Number of input node features
             num_classes: Number of output classes
             hidden_channels: Hidden dimension
-            num_layers: Number of GNN layers
+            num_layers: Number of layers
             dropout: Dropout rate
-            **kwargs: Additional model-specific arguments
+            **kwargs: Additional model-specific arguments (e.g., aggregation='sum_max' for deepsets)
         
         Returns:
             Classifier model
@@ -129,14 +132,18 @@ class OrganoidClassifier:
 
 if __name__ == "__main__":
     # Test model creation
-    for model_type in ['gcn', 'gat', 'graphsage', 'gin', 'egnn']:
+    for model_type in ['gcn', 'gat', 'graphsage', 'gin', 'egnn', 'deepsets']:
         print(f"\nCreating {model_type.upper()} model...")
+        kwargs = {}
+        if model_type == 'deepsets':
+            kwargs['aggregation'] = 'sum_max'
         model = OrganoidClassifier.create(
             model_type=model_type,
-            in_channels=10,
+            in_channels=4,  # 3D position + volume
             num_classes=5,
-            hidden_channels=64,
+            hidden_channels=128,
             num_layers=3,
+            **kwargs
         )
         print(f"Parameters: {sum(p.numel() for p in model.parameters()):,}")
 

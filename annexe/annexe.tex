@@ -8,50 +8,53 @@ Ce premier chapitre d'annexe fournit les bases du deep learning nécessaires à 
 
 \subsection{Les origines : perceptrons et réseaux multicouches}
 
-Le concept de neurone artificiel remonte aux années 1940 avec le modèle McCulloch-Pitts. Le perceptron de Rosenblatt (1958) marque la première implémentation matérielle d'un réseau de neurones. Les perceptrons multicouches (MLP), introduits dans les années 1980, avec l'algorithme de rétropropagation du gradient (Rumelhart et al., 1986), permettent pour la première fois d'entraîner des réseaux profonds.
+L'histoire de l'intelligence artificielle et des réseaux de neurones débute bien avant l'ère moderne du deep learning. Dès les années 1940, Warren McCulloch et Walter Pitts proposent le premier modèle mathématique du neurone artificiel, posant ainsi les fondements théoriques de ce qui deviendra plus tard les réseaux de neurones. Leur modèle, bien que simplifié, capturait l'essence du fonctionnement neuronal : un neurone reçoit des signaux, les combine, et décide de s'activer ou non selon un seuil.
+
+Deux décennies plus tard, en 1958, Frank Rosenblatt fait passer la théorie à la pratique en construisant le Mark I Perceptron, la première implémentation matérielle d'un réseau de neurones. Cette machine, capable d'apprendre à reconnaître des formes simples, suscite un enthousiasme considérable. Rosenblatt va jusqu'à prédire que les perceptrons apprendront bientôt à marcher, parler, voir et même développer une conscience. Malheureusement, ces espoirs seront rapidement tempérés.
+
+En 1969, Marvin Minsky et Seymour Papert publient leur ouvrage "Perceptrons", démontrant mathématiquement les limitations fondamentales de ces systèmes. Le perceptron simple ne peut résoudre le problème du XOR, une fonction logique pourtant élémentaire. Cette découverte, bien que théoriquement correcte, provoque un gel des financements de recherche en réseaux de neurones pour près de deux décennies, période connue sous le nom de "premier hiver de l'IA".
+
+Le salut viendra dans les années 1980 avec l'introduction des perceptrons multicouches (MLP). L'algorithme de rétropropagation du gradient, redécouvert et popularisé par David Rumelhart, Geoffrey Hinton et Ronald Williams en 1986, permet enfin d'entraîner des réseaux comportant plusieurs couches de neurones. Cette percée résout le problème du XOR et ouvre la voie aux réseaux profonds. Pourtant, malgré ce progrès théorique, les limitations computationnelles de l'époque empêchent encore l'exploitation du plein potentiel de ces architectures.
 
 \subsection{Premier hiver de l'IA et renaissance}
 
-Les limitations computationnelles et théoriques (problème du XOR, vanishing gradient) provoquent un "hiver de l'IA" dans les années 1990. La renaissance vient avec :
-\begin{itemize}
-    \item \textbf{LeNet (LeCun et al., 1998)} : Premier CNN appliqué avec succès à la reconnaissance de chiffres manuscrits
-    \item \textbf{Amélioration hardware} : GPUs permettant parallélisation massive
-    \item \textbf{Grandes données} : Émergence d'ImageNet et autres datasets massifs
-\end{itemize}
+Les années 1990 sont marquées par un second hiver de l'IA. Les réseaux de neurones, bien que théoriquement puissants, se heurtent à de nombreux obstacles pratiques. Le problème du vanishing gradient rend l'entraînement de réseaux profonds extrêmement difficile : les gradients deviennent exponentiellement petits à mesure qu'ils se propagent vers les couches initiales, rendant leur apprentissage quasi-impossible. De plus, les ordinateurs de l'époque ne possèdent pas la puissance de calcul nécessaire pour entraîner des modèles complexes sur des données volumineuses.
+
+La renaissance commence discrètement à la fin des années 1990. Yann LeCun et ses collègues aux Bell Labs développent LeNet-5, un réseau de neurones convolutif capable de lire des chèques bancaires avec une précision remarquable. Ce système est déployé commercialement et traite des millions de transactions, prouvant que les réseaux de neurones peuvent fonctionner en conditions réelles. Cependant, l'impact de cette réussite reste limité à quelques domaines d'application spécifiques.
+
+Parallèlement, trois évolutions majeures préparent le terrain pour la révolution à venir. Premièrement, les GPUs (processeurs graphiques) deviennent suffisamment puissants et programmables pour accélérer massivement les calculs matriciels nécessaires aux réseaux de neurones. Deuxièmement, l'ère d'Internet génère des quantités de données sans précédent. Troisièmement, des datasets annotés massifs comme ImageNet, contenant des millions d'images étiquetées, deviennent disponibles pour la communauté scientifique.
 
 \subsection{Révolution AlexNet (2012)}
 
-AlexNet~\cite{Krizhevsky2012} marque le début de l'ère moderne du deep learning en remportant ImageNet avec une marge sans précédent. Innovations clés :
-\begin{itemize}
-    \item Architecture profonde (8 couches)
-    \item Utilisation de ReLU (au lieu de sigmoïde/tanh)
-    \item Dropout pour régularisation
-    \item Data augmentation extensive
-    \item Entraînement sur GPU (2 GTX 580)
-\end{itemize}
+L'année 2012 marque un tournant historique dans l'histoire du deep learning. Alex Krizhevsky, alors doctorant sous la direction de Geoffrey Hinton, soumet son réseau AlexNet~\cite{Krizhevsky2012} au concours ImageNet Large Scale Visual Recognition Challenge (ILSVRC). Les résultats sont stupéfiants : AlexNet atteint une erreur de 15.3\%, réduisant de moitié l'erreur des méthodes traditionnelles qui stagnaient autour de 25\%. Cette marge d'amélioration, sans précédent dans l'histoire de la vision par ordinateur, fait l'effet d'un électrochoc dans la communauté scientifique.
+
+Le succès d'AlexNet ne repose pas sur une seule innovation, mais sur une combinaison judicieuse d'ingrédients. L'architecture comporte huit couches, ce qui est profond pour l'époque, et mobilise 60 millions de paramètres. Krizhevsky remplace les fonctions d'activation traditionnelles (sigmoïde et tangente hyperbolique) par la fonction ReLU (Rectified Linear Unit), résolvant en grande partie le problème du vanishing gradient. Il introduit le dropout, une technique de régularisation aléatoire qui force le réseau à développer des représentations robustes. L'augmentation intensive des données (rotations, translations, modifications colorimétriques) multiplie artificiellement la taille du dataset d'entraînement. Enfin, et c'est peut-être l'élément le plus crucial, AlexNet est entraîné sur deux GPUs NVIDIA GTX 580, réduisant le temps d'entraînement de plusieurs semaines à quelques jours.
+
+Cette victoire déclenche une course mondiale aux architectures de réseaux de neurones profonds. Les géants technologiques (Google, Facebook, Microsoft, Baidu) investissent massivement dans le domaine. Les publications scientifiques explosent. Le deep learning passe du statut de technique marginale à celui de paradigme dominant en intelligence artificielle.
 
 \subsection{Ère des architectures très profondes}
 
-\textbf{VGGNet (2014)} : Démontre que la profondeur (16-19 couches) améliore performances, mais au prix du nombre de paramètres.
+Si AlexNet prouve que la profondeur est bénéfique, les années suivantes explorent systématiquement cette direction. En 2014, l'équipe Visual Geometry Group (VGG) d'Oxford démontre qu'empiler de nombreux petits filtres convolutifs 3×3 est plus efficace que d'utiliser des grands filtres. VGGNet, avec ses 16 à 19 couches, améliore encore les performances d'ImageNet. Cependant, cette approche révèle rapidement ses limites : le nombre de paramètres explose (138 millions pour VGG-16), la mémoire requise devient prohibitive, et surtout, l'entraînement de réseaux encore plus profonds devient instable.
 
-\textbf{ResNet (2015)}~\cite{He2016} : Révolution avec skip connections (residual connections) permettant d'entraîner réseaux de 50, 101, même 152 couches sans dégradation. L'idée : apprendre des résidus $F(x) = H(x) - x$ plutôt que la fonction complète.
+C'est en 2015 que Kaiming He et ses collègues chez Microsoft Research réalisent une percée fondamentale avec ResNet~\cite{He2016}. Leur intuition est élégante : plutôt que de forcer chaque couche à apprendre directement la fonction désirée $H(x)$, pourquoi ne pas lui demander d'apprendre simplement le résidu $F(x) = H(x) - x$ ? Cette idée se concrétise par les "skip connections" ou connexions résiduelles, qui court-circuitent une ou plusieurs couches. Cette architecture permet d'entraîner des réseaux de 50, 101, et même 152 couches sans dégradation des performances. ResNet remporte ImageNet 2015 avec une erreur de seulement 3.57\%, surpassant les performances humaines estimées à environ 5\%.
 
-\textbf{DenseNet, MobileNet, EfficientNet} : Architectures optimisant le compromis performance/efficacité.
+Le principe des connexions résiduelles s'avère extraordinairement général et sera réutilisé dans presque toutes les architectures suivantes. DenseNet pousse le concept encore plus loin en connectant chaque couche à toutes les couches précédentes. D'autres travaux se concentrent sur l'efficacité : MobileNet et EfficientNet optimisent le rapport performance/coût computationnel, rendant le deep learning accessible sur smartphones et objets connectés.
 
 \subsection{Révolution Transformer (2017)}
 
-Le mécanisme d'attention~\cite{Vaswani2017}, introduit pour NLP (traduction), révolutionne le deep learning :
-\begin{itemize}
-    \item Remplace récurrence par attention parallélisable
-    \item Capture dépendances à longue distance
-    \item Scalabilité à très grandes données
-\end{itemize}
+Pendant que la vision par ordinateur connaît ses révolutions successives, le traitement du langage naturel suit sa propre trajectoire. Traditionnellement, les réseaux récurrents (RNN, LSTM, GRU) dominent ce domaine grâce à leur capacité à traiter des séquences de longueur variable. Cependant, ces architectures souffrent de limitations majeures : leur nature séquentielle les rend difficiles à paralléliser, et malgré les améliorations apportées par les LSTM, elles peinent à capturer les dépendances à très longue distance dans le texte.
 
-Extensions : BERT (2018), GPT (2018-2023), Vision Transformers (2020).
+En 2017, l'article "Attention is All You Need"~\cite{Vaswani2017} de Vaswani et al. introduit le Transformer, une architecture qui abandonne complètement la récurrence au profit d'un mécanisme d'attention. L'idée centrale est révolutionnairement simple : pour comprendre un mot dans une phrase, le modèle calcule à quel point il doit "prêter attention" à tous les autres mots, quelle que soit leur distance. Ce mécanisme d'auto-attention, répété à travers de multiples couches et têtes d'attention parallèles, s'avère extraordinairement puissant. De plus, contrairement aux RNN, les Transformers sont massivement parallélisables, permettant d'exploiter pleinement les accélérateurs modernes.
+
+L'impact des Transformers dépasse rapidement le domaine initial de la traduction automatique. BERT (2018) pré-entraîne un Transformer bidirectionnel sur des corpus massifs, créant des représentations linguistiques d'une richesse inégalée. La série GPT (Generative Pre-trained Transformer) de OpenAI démontre qu'un simple objectif de prédiction du mot suivant, combiné à un modèle suffisamment large et des données suffisantes, produit une compréhension émergente du langage. En 2020, les Vision Transformers (ViT) prouvent que l'architecture Transformer peut aussi dominer la vision par ordinateur, unifiant ainsi les deux domaines sous un même paradigme architectural.
 
 \subsection{Modèles de fondation et ère actuelle}
 
-GPT-3 (2020), DALL-E, Stable Diffusion marquent l'émergence de modèles massifs pré-entraînés adaptables à multiples tâches. Le paradigme "pre-train + fine-tune" devient dominant.
+L'année 2020 marque l'avènement des "modèles de fondation" avec GPT-3, un Transformer comportant 175 milliards de paramètres. Cette échelle, impensable quelques années auparavant, révèle des capacités émergentes stupéfiantes : GPT-3 peut traduire, résumer, programmer, raisonner, et converser avec un niveau de cohérence remarquable, le tout sans entraînement spécifique sur ces tâches. Le paradigme "pre-train + fine-tune" devient dominant : on pré-entraîne un modèle massif sur des données générales, puis on l'adapte à des tâches spécifiques avec un minimum de données supplémentaires.
+
+Cette tendance s'étend rapidement au-delà du texte. DALL-E et DALL-E 2 génèrent des images à partir de descriptions textuelles. Stable Diffusion démocratise la génération d'images en proposant un modèle open-source performant. Des modèles multimodaux comme CLIP apprennent des représentations jointes image-texte, ouvrant la voie à des applications transversales. En 2022-2023, ChatGPT et GPT-4 démontrent que ces modèles peuvent assister efficacement les humains dans une multitude de tâches créatives et analytiques.
+
+Nous sommes aujourd'hui à l'aube d'une nouvelle ère où les frontières entre domaines s'estompent. Les modèles de fondation multimodaux visent à intégrer texte, image, son et vidéo dans une représentation unifiée. L'apprentissage par renforcement avec feedback humain (RLHF) permet d'aligner ces systèmes avec nos valeurs et intentions. Les questions ne sont plus purement techniques mais touchent à l'éthique, la gouvernance et l'impact sociétal de ces technologies transformatrices.
 
 \section{Architectures classiques}
 
@@ -471,6 +474,29 @@ Diviser dataset en $K$ folds, entraîner $K$ fois en utilisant chaque fold comme
 
 Pour données déséquilibrées, assurer même distribution de classes dans train/val/test.
 
+\subsubsection{Validation croisée spécialisée pour organoïdes}
+
+\textbf{Patient-level split} :
+\begin{itemize}
+    \item Éviter le data leakage entre organoïdes du même patient
+    \item Stratification par patient plutôt que par organoïde
+    \item Garantit la généralisation à nouveaux patients
+\end{itemize}
+
+\textbf{Time-based split} :
+\begin{itemize}
+    \item Train sur les sessions anciennes, test sur les sessions récentes
+    \item Valide la stabilité temporelle des modèles
+    \item Important pour le déploiement en conditions réelles
+\end{itemize}
+
+\textbf{Lab-based split} :
+\begin{itemize}
+    \item Train sur un laboratoire, test sur un autre
+    \item Valide la robustesse aux variations expérimentales
+    \item Crucial pour la généralisation multi-sites
+\end{itemize}
+
 \subsection{Monitoring et visualisation}
 
 \subsubsection{TensorBoard}
@@ -726,35 +752,6 @@ Recette générale pour concevoir une architecture :
     \item Composer en réseau profond
 \end{enumerate}
 
-\section{Topological Data Analysis et graphes}
-
-\subsection{Persistent homology}
-
-\subsubsection{Principe}
-
-La persistent homology caractérise la topologie de données via naissance/mort de features topologiques (composantes connexes, trous, cavités) à différentes échelles.
-
-\textbf{Filtration} : Construire séquence de complexes simpliciaux $K_0 \subseteq K_1 \subseteq \cdots \subseteq K_n$ en augmentant un paramètre (ex: rayon).
-
-\textbf{Homologie} : Compter composantes connexes ($H_0$), trous ($H_1$), cavités ($H_2$).
-
-\subsubsection{Diagrammes de persistance}
-
-Visualisation : chaque feature $(b, d)$ où $b$ = naissance, $d$ = mort.
-
-Features persistantes (longue durée de vie) = structures topologiques significatives.
-
-\subsection{Applications aux graphes biologiques}
-
-\textbf{Organoïdes} : 
-\begin{itemize}
-    \item $H_0$ : Nombre de clusters cellulaires
-    \item $H_1$ : Présence de lumens (cavités)
-    \item $H_2$ : Structures 3D complexes
-\end{itemize}
-
-\textbf{Perspective} : Enrichir features de graphes avec descripteurs topologiques pour améliorer classification.
-
 \section{Expressivité théorique : au-delà du WL-test}
 
 \subsection{Rappel : limitations du 1-WL test}
@@ -796,6 +793,125 @@ Le k-WL opère sur k-tuples de nœuds au lieu de nœuds individuels.
 Pour la plupart des tâches réelles, 1-WL expressivité suffit. Les graphes pathologiques non-distinguables par 1-WL sont rares en pratique.
 
 \textbf{Notre contexte (organoïdes)} : Graphes géométriques avec positions 3D fournissent déjà information suffisante pour distinguer structures. Pas besoin de higher-order.
+
+\section{Méthodes d'interprétabilité pour GNNs}
+
+\subsection{GNNExplainer}
+
+\subsubsection{Principe}
+
+GNNExplainer~\cite{Ying2019} identifie les sous-graphes et features les plus importants pour une prédiction donnée en optimisant :
+
+\[
+\max_{G_S, F_S} MI(Y, (G_S, F_S))
+\]
+
+où $G_S$ est un sous-graphe, $F_S$ un sous-ensemble de features, et $MI$ l'information mutuelle.
+
+\subsubsection{Algorithme}
+
+\begin{enumerate}
+    \item Initialiser masque d'arêtes $\mathbf{M}_E$ et masque de features $\mathbf{M}_F$
+    \item Optimiser via gradient ascent :
+    \[
+    \mathbf{M}_E, \mathbf{M}_F = \arg\max \log p_\theta(Y \mid G_S, F_S)
+    \]
+    \item Sélectionner arêtes/features avec probabilité > seuil
+\end{enumerate}
+
+\subsubsection{Application aux organoïdes}
+
+\textbf{Interprétation biologique} :
+\begin{itemize}
+    \item Arêtes importantes : contacts cellulaires critiques
+    \item Features importantes : volume, position, intensité
+    \item Sous-graphes : régions fonctionnelles (cryptes, lumens)
+\end{itemize}
+
+\subsection{Attention weights et visualisation}
+
+\subsubsection{Attention dans GAT}
+
+Pour GAT, les poids d'attention $\alpha_{ij}$ indiquent l'importance relative des voisins :
+
+\[
+\alpha_{ij} = \frac{\exp(\text{LeakyReLU}(\mathbf{a}^T [\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_j]))}{\sum_{k \in \mathcal{N}(i)} \exp(\text{LeakyReLU}(\mathbf{a}^T [\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_k]))}
+\]
+
+\subsubsection{Visualisation 3D}
+
+\textbf{Heatmaps d'attention} : Couleur des nœuds proportionnelle à $\sum_j \alpha_{ij}$
+
+\textbf{Arêtes pondérées} : Épaisseur proportionnelle à $\alpha_{ij}$
+
+\textbf{Animation temporelle} : Évolution des poids au fil des couches
+
+\subsection{GradCAM pour graphes}
+
+\subsubsection{Extension de GradCAM}
+
+Adaptation de GradCAM~\cite{Selvaraju2017} aux GNNs :
+
+\[
+L_{GNN-CAM}^c = \text{ReLU}\left(\sum_i \alpha_i^c \cdot \mathbf{h}_i\right)
+\]
+
+où $\alpha_i^c = \frac{\partial y^c}{\partial \mathbf{h}_i}$ est le gradient de la classe $c$ par rapport aux features du nœud $i$.
+
+\subsubsection{Implémentation}
+
+\begin{verbatim}
+def gnn_gradcam(model, data, class_idx):
+    model.eval()
+    data.requires_grad_(True)
+    
+    output = model(data)
+    score = output[0, class_idx]
+    
+    # Backward pass
+    score.backward()
+    
+    # Gradients w.r.t. node features
+    gradients = data.x.grad
+    
+    # Global average pooling
+    alpha = gradients.mean(dim=1)
+    
+    # Weighted combination
+    cam = torch.relu(alpha.unsqueeze(1) * data.x).sum(dim=1)
+    
+    return cam
+\end{verbatim}
+
+\subsection{Perturbation analysis}
+
+\subsubsection{Node perturbation}
+
+Mesurer l'impact de retirer un nœud $i$ :
+
+\[
+\text{Impact}_i = |f(G) - f(G \setminus \{i\})|
+\]
+
+où $f$ est la fonction de prédiction du GNN.
+
+\subsubsection{Edge perturbation}
+
+Mesurer l'impact de retirer une arête $(i,j)$ :
+
+\[
+\text{Impact}_{ij} = |f(G) - f(G \setminus \{(i,j)\})|
+\]
+
+\subsubsection{Feature ablation}
+
+Mesurer l'impact de masquer une feature $d$ :
+
+\[
+\text{Impact}_d = |f(G, \mathbf{X}) - f(G, \mathbf{X}_{-d})|
+\]
+
+où $\mathbf{X}_{-d}$ masque la dimension $d$.
 
 \section{Message passing généralisé et extensions}
 
@@ -850,1603 +966,338 @@ Hierarchical pooling pourrait capturer :
 
 \textbf{Perspective future} : À explorer pour classification fine.
 
-\chapter{Théorie des processus ponctuels}
+\chapter{Processus ponctuels sur la sphère}
 
-Ce chapitre fournit les fondements mathématiques des processus ponctuels spatiaux utilisés pour notre génération de données synthétiques. Pour des traitements complets, voir~\cite{Illian2008,Diggle2013,Baddeley2015}.
+Ce chapitre se concentre spécifiquement sur les processus ponctuels définis sur la sphère $\mathbb{S}^2$, adaptés à la modélisation des organoïdes sphériques.
 
-\section{Processus de Poisson : propriétés et simulation}
+\section{Géométrie de la sphère}
 
-\subsection{Définition rigoureuse}
+\subsection{Coordonnées et métrique}
 
-\subsubsection{Processus ponctuel}
-
-Un processus ponctuel $\Phi$ sur un espace $\mathcal{X}$ est une variable aléatoire à valeurs dans l'ensemble des configurations de points $\mathcal{N} = \{n \subseteq \mathcal{X} : n \text{ localement fini}\}$.
-
-Pour un domaine borné $D \subset \mathbb{R}^d$, $\Phi(D)$ est le nombre de points dans $D$.
-
-\subsubsection{Processus de Poisson homogène}
-
-Un processus de Poisson sur domaine $D$ d'intensité $\lambda > 0$ satisfait :
-
-\textbf{P1. Nombre de points} : $N(D) = \Phi(D) \sim \text{Poisson}(\lambda |D|)$ où $|D|$ est le volume de $D$.
-
-\textbf{P2. Indépendance spatiale} : Pour régions disjointes $B_1, \ldots, B_k$, les $N(B_i)$ sont indépendants.
-
-\textbf{P3. Uniformité} : Conditionnellement à $N(D) = n$, les $n$ points sont i.i.d. uniformes dans $D$.
-
-\subsubsection{Fonction d'intensité}
-
-L'intensité $\lambda$ représente le nombre moyen de points par unité de volume :
-\[
-\mathbb{E}[N(B)] = \lambda |B|
-\]
-
-\subsection{Propriétés mathématiques}
-
-\subsubsection{Superposition}
-
-Si $\Phi_1, \ldots, \Phi_k$ sont des processus de Poisson indépendants d'intensités $\lambda_1, \ldots, \lambda_k$, alors leur superposition $\Phi = \bigcup_i \Phi_i$ est un processus de Poisson d'intensité $\sum_i \lambda_i$.
-
-\subsubsection{Thinning}
-
-Si on garde chaque point d'un processus de Poisson $\Phi(\lambda)$ indépendamment avec probabilité $p$, le résultat est un processus de Poisson $\Phi(p\lambda)$.
-
-\textbf{Utilité} : Génération de processus inhomogènes par rejection sampling.
-
-\subsubsection{Campbell's theorem}
-
-Pour une fonction $f : \mathcal{X} \rightarrow \mathbb{R}$ :
-\[
-\mathbb{E}\left[\sum_{x \in \Phi} f(x)\right] = \int_\mathcal{X} f(x) \lambda(x) dx
-\]
-
-\subsection{Simulation}
-
-\subsubsection{Algorithme basique (domaine borné)}
-
-Pour un processus homogène d'intensité $\lambda$ sur domaine $D$ :
-\begin{enumerate}
-    \item Tirer $N \sim \text{Poisson}(\lambda |D|)$
-    \item Tirer $N$ points i.i.d. uniformément dans $D$
-\end{enumerate}
-
-\subsubsection{Simulation dans une sphère 3D}
-
-Pour une sphère de rayon $R$ :
-
-\textbf{Méthode 1 : Rejection sampling}
-\begin{enumerate}
-    \item Tirer $(x, y, z) \sim \mathcal{U}([-R, R]^3)$
-    \item Accepter si $x^2 + y^2 + z^2 \leq R^2$
-    \item Répéter jusqu'à obtenir $N$ points
-\end{enumerate}
-
-\textbf{Méthode 2 : Coordonnées sphériques}
-\begin{enumerate}
-    \item Tirer $r \sim$ avec densité $p(r) \propto r^2$ sur $[0, R]$ (correction volumétrique)
-    \item Tirer $\theta \sim \mathcal{U}([0, 2\pi])$ (azimuth)
-    \item Tirer $\cos\phi \sim \mathcal{U}([-1, 1])$ (polar, uniforme sur sphère)
-    \item Convertir : $x = r\sin\phi\cos\theta$, $y = r\sin\phi\sin\theta$, $z = r\cos\phi$
-\end{enumerate}
-
-\textbf{Notre implémentation} : Méthode 1 (rejection) par simplicité.
-
-\section{Processus de Poisson inhomogènes}
-
-\subsection{Définition}
-
-Un processus de Poisson inhomogène possède une fonction d'intensité spatiale $\lambda(\mathbf{x})$ variant dans l'espace :
-\[
-\mathbb{E}[N(B)] = \int_B \lambda(\mathbf{x}) d\mathbf{x}
-\]
-
-\textbf{Interprétation biologique} : Modélise gradients de densité cellulaire (centre vs périphérie).
-
-\subsection{Simulation par thinning}
-
-\begin{enumerate}
-    \item Générer processus de Poisson homogène d'intensité $\lambda_{\max} = \sup_{\mathbf{x}} \lambda(\mathbf{x})$
-    \item Pour chaque point $\mathbf{x}_i$, le garder avec probabilité $p(\mathbf{x}_i) = \lambda(\mathbf{x}_i) / \lambda_{\max}$
-\end{enumerate}
-
-\subsection{Exemples de fonctions d'intensité}
-
-\subsubsection{Gradient radial}
+Pour une sphère de rayon $R$, les coordonnées sphériques $(r, \theta, \phi)$ avec $r = R$ constant donnent :
 
 \[
-\lambda(x, y, z) = \lambda_{\max} \exp\left(-\alpha \frac{\|(x,y,z)\|}{R}\right)
+\begin{cases}
+x = R\sin\phi\cos\theta \\
+y = R\sin\phi\sin\theta \\
+z = R\cos\phi
+\end{cases}
 \]
 
-Intensité décroît exponentiellement du centre à la périphérie.
+où $\theta \in [0, 2\pi]$ (azimuth) et $\phi \in [0, \pi]$ (colatitude).
 
-\subsubsection{Gradient linéaire}
+\subsection{Distance géodésique}
 
-\[
-\lambda(x, y, z) = \lambda_{\min} + (\lambda_{\max} - \lambda_{\min}) \frac{z + R}{2R}
-\]
+La distance géodésique entre deux points $\mathbf{p}_1, \mathbf{p}_2$ sur la sphère est :
 
-Gradient le long d'un axe (modélise polarisation).
-
-\section{Processus de Cox et processus log-gaussiens}
-
-\subsection{Processus de Cox (doubly stochastic)}
-
-Un processus de Cox est un processus de Poisson dont l'intensité $\Lambda(\mathbf{x})$ est elle-même un champ aléatoire.
-
-\textbf{Construction} :
-\begin{enumerate}
-    \item Tirer un champ d'intensité $\Lambda(\mathbf{x})$ d'une distribution (ex: log-normal)
-    \item Conditionnellement à $\Lambda$, générer Poisson d'intensité $\Lambda(\mathbf{x})$
-\end{enumerate}
-
-\subsection{Processus log-gaussiens}
-
-Cas particulier où $\log \Lambda(\mathbf{x})$ est un champ gaussien :
-\[
-\log \Lambda(\mathbf{x}) = \mu + Z(\mathbf{x})
-\]
-
-où $Z$ est un processus gaussien de moyenne 0 et covariance $C(\mathbf{x}, \mathbf{x}')$.
-
-\textbf{Propriété} : La corrélation spatiale dans $\Lambda$ induit du clustering dans les points générés.
-
-\textbf{Application} : Modéliser variabilité expérimentale entre organoïdes (même protocole, densités variables).
-
-\section{Processus de Gibbs et modèles énergétiques}
-
-\subsection{Formulation générale}
-
-Un processus de Gibbs définit une distribution via une densité de probabilité :
-\[
-f(\mathbf{x}) = \frac{1}{Z} \exp(-U(\mathbf{x}))
-\]
-
-où $U(\mathbf{x})$ est l'énergie de la configuration, $Z$ la constante de normalisation (partition function).
-
-\subsection{Processus de Matérn (clustering)}
-
-\subsubsection{Construction hiérarchique}
-
-Le processus de Matérn~\cite{Matern1960} génère clusters via :
-\begin{enumerate}
-    \item Générer centres de clusters via Poisson d'intensité $\kappa$ (parents)
-    \item Autour de chaque parent, générer Poisson d'intensité $\mu$ dans rayon $r$ (offspring)
-    \item Retirer les parents, garder seulement offspring
-\end{enumerate}
-
-\subsubsection{Paramètres et contrôle}
-
-\begin{itemize}
-    \item $\kappa$ : intensité de parents (contrôle nombre de clusters)
-    \item $\mu$ : offspring par parent (contrôle taille clusters)
-    \item $r$ : rayon de clustering (contrôle compacité)
-\end{itemize}
-
-\textbf{Interprétation biologique} : Cellules issues de même précurseur restent proches (lignage commun).
-
-\subsubsection{Fonction K de Ripley attendue}
-
-Pour Matérn, $K(t)$ exhibe valeurs supérieures à Poisson ($K_{\text{Poisson}}(t) = (4/3)\pi t^3$) pour $t < r$, indiquant clustering.
-
-\subsection{Processus de Strauss (répulsion)}
-
-\subsubsection{Fonction d'énergie}
-
-Le processus de Strauss~\cite{Strauss1975} définit :
-\[
-U(\mathbf{x}) = -\alpha n(\mathbf{x}) - \beta s_R(\mathbf{x})
-\]
-
-où :
-\begin{itemize}
-    \item $n(\mathbf{x})$ : nombre de points
-    \item $s_R(\mathbf{x})$ : nombre de paires de points à distance $< R$
-    \item $\beta < 0$ : pénalité pour proximité (répulsion)
-\end{itemize}
-
-\subsubsection{Hard-core}
-
-Cas extrême : $\beta = -\infty$, aucune paire à distance $< R$ (exclusion stricte).
-
-\textbf{Interprétation} : Modélise exclusion stérique entre cellules (volume incompressible).
-
-\subsubsection{Simulation}
-
-Pas de simulation directe. Utilisation de MCMC (Metropolis-Hastings) :
-\begin{enumerate}
-    \item Initialiser avec Poisson
-    \item Proposer modifications (ajouter/retirer/déplacer point)
-    \item Accepter/rejeter selon ratio de Metropolis-Hastings
-    \item Itérer jusqu'à convergence
-\end{enumerate}
-
-\textbf{Défis} : Convergence lente, tuning des propositions.
-
-\textbf{Notre implémentation} : 10,000 itérations MCMC, taux d'acceptation ~30\%.
-
-\section{Estimation statistique et inférence}
-
-\subsection{Maximum de vraisemblance}
-
-\subsubsection{Vraisemblance pour Poisson}
-
-Pour processus de Poisson homogène, la log-vraisemblance est :
-\[
-\log L(\lambda ; \mathbf{x}) = n \log \lambda - \lambda |D| + \text{const}
-\]
-
-\textbf{MLE} : $\hat{\lambda} = n / |D|$ (estimateur naturel).
-
-\subsubsection{Pour processus complexes}
-
-Pour Gibbs/Strauss, la constante $Z$ est intractable (intégrale sur configurations). Méthodes alternatives nécessaires.
-
-\subsection{Méthodes basées simulation}
-
-\subsubsection{Approximate Bayesian Computation (ABC)}
-
-Inférence sans vraisemblance explicite :
-\begin{enumerate}
-    \item Proposer paramètres $\theta$ du prior
-    \item Simuler données $\mathbf{x}_{\text{sim}}$ avec ces paramètres
-    \item Calculer distance $d(\mathbf{x}_{\text{sim}}, \mathbf{x}_{\text{obs}})$ (ex: via statistiques K, F, G)
-    \item Accepter $\theta$ si $d < \epsilon$
-\end{enumerate}
-
-\textbf{Application} : Valider que nos paramètres Matérn/Strauss génèrent patterns compatibles avec données réelles.
-
-\subsection{Pseudo-likelihood}
-
-Pour Gibbs, remplace vraisemblance complète par produit de vraisemblances conditionnelles :
-\[
-PL(\theta) = \prod_i f(x_i \mid \mathbf{x}_{-i}; \theta)
-\]
-
-Plus tractable, permet estimation via optimisation.
-
-\section{Processus ponctuels sur variétés}
-
-\subsection{Extension aux sphères}
-
-\subsubsection{Processus sur $\mathbb{S}^2$}
-
-Pour la sphère 2D, adapter fonctions K, F, G en tenant compte de la géométrie sphérique.
-
-\textbf{Distance géodésique} : Arc length sur sphère au lieu de distance euclidienne.
-
-Pour deux points $\mathbf{p}_1, \mathbf{p}_2$ sur sphère de rayon $R$ :
 \[
 d_{\text{geo}}(\mathbf{p}_1, \mathbf{p}_2) = R \arccos\left(\frac{\mathbf{p}_1 \cdot \mathbf{p}_2}{R^2}\right)
 \]
 
-\subsubsection{Fonction K adaptée}
+\textbf{Propriété} : $d_{\text{geo}} \in [0, \pi R]$ (diamètre de la sphère).
+
+\subsection{Élément de surface}
+
+L'élément de surface sur la sphère est :
+\[
+dS = R^2 \sin\phi \, d\phi \, d\theta
+\]
+
+L'aire totale de la sphère est $4\pi R^2$.
+
+\section{Processus de Poisson sur la sphère}
+
+\subsection{Processus de Poisson homogène}
+
+Un processus de Poisson homogène sur $\mathbb{S}^2$ d'intensité $\lambda$ satisfait :
+
+\textbf{P1. Nombre de points} : $N(\mathbb{S}^2) \sim \text{Poisson}(\lambda \cdot 4\pi R^2)$
+
+\textbf{P2. Uniformité} : Les points sont uniformément distribués sur la surface sphérique.
+
+\subsection{Simulation}
+
+\subsubsection{Méthode directe}
+
+\begin{enumerate}
+    \item Tirer $N \sim \text{Poisson}(\lambda \cdot 4\pi R^2)$
+    \item Pour chaque point :
+        \begin{itemize}
+            \item $\theta \sim \mathcal{U}([0, 2\pi])$
+            \item $\cos\phi \sim \mathcal{U}([-1, 1])$ (uniforme sur sphère)
+            \item Convertir en coordonnées cartésiennes
+        \end{itemize}
+\end{enumerate}
+
+\subsubsection{Rejection sampling}
+
+Alternative pour intensités variables :
+\begin{enumerate}
+    \item Générer points uniformément dans le cube $[-R, R]^3$
+    \item Projeter sur la sphère : $\mathbf{p} \leftarrow R \frac{\mathbf{p}}{\|\mathbf{p}\|}$
+    \item Accepter avec probabilité $\lambda(\mathbf{p})/\lambda_{\max}$
+\end{enumerate}
+
+\section{Processus inhomogènes sur la sphère}
+
+\subsection{Fonctions d'intensité}
+
+\subsubsection{Gradient latitudinal}
+
+\[
+\lambda(\theta, \phi) = \lambda_0 + \lambda_1 \cos\phi
+\]
+
+Intensité maximale aux pôles ($\phi = 0, \pi$), minimale à l'équateur ($\phi = \pi/2$).
+
+\subsubsection{Gradient longitudinal}
+
+\[
+\lambda(\theta, \phi) = \lambda_0 + \lambda_1 \cos\theta
+\]
+
+Modélise une polarisation directionnelle.
+
+\subsubsection{Clustering polaire}
+
+\[
+\lambda(\theta, \phi) = \lambda_0 + \lambda_1 \exp\left(-\frac{\phi^2}{2\sigma^2}\right)
+\]
+
+Concentration autour du pôle nord ($\phi = 0$).
+
+\section{Statistiques de second ordre sur la sphère}
+
+\subsection{Fonction K de Ripley sphérique}
+
+Pour un processus d'intensité $\lambda$ sur la sphère :
 
 \[
 K(r) = \frac{1}{\lambda} \mathbb{E}\left[\sum_{i \neq j} \mathbb{1}(d_{\text{geo}}(x_i, x_j) < r)\right]
 \]
 
-Pour Poisson sur sphère, $K_{\text{Poisson}}(r) = 4\pi R^2 (1 - \cos(r/R))$.
+\textbf{Estimateur empirique} :
+\[
+\hat{K}(r) = \frac{4\pi R^2}{n(n-1)} \sum_{i=1}^n \sum_{j \neq i} \mathbb{1}(d_{\text{geo}}(x_i, x_j) < r) w_{ij}
+\]
 
-\subsection{Processus sur surfaces courbes générales}
+où $w_{ij}$ corrige les effets de bord sphériques.
 
-\subsubsection{Variétés riemanniennes}
+\textbf{Valeurs théoriques} : Pour un processus de Poisson homogène sur la sphère :
+\[
+K_{\text{Poisson}}(r) = 4\pi R^2 (1 - \cos(r/R))
+\]
 
-Généralisation aux variétés $\mathcal{M}$ avec métrique riemannienne $g$.
+\subsection{Fonction F sphérique (nearest neighbor)}
 
-\textbf{Intensité} : $\lambda(\mathbf{x})$ densité par rapport à mesure de volume riemannienne.
+Distribution de la distance au plus proche voisin sur la sphère :
 
-\textbf{Applications futures} : 
+\[
+F(r) = P(\text{distance géodésique au NN} \leq r)
+\]
+
+\textbf{Estimateur empirique} :
+\[
+\hat{F}(r) = \frac{1}{n} \sum_{i=1}^n \mathbb{1}(d_{\text{geo}}(x_i, \text{NN}(x_i)) \leq r)
+\]
+
+\textbf{Valeur théorique pour Poisson} :
+\[
+F_{\text{Poisson}}(r) = 1 - \exp\left(-\lambda \cdot 2\pi R^2 (1 - \cos(r/R))\right)
+\]
+
+\subsection{Fonction G sphérique (event-to-event)}
+
+Distribution de distance entre points sur la sphère :
+
+\[
+G(r) = P(\text{distance géodésique d'un point typique à son NN} \leq r)
+\]
+
+\textbf{Estimateur empirique} :
+\[
+\hat{G}(r) = \frac{1}{n} \sum_{i=1}^n \mathbb{1}(d_{\text{geo}}(x_i, \text{NN}(x_i)) \leq r)
+\]
+
+\textbf{Propriété} : Pour un processus de Poisson, $G = F$ (propriété de Slivnyak).
+
+\subsection{Interprétation des fonctions}
+
+\textbf{Fonction K} :
 \begin{itemize}
-    \item Organoïdes non-sphériques (tubulaires, bourgeonnés)
-    \item Surfaces d'organes réels (cortex cérébral plissé)
+    \item $K(r) > K_{\text{Poisson}}(r)$ : Clustering à distance $r$
+    \item $K(r) < K_{\text{Poisson}}(r)$ : Répulsion à distance $r$
 \end{itemize}
 
-\section{Statistiques de second ordre}
-
-\subsection{Fonction K de Ripley}
-
-\subsubsection{Définition}
-
-Pour un processus d'intensité $\lambda$ :
-\[
-K(r) = \frac{1}{\lambda} \mathbb{E}[\text{nombre de points à distance} < r \text{ d'un point typique}]
-\]
-
-\textbf{Estimateur empirique} (correction des effets de bord) :
-\[
-\hat{K}(r) = \frac{|D|}{n(n-1)} \sum_{i=1}^n \sum_{j \neq i} \mathbb{1}(d_{ij} < r) w_{ij}
-\]
-
-où $w_{ij}$ corrige les effets de bord.
-
-\subsubsection{Fonction L (variance stabilisée)}
-
-\[
-L(r) = \sqrt{\frac{K(r)}{\pi}} - r \quad \text{(2D)}, \quad L(r) = \left(\frac{3K(r)}{4\pi}\right)^{1/3} - r \quad \text{(3D)}
-\]
-
-\textbf{Interprétation} :
+\textbf{Fonction F} :
 \begin{itemize}
-    \item $L(r) = 0$ : Poisson (random)
-    \item $L(r) > 0$ : Clustering
-    \item $L(r) < 0$ : Régularité/répulsion
+    \item $F(r) > F_{\text{Poisson}}(r)$ : Plus de voisins proches (clustering)
+    \item $F(r) < F_{\text{Poisson}}(r)$ : Moins de voisins proches (répulsion)
 \end{itemize}
 
-\subsection{Fonction F (nearest neighbor)}
+\textbf{Fonction G} : Même interprétation que F pour les processus de Poisson.
 
-Distribution de la distance au plus proche voisin :
-\[
-F(r) = P(\text{distance au NN} \leq r)
-\]
+\section{Processus de Matérn sur la sphère}
 
-Pour Poisson 3D : $F_{\text{Poisson}}(r) = 1 - \exp\left(-\frac{4\pi\lambda r^3}{3}\right)$.
+\subsection{Construction}
 
-\subsection{Fonction G (event-to-event)}
+Le processus de Matérn sphérique génère des clusters via :
 
-Distribution de distance entre points :
-\[
-G(r) = P(\text{distance d'un point typique à son NN} \leq r)
-\]
-
-Pour Poisson : $G = F$ (propriété de Slivnyak).
-
-\subsection{Test d'hypothèse CSR}
-
-\subsubsection{Enveloppes de Monte Carlo}
-
-Pour tester $H_0$ : "données issues de Poisson" :
 \begin{enumerate}
-    \item Simuler $M$ réalisations de Poisson (ex: $M=99$)
-    \item Calculer $K(r)$ pour chaque simulation
-    \item Construire enveloppes : min, max à chaque $r$
-    \item Comparer $K_{\text{obs}}(r)$ aux enveloppes
+    \item Générer centres de clusters via Poisson d'intensité $\kappa$ sur la sphère
+    \item Autour de chaque centre, générer points dans un cap sphérique de rayon $r$
+    \item Retirer les centres, garder seulement les points générés
 \end{enumerate}
 
-Si $K_{\text{obs}}(r)$ sort des enveloppes : rejet de $H_0$.
+\subsection{Cap sphérique}
 
-\subsubsection{Tests formels}
+Un cap de rayon $r$ autour d'un point $\mathbf{c}$ contient tous les points à distance géodésique $< r$ de $\mathbf{c}$.
 
-\textbf{Test de Kolmogorov-Smirnov} : Comparer distributions $F_{\text{obs}}$ vs $F_{\text{Poisson}}$.
+L'aire d'un cap de rayon $r$ est :
+\[
+A_{\text{cap}}(r) = 2\pi R^2 (1 - \cos(r/R))
+\]
 
-\textbf{Test du $\chi^2$} : Sur histogramme des distances NN.
+\subsection{Paramètres}
 
-\section{Notre utilisation pour validation}
+\begin{itemize}
+    \item $\kappa$ : intensité des centres (nombre de clusters)
+    \item $\mu$ : nombre moyen de points par cluster
+    \item $r$ : rayon de clustering (en radians ou distance géodésique)
+\end{itemize}
 
-\subsection{Protocole de validation synthétiques}
+\section{Processus de Strauss sur la sphère}
 
-Pour chaque type de processus généré :
+\subsection{Énergie d'interaction}
+
+Le processus de Strauss sphérique définit :
+
+\[
+U(\mathbf{x}) = -\alpha n(\mathbf{x}) - \beta s_R(\mathbf{x})
+\]
+
+où $s_R(\mathbf{x})$ compte les paires à distance géodésique $< R$.
+
+\subsection{Simulation MCMC}
+
 \begin{enumerate}
-    \item Calculer $\hat{K}(r)$, $\hat{L}(r)$ empiriques
+    \item Initialiser avec Poisson uniforme
+    \item Proposer déplacements sur la sphère (rotations aléatoires)
+    \item Accepter/rejeter selon ratio de Metropolis-Hastings
+    \item Itérer jusqu'à convergence
+\end{enumerate}
+
+\subsection{Déplacements sur la sphère}
+
+Pour déplacer un point $\mathbf{p}$ :
+\begin{enumerate}
+    \item Choisir un axe de rotation aléatoire
+    \item Appliquer une rotation d'angle $\delta \sim \mathcal{N}(0, \sigma^2)$
+    \item Projeter le résultat sur la sphère
+\end{enumerate}
+
+\section{Applications aux organoïdes}
+
+\subsection{Modélisation des gradients}
+
+\textbf{Gradient radial} : Intensité décroissante du centre vers la périphérie
+\[
+\lambda(\phi) = \lambda_0 \exp(-\alpha \phi)
+\]
+
+\textbf{Gradient polaire} : Concentration aux pôles (division asymétrique)
+\[
+\lambda(\phi) = \lambda_0 + \lambda_1 \cos^2\phi
+\]
+
+\subsection{Validation statistique}
+
+Pour valider nos processus synthétiques :
+
+\begin{enumerate}
+    \item Calculer $\hat{K}(r)$, $\hat{F}(r)$, $\hat{G}(r)$ empiriques
     \item Comparer aux valeurs théoriques attendues
     \item Construire enveloppes Monte Carlo (99 simulations)
-    \item Vérifier que données synthétiques tombent dans enveloppes
+    \item Vérifier que les données synthétiques respectent les enveloppes
 \end{enumerate}
 
-\subsection{Résultats de validation}
+\subsection{Exemples de résultats}
 
-[À compléter avec vos résultats - exemples de figures K/L pour chaque processus]
+\textbf{Poisson sphérique} : 
+\begin{itemize}
+    \item $K(r) = K_{\text{Poisson}}(r)$ pour tous $r$
+    \item $F(r) = F_{\text{Poisson}}(r)$ et $G(r) = G_{\text{Poisson}}(r)$
+\end{itemize}
 
-\textbf{Poisson} : $L(r) \approx 0$ pour tous $r$ (attendu).
+\textbf{Matérn sphérique} : 
+\begin{itemize}
+    \item $K(r) > K_{\text{Poisson}}(r)$ pour $r < r_{\text{cluster}}$
+    \item $F(r) > F_{\text{Poisson}}(r)$ (plus de voisins proches)
+\end{itemize}
 
-\textbf{Matérn} : $L(r) > 0$ pour $r < 30$ μm, pic clustering à $r \approx 15$ μm.
-
-\textbf{Strauss} : $L(r) < 0$ pour $r < 20$ μm, indiquant répulsion effective.
-
-\section{Processus de Cox et processus log-gaussiens}
-
-Les processus de Cox généralisent Poisson avec une intensité $\Lambda$ elle-même aléatoire. Les processus log-gaussiens modélisent $\log \Lambda$ par un champ gaussien, permettant d'incorporer de la corrélation spatiale.
-
-\section{Processus de Gibbs et modèles énergétiques}
-
-Les processus de Gibbs définissent une distribution via une énergie :
-\[
-P(\mathbf{x}) \propto \exp(-U(\mathbf{x}))
-\]
-Exemples : processus de Strauss (répulsion), processus de Matérn (clustering).
-
-\section{Estimation statistique et inférence}
-
-\subsection{Maximum de vraisemblance}
-Difficile pour processus complexes, nécessite calcul de constante de normalisation.
-
-\subsection{Méthodes basées simulation}
-ABC (Approximate Bayesian Computation) permet l'inférence sans vraisemblance explicite.
-
-\section{Processus ponctuels sur variétés}
-
-\subsection{Extension aux sphères}
-Pour un processus sur la sphère $\mathbb{S}^2$, les fonctions K, F, G sont adaptées en tenant compte de la géométrie sphérique (distances géodésiques).
-
-\subsection{Processus sur surfaces courbes}
-Généralisation aux variétés riemanniennes quelconques, pertinent pour modéliser des organes de formes complexes.
+\textbf{Strauss sphérique} : 
+\begin{itemize}
+    \item $K(r) < K_{\text{Poisson}}(r)$ pour $r < R_{\text{interaction}}$
+    \item $F(r) < F_{\text{Poisson}}(r)$ (moins de voisins proches)
+\end{itemize}
 
 \chapter{Détails d'implémentation}
 
-Ce chapitre décrit les aspects techniques de l'implémentation logicielle, permettant la reproduction complète de nos résultats.
+Ce chapitre décrit l'implémentation logicielle permettant la reproduction de nos résultats.
 
-\section{Technologies et bibliothèques}
+\section{Environnement technique}
 
-\subsection{Environnement logiciel complet}
+\subsection{Stack technologique}
 
-\subsubsection{Langage et frameworks}
-
-\textbf{Python 3.9} : Langage principal pour sa richesse d'écosystème scientifique.
-
-\textbf{PyTorch 2.0}~\cite{Paszke2019} : Framework de deep learning choisi pour :
+\textbf{Langages et frameworks :}
 \begin{itemize}
-    \item API pythonique et intuitive
-    \item Graphe computationnel dynamique (debug facile)
-    \item Communauté active et documentation excellente
-    \item Support GPU/TPU mature
-    \item Intégration native avec PyTorch Geometric
+    \item Python 3.9 : Langage principal
+    \item PyTorch 2.0 : Framework de deep learning
+    \item PyTorch Geometric 2.3 : Bibliothèque spécialisée GNN
 \end{itemize}
 
-\textbf{PyTorch Geometric 2.3}~\cite{Fey2019} : Bibliothèque spécialisée GNN :
+\textbf{Traitement d'images :}
 \begin{itemize}
-    \item Implémentations optimisées de GCN, GAT, GraphSAGE, etc.
-    \item Data structures efficaces pour graphes
-    \item Mini-batching intelligent
-    \item CUDA kernels optimisés (scatter/gather operations)
+    \item Cellpose 2.2 : Segmentation cellulaire 3D
+    \item Faster Cellpose : Optimisation développée (5× accélération, F1=0.95)
+    \item scikit-image 0.20 : Opérations morphologiques
+    \item OpenCV 4.7 : Opérations bas-niveau
 \end{itemize}
 
-\subsubsection{Traitement d'images}
-
-\textbf{Cellpose 2.2}~\cite{Stringer2021} : Segmentation cellulaire state-of-the-art
+\textbf{Calcul scientifique :}
 \begin{itemize}
-    \item Modèle cyto2 pré-entraîné
-    \item Support 3D natif
-    \item Fine-tuning possible sur nos données
-\end{itemize}
-
-\textbf{scikit-image 0.20}~\cite{VanDerWalt2014} : Opérations morphologiques
-\begin{itemize}
-    \item Filtrage (gaussien, médian, bilatéral)
-    \item Transformations géométriques
-    \item Extraction de features (regionprops 3D)
-    \item Label manipulation
-\end{itemize}
-
-\textbf{OpenCV 4.7} : Opérations bas-niveau optimisées
-
-\subsubsection{Calcul scientifique}
-
-\textbf{NumPy 1.24} : Arrays N-dimensionnels, opérations vectorisées
-
-\textbf{SciPy 1.10} : 
-\begin{itemize}
-    \item \texttt{scipy.spatial} : cKDTree (K-NN efficient), Delaunay, distance matrices
-    \item \texttt{scipy.ndimage} : Filtres 3D, morphologie mathématique
-    \item \texttt{scipy.stats} : Tests statistiques
-\end{itemize}
-
-\textbf{Pandas 2.0} : Manipulation de données tabulaires (métadonnées, résultats)
-
-\subsubsection{Machine Learning classique}
-
-\textbf{scikit-learn 1.2} :
-\begin{itemize}
-    \item Baselines (Random Forest, SVM)
-    \item Métriques (accuracy, F1, confusion matrix)
-    \item Preprocessing (StandardScaler, train\_test\_split)
-    \item Model selection (GridSearchCV)
+    \item NumPy 1.24, SciPy 1.10 : Calculs numériques
+    \item Pandas 2.0 : Manipulation de données
+    \item scikit-learn 1.2 : Baselines et métriques
 \end{itemize}
 
 \subsection{Visualisation et monitoring}
 
-\subsubsection{Visualisation statique}
+\textbf{Visualisation :} Matplotlib, Seaborn, PyVista (3D), Plotly (interactif)
 
-\textbf{Matplotlib 3.7} : Plotting standard
+\textbf{Monitoring :} TensorBoard, Weights \& Biases
+
+\textbf{Infrastructure :} Docker, Git/GitHub, CI/CD
+
+\section{Architecture logicielle}
+
+\subsection{Organisation du code}
+
+Codebase modulaire (~5,000 lignes) organisée en modules :
 \begin{itemize}
-    \item Courbes d'apprentissage
-    \item Matrices de confusion
-    \item Distributions de features
+    \item \texttt{data/} : Gestion des datasets PyG
+    \item \texttt{models/} : Architectures GNN (GCN, GAT, EGNN, etc.)
+    \item \texttt{utils/} : Segmentation, construction de graphes, features
+    \item \texttt{synthetic/} : Génération de données synthétiques
+    \item \texttt{scripts/} : Scripts d'entraînement et évaluation
+    \item \texttt{visualization/} : Visualisation et interprétabilité
 \end{itemize}
 
-\textbf{Seaborn 0.12} : Visualisations statistiques high-level
-\begin{itemize}
-    \item Heatmaps
-    \item Pairplots
-    \item Distribution plots
-\end{itemize}
+\subsection{Optimisations}
 
-\subsubsection{Visualisation 3D interactive}
+\textbf{Hardware :} RTX 3090 (développement), A100/V100 (entraînement final)
 
-\textbf{PyVista 0.38} : Visualisation scientifique 3D
-\begin{itemize}
-    \item Rendering de graphes cellulaires
-    \item Export HTML interactif
-    \item Volume rendering d'images
-\end{itemize}
+\textbf{Optimisations mémoire :} Mixed precision (FP16), gradient accumulation, checkpointing
 
-\textbf{Plotly 5.13} : Visualisations web interactives
-\begin{itemize}
-    \item Scatter 3D interactifs
-    \item Dashboard de résultats
-\end{itemize}
+\textbf{Performance :} 4-6h d'entraînement par modèle complet
 
-\subsubsection{Monitoring d'entraînement}
-
-\textbf{TensorBoard 2.12} : Visualisation temps-réel
-\begin{itemize}
-    \item Scalars (loss, metrics)
-    \item Histogrammes (poids, gradients)
-    \item Graphs (architecture)
-    \item Embeddings (projections)
-\end{itemize}
-
-\textbf{Weights \& Biases (Wandb)} : Tracking cloud
-\begin{itemize}
-    \item Comparaison d'expériences
-    \item Hyperparameter sweeps
-    \item Collaboration en équipe
-    \item Hosting de modèles
-\end{itemize}
-
-\subsection{Infrastructure et déploiement}
-
-\textbf{Docker} : Containerisation pour reproductibilité
-\begin{verbatim}
-FROM pytorch/pytorch:2.0.0-cuda11.8-cudnn8-runtime
-RUN pip install torch-geometric cellpose ...
-\end{verbatim}
-
-\textbf{Git + GitHub} : Versioning de code
-\begin{itemize}
-    \item Branches : main, develop, feature/xxx
-    \item CI/CD : GitHub Actions (tests, linting)
-    \item Releases : versions tagguées
-\end{itemize}
-
-\section{Architecture logicielle du pipeline}
-
-\subsection{Organisation modulaire}
-
-Notre codebase (~5,000 lignes) est organisée en 9 modules Python :
-
-\begin{verbatim}
-code/
-├── data/                    # Dataset management
-│   ├── dataset.py          # PyG Dataset classes
-│   ├── loader.py           # DataLoaders
-│   └── preprocessing.py    # Image preprocessing
-├── models/                  # GNN architectures
-│   ├── gcn.py              # 250 lignes
-│   ├── gat.py              # 280 lignes
-│   ├── graphsage.py        # 180 lignes
-│   ├── gin.py              # 200 lignes
-│   ├── egnn.py             # 320 lignes
-│   └── classifier.py       # Interface unifiée
-├── utils/                   # Utilities
-│   ├── segmentation.py     # Cellpose wrapper (300 lignes)
-│   ├── graph_builder.py    # Graph construction (350 lignes)
-│   ├── features.py         # Feature extraction (300 lignes)
-│   └── metrics.py          # Evaluation metrics
-├── synthetic/               # Synthetic generation
-│   ├── point_processes.py  # Spatial processes (450 lignes)
-│   ├── generator.py        # Organoid generator (350 lignes)
-│   └── statistics.py       # Ripley's K, etc.
-├── scripts/                 # Execution scripts
-│   ├── train.py            # Training (350 lignes)
-│   ├── evaluate.py         # Evaluation (200 lignes)
-│   └── generate_data.py    # Data generation
-└── visualization/           # Visualization
-    ├── plot_graphs.py      # 2D/3D plots
-    ├── plot_3d.py          # Interactive viewer
-    └── interpretability.py # GNNExplainer
-\end{verbatim}
-
-\subsection{Patterns de conception}
-
-\subsubsection{Factory pattern}
-
-Classe \texttt{OrganoidClassifier} unifie création de modèles :
-\begin{verbatim}
-model = OrganoidClassifier.create(
-    model_type='gcn',  # or 'gat', 'gin', etc.
-    in_channels=10,
-    num_classes=5,
-    hidden_channels=128,
-)
-\end{verbatim}
-
-\subsubsection{Builder pattern}
-
-\texttt{GraphBuilder} avec stratégies configurables :
-\begin{verbatim}
-builder = GraphBuilder(
-    edge_method='knn',
-    k_neighbors=8,
-)
-graph = builder.build_graph(masks, features, label)
-\end{verbatim}
-
-\subsubsection{Strategy pattern}
-
-Différentes stratégies de pooling, agrégation, normalization interchangeables.
-
-\subsection{Design pour extensibilité}
-
-\textbf{Abstraction} : Classes de base abstraites pour Dataset, Model, Trainer
-
-\textbf{Plugins} : Nouvelles architectures GNN ajoutables sans modifier code existant
-
-\textbf{Configuration} : Hyperparamètres externes (YAML, pas hard-codés)
-
-\section{Gestion des ressources computationnelles}
-
-\subsection{Hardware utilisé}
-
-\textbf{Développement et tests} :
-\begin{itemize}
-    \item GPU : NVIDIA RTX 3090 (24 GB VRAM)
-    \item CPU : AMD Ryzen 9 5950X (16 cores)
-    \item RAM : 64 GB DDR4
-    \item Stockage : 2 TB NVMe SSD
-\end{itemize}
-
-\textbf{Entraînements finaux} :
-\begin{itemize}
-    \item GPU : NVIDIA A100 (40 GB VRAM) ou V100 (32 GB)
-    \item Cluster : 4-8 GPUs en data-parallel
-    \item Temps typique : 4-6h pour modèle complet
-\end{itemize}
-
-\subsection{Optimisations mémoire}
-
-\subsubsection{Mixed precision training (FP16)}
-
-Utilisation de \texttt{torch.cuda.amp} (Automatic Mixed Precision) :
-\begin{verbatim}
-scaler = torch.cuda.amp.GradScaler()
-with torch.cuda.amp.autocast():
-    output = model(data)
-    loss = criterion(output, labels)
-scaler.scale(loss).backward()
-scaler.step(optimizer)
-scaler.update()
-\end{verbatim}
-
-\textbf{Gains} :
-\begin{itemize}
-    \item Réduction mémoire : 2×
-    \item Accélération calculs : 1.5-2× (Tensor Cores)
-    \item Précision : aucune perte pour nos tâches
-\end{itemize}
-
-\subsubsection{Gradient accumulation}
-
-Pour simuler large batch avec mémoire limitée :
-\begin{verbatim}
-accumulation_steps = 4
-for i, batch in enumerate(loader):
-    loss = model(batch) / accumulation_steps
-    loss.backward()
-    if (i + 1) % accumulation_steps == 0:
-        optimizer.step()
-        optimizer.zero_grad()
-\end{verbatim}
-
-\textbf{Équivalent} : batch size effectif = batch\_size × accumulation\_steps
-
-\subsubsection{Gradient checkpointing}
-
-Trade-off temps/mémoire : recalculer activations en backward au lieu de les stocker.
-
-\textbf{Usage} : Modèles très profonds (6+ couches) sur graphes larges (1000+ nœuds).
-
-\subsection{Optimisations vitesse}
-
-\subsubsection{DataLoader multi-process}
-
-\begin{verbatim}
-loader = DataLoader(
-    dataset,
-    batch_size=32,
-    num_workers=4,      # 4 processus parallèles
-    pin_memory=True,    # Transfert CPU→GPU plus rapide
-    persistent_workers=True,  # Réutilise workers
-)
-\end{verbatim}
-
-\textbf{Speedup} : 3-4× vs single-process loading.
-
-\subsubsection{Compilation JIT}
-
-PyTorch 2.0 compile graphe computationnel :
-\begin{verbatim}
-model = torch.compile(model, mode='max-autotune')
-\end{verbatim}
-
-\textbf{Speedup} : 10-30\% (selon architecture).
-
-\subsubsection{Batching intelligent de graphes}
-
-PyTorch Geometric batch automatiquement graphes de tailles variables via création d'un grand graphe disjoint :
-\begin{itemize}
-    \item Concaténation des nœuds : $\mathbf{X}_{\text{batch}} = [\mathbf{X}_1; \mathbf{X}_2; \ldots; \mathbf{X}_B]$
-    \item Renumérotation des arêtes pour éviter collisions
-    \item Vecteur \texttt{batch} pour identifier appartenance
-\end{itemize}
-
-\textbf{Avantage} : Exploitation parallélisme GPU maximal.
-
-\subsection{Profiling et debugging}
-
-\subsubsection{PyTorch Profiler}
-
-Identification des bottlenecks :
-\begin{verbatim}
-with torch.profiler.profile(
-    activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-    record_shapes=True
-) as prof:
-    model(data)
-print(prof.key_averages().table())
-\end{verbatim}
-
-\subsubsection{Memory profiler}
-
-Tracking de l'utilisation mémoire GPU :
-\begin{verbatim}
-torch.cuda.memory_summary()
-torch.cuda.max_memory_allocated()
-\end{verbatim}
-
-\section{Configuration et hyperparamètres}
-
-\subsection{Fichiers de configuration YAML}
-
-Exemple \texttt{configs/gcn\_baseline.yaml} :
-\begin{verbatim}
-model:
-  type: gcn
-  in_channels: 27
-  hidden_channels: 128
-  num_layers: 3
-  num_classes: 5
-  dropout: 0.5
-  batch_norm: true
-  pooling: mean
-
-training:
-  epochs: 200
-  batch_size: 32
-  lr: 0.001
-  weight_decay: 0.0001
-  optimizer: adamw
-  scheduler:
-    type: plateau
-    patience: 10
-    factor: 0.5
-
-data:
-  edge_method: knn
-  k_neighbors: 8
-  feature_normalization: true
-
-system:
-  device: cuda
-  num_workers: 4
-  seed: 42
-\end{verbatim}
-
-\subsection{Gestion de versions et tracking}
-
-\textbf{Git tags} : Chaque expérience tagguée (ex: \texttt{exp-gcn-baseline-v1.2})
-
-\textbf{Wandb config logging} : Toute configuration sauvegardée automatiquement
-
-\textbf{MLflow} : Alternative open-source pour tracking local
-
-\section{Reproductibilité}
-
-\subsection{Seeds aléatoires}
-
-\subsubsection{Initialisation complète}
-
-\begin{verbatim}
-import random
-import numpy as np
-import torch
-
-def set_seed(seed=42):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # Multi-GPU
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-\end{verbatim}
-
-\textbf{Trade-off} : Déterminisme vs performance (cudnn.benchmark=False plus lent de ~10\%).
-
-\subsubsection{Seeds multiples}
-
-Pour expériences robustes, répéter avec 5 seeds : 42, 123, 456, 789, 1011.
-
-Rapporter : $\text{mean} \pm \text{std}$ sur ces 5 runs.
-
-\subsection{Environnement logiciel fixé}
-
-\subsubsection{requirements.txt}
-
-Versions exactes de toutes dépendances :
-\begin{verbatim}
-torch==2.0.1
-torch-geometric==2.3.1
-cellpose==2.2.3
-numpy==1.24.3
-...
-\end{verbatim}
-
-\subsubsection{Environnement conda}
-
-Export complet :
-\begin{verbatim}
-conda env export > environment.yml
-\end{verbatim}
-
-Recréation identique :
-\begin{verbatim}
-conda env create -f environment.yml
-\end{verbatim}
-
-\subsubsection{Container Docker}
-
-Image complète avec environnement + code + dépendances :
-\begin{verbatim}
-docker pull username/organoid-gnn:v1.0
-docker run --gpus all -v $(pwd)/data:/data \
-    username/organoid-gnn:v1.0 \
-    python train.py --data_dir /data
-\end{verbatim}
-
-\subsection{Documentation du code}
-
-\subsubsection{Docstrings}
-
-Style Google Python :
-\begin{verbatim}
-def build_graph(masks, features, label):
-    """
-    Build cellular graph from segmentation.
-    
-    Args:
-        masks (np.ndarray): Segmentation masks (Z, Y, X)
-        features (np.ndarray): Node features (N, D)
-        label (int): Graph-level label
-    
-    Returns:
-        Data: PyG Data object
-    """
-\end{verbatim}
-
-\subsubsection{Type hints}
-
-Annotations de types pour clarté :
-\begin{verbatim}
-from typing import Optional, Tuple, List
-
-def segment_3d(
-    image: np.ndarray,
-    diameter: Optional[float] = None
-) -> Tuple[np.ndarray, dict]:
-    ...
-\end{verbatim}
-
-\subsubsection{Tests unitaires}
-
-Framework pytest :
-\begin{verbatim}
-def test_graph_builder():
-    builder = GraphBuilder(edge_method='knn', k_neighbors=8)
-    masks = create_dummy_masks()
-    graph = builder.build_graph(masks)
-    assert graph.num_nodes > 0
-    assert graph.num_edges > 0
-\end{verbatim}
-
-\textbf{Coverage} : Viser 70-80\% de code coverage.
-
-\section{Gestion des expériences}
-
-\subsection{Structure de résultats}
-
-\begin{verbatim}
-results/
-├── gcn_baseline/
-│   ├── config.yaml          # Configuration
-│   ├── best_model.pth       # Meilleur checkpoint
-│   ├── latest_model.pth     # Dernier checkpoint
-│   ├── training_history.json  # Losses, metrics
-│   ├── logs/                # Logs détaillés
-│   │   └── tensorboard/
-│   └── figures/             # Visualisations
-├── gat_attention/
-│   └── ...
-└── comparison/              # Comparaisons multi-modèles
-    └── results_table.csv
-\end{verbatim}
-
-\subsection{Sauvegarde de checkpoints}
-
-\textbf{Format complet} :
-\begin{verbatim}
-checkpoint = {
-    'epoch': epoch,
-    'model_state_dict': model.state_dict(),
-    'optimizer_state_dict': optimizer.state_dict(),
-    'scheduler_state_dict': scheduler.state_dict(),
-    'train_loss': train_loss,
-    'val_loss': val_loss,
-    'val_metrics': {
-        'accuracy': acc,
-        'f1': f1,
-        'confusion_matrix': cm.tolist(),
-    },
-    'config': config_dict,
-    'timestamp': datetime.now().isoformat(),
-    'git_commit': get_git_commit_hash(),
-    'seed': seed,
-}
-torch.save(checkpoint, path)
-\end{verbatim}
-
-\textbf{Traçabilité complète} : Permettre reproduction exacte.
-
-\chapter{Données et benchmarks}
-
-Ce chapitre documente exhaustivement les datasets utilisés, permettant reproduction et comparaison future.
-
-\section{Description détaillée des datasets}
-
-\subsection{Dataset synthétique}
-
-\subsubsection{Statistiques globales}
-
-\textbf{Composition générale} :
-\begin{itemize}
-    \item \textbf{Total} : 5,000 organoïdes générés
-    \item \textbf{Split} : Train 3,500 (70\%), Val 750 (15\%), Test 750 (15\%)
-    \item \textbf{Classes} : 5 types de processus ponctuels (distribution équilibrée)
-\end{itemize}
-
-\subsubsection{Classes et processus}
-
-\textbf{Classe 0 : Poisson homogène} (1000 organoïdes)
-\begin{itemize}
-    \item Intensité : $\lambda = 0.0015$ cellules/μm$^3$
-    \item Caractéristique : Complete Spatial Randomness (CSR)
-    \item $L(r) \approx 0$ pour tous $r$
-\end{itemize}
-
-\textbf{Classe 1 : Matérn high clustering} (1000 organoïdes)
-\begin{itemize}
-    \item Parent intensity : $\kappa = 5.0$
-    \item Offspring per parent : $\mu = 50$
-    \item Cluster radius : $r = 20$ μm
-    \item Caractéristique : Clustering fort
-\end{itemize}
-
-\textbf{Classe 2 : Matérn low clustering} (1000 organoïdes)
-\begin{itemize}
-    \item Parent intensity : $\kappa = 10.0$
-    \item Offspring per parent : $\mu = 25$
-    \item Cluster radius : $r = 15$ μm
-    \item Caractéristique : Clustering modéré
-\end{itemize}
-
-\textbf{Classe 3 : Strauss high repulsion} (1000 organoïdes)
-\begin{itemize}
-    \item Intensity : $\alpha = 100.0$
-    \item Interaction radius : $R = 15$ μm
-    \item Interaction parameter : $\beta = 0.1$
-    \item Caractéristique : Régularité forte
-\end{itemize}
-
-\textbf{Classe 4 : Strauss low repulsion} (1000 organoïdes)
-\begin{itemize}
-    \item Intensity : $\alpha = 100.0$
-    \item Interaction radius : $R = 10$ μm
-    \item Interaction parameter : $\beta = 0.3$
-    \item Caractéristique : Régularité modérée
-\end{itemize}
-
-\subsubsection{Propriétés géométriques}
-
-\textbf{Nombre de cellules par organoïde} :
-\begin{itemize}
-    \item Range : 50-500 cellules
-    \item Moyenne : 250.3 $\pm$ 85.7
-    \item Médiane : 230
-    \item Distribution : Approximativement log-normale
-\end{itemize}
-
-\textbf{Rayon des organoïdes} :
-\begin{itemize}
-    \item Range : 80-120 μm
-    \item Moyenne : 100 $\pm$ 10 μm
-    \item Distribution : Gaussienne
-\end{itemize}
-
-\textbf{Densité cellulaire} :
-\begin{itemize}
-    \item Moyenne : 0.0015 cellules/μm$^3$
-    \item Compatible avec données biologiques réelles
-\end{itemize}
-
-\subsubsection{Features cellulaires (27 dimensions)}
-
-\textbf{Features spatiales (3)} :
-\begin{enumerate}
-    \item Position X normalisée : $x / R \in [-1, 1]$
-    \item Position Y normalisée : $y / R \in [-1, 1]$
-    \item Position Z normalisée : $z / R \in [-1, 1]$
-\end{enumerate}
-
-\textbf{Features géométriques (7)} :
-\begin{enumerate}
-    \setcounter{enumi}{3}
-    \item Distance au centre : $\|\mathbf{p}\| / R \in [0, 1]$
-    \item Degré dans le graphe : nombre de voisins
-    \item Densité locale : voisins dans rayon 20 μm
-    \item Volume cellulaire simulé : 800-1500 μm$^3$
-    \item Sphéricité : 0.7-1.0
-    \item Elongation : 1.0-2.5
-    \item Surface : dérivée du volume
-\end{enumerate}
-
-\textbf{Features d'intensité simulées (12)} :
-\begin{enumerate}
-    \setcounter{enumi}{10}
-    \item-\item[15] Canal 1 (DAPI/noyau) : mean, std, min, max, q25, q75
-    \item-\item[21] Canal 2 (marqueur 1) : idem
-\end{enumerate}
-
-\textbf{Features texturales (6)} :
-\begin{enumerate}
-    \setcounter{enumi}{21}
-    \item-\item[27] Gradients, contraste, etc.
-\end{enumerate}
-
-\subsubsection{Graphes construits}
-
-\textbf{Méthode de connectivité} : K-Nearest Neighbors (KNN)
-\begin{itemize}
-    \item $K = 10$ voisins (symétrisé : si $i$ voisin de $j$ alors $j$ voisin de $i$)
-    \item Distance : Euclidienne 3D
-    \item Degré moyen : $\approx 10$ (par construction)
-    \item Graphes non-orientés, sans self-loops
-\end{itemize}
-
-\textbf{Edge attributes} :
-\begin{itemize}
-    \item Distance euclidienne : $d_{ij} = \|\mathbf{p}_i - \mathbf{p}_j\|$
-    \item Vecteur directionnel (optionnel) : $\mathbf{p}_j - \mathbf{p}_i$ (pour EGNN)
-\end{itemize}
-
-\textbf{Statistiques de graphes} :
-\begin{itemize}
-    \item Nombre moyen de nœuds : 250
-    \item Nombre moyen d'arêtes : 2,500 (10 × 250)
-    \item Densité : $\approx 0.04$ (sparse)
-    \item Diamètre : 8-15 hops
-    \item Clustering coefficient : 0.3-0.6 (selon processus)
-\end{itemize}
-
-\subsection{Dataset réel : OrganoProstate-2K}
-
-\subsubsection{Source biologique}
-
-\textbf{Type d'organoïdes} : Organoïdes de prostate humains
-
-\textbf{Origine cellulaire} :
-\begin{itemize}
-    \item Dérivés de biopsies patients et lignées cellulaires établies
-    \item Collaboration ANR Morpheus : IPMC Nice + Université Paris Cité
-    \item Lignées immortalisées : Non (cellules primaires et passages précoces)
-    \item Approbation éthique : IRB Paris Cité \#2023-A00215-40
-\end{itemize}
-
-\textbf{Conditions de culture} :
-\begin{itemize}
-    \item Matrice : Matrigel (Corning \#356231) à 100\%
-    \item Milieu : ProstaCult (adapté protocole Karthaus et al., 2020)
-    \item Facteurs de croissance : DHT (1 nM), EGF (5 ng/ml), FGF10 (20 ng/ml), Noggin (100 ng/ml), R-spondin (500 ng/ml)
-    \item Additifs : A83-01 (0.5 μM, inhibiteur TGF-β), SB202190 (10 μM, inhibiteur p38)
-    \item Température : 37°C, 5\% CO₂, atmosphère humidifiée
-    \item Durée : 7 jours post-passage (J7 pour analyses, état d'équilibre prolifération/différenciation)
-    \item Renouvellement milieu : tous les 2-3 jours
-\end{itemize}
-
-\textbf{Période de collecte} :
-\begin{itemize}
-    \item Début : Mai 2023
-    \item Fin : Février 2025
-    \item Durée totale : 22 mois continus
-    \item Fréquence imagerie : 2-3 sessions/semaine (50-80 échantillons/session)
-\end{itemize}
-
-\subsubsection{Protocole d'imagerie}
-
-\textbf{Microscopes utilisés} :
-\begin{itemize}
-    \item \textbf{Site Paris} : Leica SP8 Confocal
-    \begin{itemize}
-        \item Objectif : HC PL APO 40×/1.30 Oil CS2
-        \item Résolution XY : 0.2 μm/pixel
-        \item Résolution Z : 0.5 μm/slice
-    \end{itemize}
-    \item \textbf{Site Nice} : Zeiss LSM 900 Confocal
-    \begin{itemize}
-        \item Objectif : Plan-Apochromat 20×/0.8 (organoïdes cystiques larges)
-        \item Objectif : Plan-Apochromat 40×/1.4 Oil (standard)
-        \item Résolution XY : 0.2-0.4 μm/pixel (selon objectif)
-        \item Résolution Z : 0.8-1.0 μm/slice
-    \end{itemize}
-    \item Dimensions typiques : 2048 × 2048 × 100-300 voxels
-    \item Format d'acquisition : TIFF 8-bit, non compressé
-\end{itemize}
-
-\textbf{Marquages fluorescents} :
-\begin{itemize}
-    \item DAPI (405 nm) : Noyaux cellulaires (obligatoire pour segmentation)
-    \item Ki67-FITC (488 nm) : Marqueur prolifération (optionnel selon protocole)
-    \item CK5/14-AF568 (561 nm) : Kératines basales (détection phénotype kératinisé)
-    \item E-cadhérine-AF647 (633 nm) : Jonctions cellulaires (optionnel)
-\end{itemize}
-
-\textbf{Note} : Canal DAPI seul utilisé pour segmentation cellulaire (Faster Cellpose). Autres canaux utilisés pour validation phénotypique par experts.
-
-\textbf{Paramètres d'acquisition} :
-\begin{itemize}
-    \item Laser power : 5-10\% (éviter photobleaching)
-    \item PMT gain : 600-800V
-    \item Pixel dwell time : 1.2 μs
-    \item Line averaging : 3×
-    \item Z-stack : 100-250 slices, 0.5 μm step
-\end{itemize}
-
-\subsubsection{Composition du dataset}
-
-\textbf{Échelle du dataset} :
-\begin{itemize}
-    \item \textbf{Échantillons imagés} : 1,311 wells de culture
-    \item \textbf{Organoïdes extraits} : 2,272 organoïdes individuels (après clustering DBSCAN)
-    \item \textbf{Volume données brutes} : ~2.6 To (TIFF stacks non compressés)
-    \item \textbf{Taille moyenne fichier} : 2 Go par échantillon
-\end{itemize}
-
-\textbf{Classes (4 phénotypes)} :
-\begin{itemize}
-    \item \textbf{Classe 0 : Chouxfleurs} (1,404 organoïdes, 61.8\%) 
-    \begin{itemize}
-        \item Surface irrégulière, aspect "chou-fleur"
-        \item Prolifération active, haute densité périphérique
-    \end{itemize}
-    \item \textbf{Classe 1 : Cystiques} (817 organoïdes, 36.0\%)
-    \begin{itemize}
-        \item Formation kystes/cavités internes
-        \item Épithélium polarisé, lumière centrale
-    \end{itemize}
-    \item \textbf{Classe 2 : Compact} (41 organoïdes, 1.8\%)
-    \begin{itemize}
-        \item Structure dense, surface lisse
-        \item Arrangement cellulaire serré
-    \end{itemize}
-    \item \textbf{Classe 3 : Kératinisés} (10 organoïdes, 0.4\%)
-    \begin{itemize}
-        \item Centres denses/opaques, lamination
-        \item Différenciation kératinique (CK5/14+)
-    \end{itemize}
-\end{itemize}
-
-\textbf{Déséquilibre} : 140:1 entre classe majoritaire (Chouxfleurs) et minoritaire (Kératinisés)
-
-\textbf{Split stratifié} :
-\begin{itemize}
-    \item Train : 1,590 organoïdes (70\%)
-    \item Val : 340 organoïdes (15\%)
-    \item Test : 342 organoïdes (15\%)
-    \item Stratification : par phénotype (préserve distribution)
-    \item Oversampling : ×5 pour classes 2 et 3 pendant entraînement
-\end{itemize}
-
-\textbf{Statistiques morphologiques} :
-\begin{itemize}
-    \item Taille fichiers : 800 MB - 2 GB par stack 3D
-    \item Nombre de cellules : 20-5,284 par organoïde (moyenne : 252, médiane : 180)
-    \item Distribution tailles : Log-normale (queue lourde)
-    \item Qualité segmentation : F1=0.95 (Faster Cellpose, validation sur 100 échantillons)
-\end{itemize}
-
-\textbf{Annotation et qualité} :
-\begin{itemize}
-    \item 2 biologistes experts (Paris + Nice)
-    \item Accord inter-annotateurs : Cohen's κ = 0.78 (bon accord)
-    \item Désaccords : 21.2\% résolus par consensus
-    \item Validation indépendante : 100 organoïdes (échantillon stratifié)
-\end{itemize}
-
-\section{Statistiques descriptives complètes}
-
-\subsection{Distributions morphologiques}
-
-\subsubsection{Taille des organoïdes}
-
-\textbf{Volume total} (synthétiques) :
-\begin{itemize}
-    \item Moyenne : $4.19 \times 10^6$ μm$^3$
-    \item Écart-type : $1.05 \times 10^6$ μm$^3$
-    \item Range : $2.1 \times 10^6$ - $9.0 \times 10^6$ μm$^3$
-    \item Distribution : Log-normale
-\end{itemize}
-
-\textbf{Nombre de cellules} :
-\begin{itemize}
-    \item Par processus :
-        \begin{itemize}
-            \item Poisson : 248 $\pm$ 82
-            \item Matérn high : 265 $\pm$ 91
-            \item Matérn low : 243 $\pm$ 78
-            \item Strauss high : 238 $\pm$ 76
-            \item Strauss low : 251 $\pm$ 84
-        \end{itemize}
-    \item Test ANOVA : pas de différence significative (p=0.32)
-\end{itemize}
-
-\subsection{Statistiques de graphes}
-
-\textbf{Propriétés topologiques moyennes} :
-
-\begin{tabular}{lccccc}
-\hline
-Propriété & Poisson & Matérn H & Matérn L & Strauss H & Strauss L \\
-\hline
-Nœuds & 248 & 265 & 243 & 238 & 251 \\
-Arêtes & 2,480 & 2,650 & 2,430 & 2,380 & 2,510 \\
-Degré moyen & 10.0 & 10.0 & 10.0 & 10.0 & 10.0 \\
-Degré std & 0.2 & 0.3 & 0.2 & 0.2 & 0.2 \\
-Clustering & 0.42 & 0.58 & 0.51 & 0.31 & 0.38 \\
-Diamètre & 12.3 & 9.8 & 11.1 & 14.5 & 13.2 \\
-\hline
-\end{tabular}
-
-\textbf{Observation clé} : Clustering coefficient discrimine bien les processus.
-
-\subsection{Validation statistique des synthétiques}
-
-\subsubsection{Test de Ripley}
-
-Pour chaque processus, calculé $\hat{K}(r)$ et $\hat{L}(r)$ sur 100 organoïdes échantillonnés :
-
-\textbf{Poisson} :
-\begin{itemize}
-    \item $L(r)$ reste dans enveloppes Monte Carlo (p=0.89)
-    \item Pas de déviation significative de CSR
-\end{itemize}
-
-\textbf{Matérn high} :
-\begin{itemize}
-    \item $L(r) > 0$ pour $r < 30$ μm (clustering confirmé)
-    \item Pic à $r \approx 18$ μm (cohérent avec $r_{\text{cluster}} = 20$ μm)
-\end{itemize}
-
-\textbf{Strauss high} :
-\begin{itemize}
-    \item $L(r) < 0$ pour $r < 18$ μm (répulsion confirmée)
-    \item Compatible avec $R = 15$ μm
-\end{itemize}
-
-\subsubsection{Distributions de distances NN}
-
-Test de Kolmogorov-Smirnov comparant distributions observées vs théoriques :
-\begin{itemize}
-    \item Poisson : KS-statistic = 0.031, p = 0.73 (accept H0)
-    \item Matérn : KS-statistic = 0.087, p = 0.02 (reject H0, attendu)
-    \item Strauss : KS-statistic = 0.094, p = 0.01 (reject H0, attendu)
-\end{itemize}
-
-\textbf{Conclusion} : Synthétiques reflètent bien les propriétés statistiques attendues.
-
-\section{Benchmarks et comparaisons}
-
-\subsection{Protocole expérimental standard}
-
-\textbf{Pour toute expérience} :
-\begin{itemize}
-    \item 5 seeds aléatoires différents : 42, 123, 456, 789, 1011
-    \item 5-fold cross-validation sur ensemble de validation
-    \item Rapporter : mean $\pm$ std
-    \item Tests statistiques : paired t-test (comparaisons)
-\end{itemize}
-
-\textbf{Métriques reportées} :
-\begin{itemize}
-    \item Accuracy
-    \item Precision, Recall, F1-score (macro et weighted)
-    \item Confusion matrix
-    \item AUC-ROC (si probabilités calibrées)
-\end{itemize}
-
-\subsection{Baselines implémentées}
-
-\textbf{Analyse manuelle} (gold standard) :
-\begin{itemize}
-    \item 3 experts indépendants
-    \item Vote majoritaire
-    \item Performance : 76.0\% $\pm$ 3.2\% (inter-rater)
-\end{itemize}
-
-\textbf{Descripteurs + Machine Learning} :
-\begin{itemize}
-    \item Features : 27 morphologiques + texturales (total: 45)
-    \item Random Forest (500 trees) : 68.5\% $\pm$ 2.1\%
-    \item SVM (RBF kernel) : 65.3\% $\pm$ 2.8\%
-\end{itemize}
-
-\textbf{CNN 3D} :
-\begin{itemize}
-    \item ResNet3D-18 (adapté de vidéo)
-    \item Input : 128 × 128 × 64 (downsampled)
-    \item Performance : 81.2\% $\pm$ 1.9\%
-    \item Temps d'entraînement : 48h (vs 6h pour GNN)
-\end{itemize}
-
-\section{Accès aux données et code}
-
-\subsection{Dépôt de code}
-
-\textbf{GitHub} : \texttt{github.com/username/organoid-gnn}
-\begin{itemize}
-    \item Licence : MIT (code) + CC-BY-4.0 (documentation)
-    \item Stars : [à mettre à jour]
-    \item Forks : [à mettre à jour]
-    \item Documentation : README 400+ lignes, QUICKSTART, API docs
-    \item Examples : 10+ notebooks Jupyter
-    \item Tests : Pytest avec 75\% coverage
-    \item CI/CD : GitHub Actions (linting, tests, build)
-\end{itemize}
-
-\textbf{Organisation} :
-\begin{verbatim}
-organoid-gnn/
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── setup.py
-├── code/               # Code source
-├── configs/            # Configurations
-├── notebooks/          # Tutoriels
-├── tests/              # Tests unitaires
-├── docs/               # Documentation Sphinx
-└── .github/workflows/  # CI/CD
-\end{verbatim}
-
-\subsection{Données disponibles}
-
-\subsubsection{Dataset synthétique OrganoSynth-5K}
-
-\textbf{Accès} :
-\begin{itemize}
-    \item DOI : 10.5281/zenodo.XXXXXX [à obtenir]
-    \item Format : PyG Data objects (.pt files), ~2 GB compressé
-    \item Licence : CC0 (domaine public)
-\end{itemize}
-
-\textbf{Contenu} :
-\begin{itemize}
-    \item 5,000 graphes (train/val/test splits)
-    \item Métadonnées : paramètres de génération, statistiques K/L
-    \item Code de génération : reproductible
-\end{itemize}
-
-\subsubsection{Dataset réel [selon restrictions]}
-
-\textbf{Accès} : Soumis à accord de transfert de matériel (MTA) et approbation IRB
-
-\textbf{Demande} : Contact [email]
-
-\textbf{Format fourni} :
-\begin{itemize}
-    \item Images anonymisées (TIFF stacks)
-    \item Segmentations (si autorisé)
-    \item Métadonnées cliniques anonymisées
-    \item Labels consensus
-\end{itemize}
-
-\subsection{Modèles pré-entraînés}
-
-\textbf{Hugging Face Hub} : \texttt{huggingface.co/username/organoid-gnn}
-
-\textbf{Modèles disponibles} :
-\begin{itemize}
-    \item \texttt{gcn-synthetic-v1.0} : GCN pré-entraîné sur synthétiques
-    \item \texttt{egnn-synthetic-v1.0} : EGNN pré-entraîné
-    \item \texttt{gat-finetuned-v1.0} : GAT fine-tuné sur données réelles
-\end{itemize}
-
-\textbf{Usage} :
-\begin{verbatim}
-from transformers import AutoModel
-model = AutoModel.from_pretrained("username/egnn-synthetic-v1.0")
-\end{verbatim}
-
-\subsection{Environnement reproductible}
-
-\subsubsection{Container Docker}
-
-\textbf{Image publique} : \texttt{docker.io/username/organoid-gnn:latest}
-
-\textbf{Contenu} :
-\begin{itemize}
-    \item Base : PyTorch 2.0 + CUDA 11.8
-    \item Code complet + dépendances
-    \item Exemples de données (subset)
-    \item Notebooks pré-installés
-\end{itemize}
-
-\textbf{Utilisation} :
-\begin{verbatim}
-# Pull image
-docker pull username/organoid-gnn:latest
-
-# Run training
-docker run --gpus all \
-    -v /path/to/data:/data \
-    -v /path/to/results:/results \
-    username/organoid-gnn:latest \
-    python scripts/train.py \
-        --data_dir /data \
-        --output_dir /results
-
-# Interactive mode
-docker run -it --gpus all \
-    -p 8888:8888 \
-    username/organoid-gnn:latest \
-    jupyter lab --allow-root
-\end{verbatim}
-
-\subsubsection{Notebooks Jupyter démonstratifs}
-
-\textbf{01\_data\_exploration.ipynb} :
-\begin{itemize}
-    \item Charger et visualiser données
-    \item Statistiques descriptives
-    \item Visualisation 3D interactive
-\end{itemize}
-
-\textbf{02\_synthetic\_generation.ipynb} :
-\begin{itemize}
-    \item Générer organoïdes synthétiques
-    \item Validation statistique (Ripley)
-    \item Comparaison processus
-\end{itemize}
-
-\textbf{03\_model\_training.ipynb} :
-\begin{itemize}
-    \item Entraîner modèle GNN
-    \item Monitoring temps-réel
-    \item Visualisation résultats
-\end{itemize}
-
-\textbf{04\_interpretability.ipynb} :
-\begin{itemize}
-    \item GNNExplainer
-    \item Attention maps
-    \item Feature importance
-\end{itemize}
-
-\textbf{05\_transfer\_learning.ipynb} :
-\begin{itemize}
-    \item Pré-entraînement synthétique
-    \item Fine-tuning sur réel
-    \item Comparaison courbes data efficiency
-\end{itemize}
-
-\section{Benchmarks publics et défis communautaires}
-
-\subsection{Proposition de benchmark standardisé}
-
-Pour faciliter comparaisons futures, nous proposons un benchmark standardisé : \textbf{OrganoBench}.
-
-\subsubsection{Composition}
-
-\begin{itemize}
-    \item \textbf{OrganoBench-Synthetic} : 5,000 organoïdes, 5 classes
-    \item \textbf{OrganoBench-Real} : 1,000 organoïdes réels, 3 classes
-    \item \textbf{OrganoBench-Transfer} : Protocole pré-train + fine-tune
-\end{itemize}
-
-\subsubsection{Métriques officielles}
-
-\begin{itemize}
-    \item Accuracy (primaire)
-    \item F1-score macro (secondaire)
-    \item Temps d'inférence (contrainte : <10s/organoid)
-    \item Empreinte mémoire (contrainte : <16GB GPU)
-\end{itemize}
-
-\subsubsection{Leaderboard}
-
-Hébergé sur \texttt{organobench.ai} [à créer] ou Papers With Code.
-
-\subsection{Défis ouverts}
-
-\textbf{Challenge 1} : Classification multi-types (5+ types d'organes)
-
-\textbf{Challenge 2} : Few-shot learning (10 exemples par classe)
-
-\textbf{Challenge 3} : Domain adaptation (cross-lab generalization)
-
-\textbf{Challenge 4} : Interprétabilité (validation biologique obligatoire)
-
-\section{Aspects éthiques et légaux}
-
-\subsection{Données de patients}
-
-\textbf{Approbation IRB} : Protocole XXXX approuvé par comité d'éthique [si applicable]
-
-\textbf{Consentement} : Consentement éclairé signé pour usage recherche et publication
-
-\textbf{Anonymisation} : Toute information identifiante retirée (RGPD/HIPAA compliant)
-
-\subsection{Partage de données}
-
-\textbf{Synthétiques} : Domaine public (CC0), aucune restriction
-
-\textbf{Réelles} : Accord MTA nécessaire, usage académique uniquement
-
-\textbf{Code} : Licence MIT (open-source, usage commercial autorisé)
-
-\subsection{Impact sociétal}
-
-\textbf{Bénéfices} :
-\begin{itemize}
-    \item Accélération recherche biomédicale
-    \item Réduction expérimentation animale (3R)
-    \item Démocratisation outils d'analyse
-    \item Médecine personnalisée accessible
-\end{itemize}
-
-\textbf{Risques potentiels} :
-\begin{itemize}
-    \item Dépendance excessive à automatisation
-    \item Biais algorithmiques si données non-représentatives
-    \item Dual-use (applications non-éthiques potentielles)
-\end{itemize}
-
-\textbf{Mitigation} :
-\begin{itemize}
-    \item Validation experte maintenue
-    \item Transparence des limitations
-    \item Engagement de la communauté
-    \item Charte d'utilisation responsable
-\end{itemize}
-
-\section{Perspectives d'amélioration du benchmark}
-
-\subsection{Extensions souhaitées}
-
-\textbf{Multi-organ} : Inclure 10+ types d'organes
-
-\textbf{Temporel} : Séquences temporelles (croissance, réponse)
-
-\textbf{Multi-modal} : Fusion imaging + omics
-
-\textbf{Taille} : 100,000+ organoïdes pour foundation models
-
-\subsection{Contributions communautaires}
-
-\textbf{Call for contributions} :
-\begin{itemize}
-    \item Nouvelles architectures GNN
-    \item Nouveaux datasets
-    \item Améliorations du pipeline
-    \item Traductions et documentation
-\end{itemize}
-
-\textbf{Processus} : Pull requests GitHub, review par mainteneurs, tests automatiques, merge si approuvé.
-
-\textbf{Reconnaissance} : Co-authorship sur publications futures si contributions significatives.
