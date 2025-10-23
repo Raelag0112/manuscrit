@@ -277,31 +277,16 @@ La prédiction de réponse thérapeutique personnalisée constitue l'application
 
 \subsubsection{Modélisation de la réponse}
 
-La modélisation formelle de la réponse thérapeutique nécessiterait des architectures spécialisées capables de comparer les états pré- et post-traitement. Les architectures siamaises, traitant simultanément les graphes avant et après exposition au composé puis comparant leurs représentations apprises dans un espace latent partagé, constitueraient une approche naturelle :
-\begin{itemize}
-    \item Encoder les deux graphes via EGNN partagé
-    \item Calculer similarité ou différence d'embeddings
-    \item Prédire réponse (répondeur/non-répondeur, régression de efficacité)
-\end{itemize}
+Pour modéliser la réponse thérapeutique, il est nécessaire de concevoir des architectures capables de comparer efficacement les états pré- et post-traitement des organoïdes. Une stratégie naturelle repose sur l’utilisation d’architectures dites « siamaises » : il s’agit de traiter en parallèle les deux graphes représentant les états avant et après exposition au composé, en utilisant un encodeur graphique (par exemple un EGNN partagé) pour extraire les représentations latentes de chaque état. Ces représentations apprises sont ensuite comparées — soit en mesurant explicitement leur similarité, soit en calculant la différence de leurs embeddings — afin de quantifier l’effet du traitement. La prédiction finale peut alors prendre la forme d’une classification (répondeur versus non-répondeur) ou d’une régression estimant l’efficacité du traitement.
 
-\textbf{Features différentielles :}
-\[
-\Delta \mathbf{f}_i = \mathbf{f}_i^{\text{post}} - \mathbf{f}_i^{\text{pré}}
-\]
-
-Graphe avec features = changements. Le GNN identifie les patterns de changements caractéristiques d'efficacité.
+Une approche clef dans cette modélisation consiste à extraire directement, pour chaque cellule, les variations de ses caractéristiques entre l’état post- et pré-traitement, définies comme la différence entre les features correspondantes (\(\Delta \mathbf{f}_i = \mathbf{f}_i^{\text{post}} - \mathbf{f}_i^{\text{pré}}\)). En fournissant au modèle un graphe où les attributs des nœuds décrivent les changements survenus, le GNN peut apprendre à identifier les motifs de modification signature d’une réponse efficace au traitement.
 
 \subsubsection{Prédiction précoce}
 
-Prédire la réponse finale à partir d'images précoces (24h post-traitement) avant changements morphologiques majeurs. Nécessite :
-\begin{itemize}
-    \item Capture de signaux subtils (changements d'intensité de marqueurs, légers changements morphologiques)
-    \item Features sensibles précocement
-    \item Validation que prédiction précoce corrèle avec outcome final
-\end{itemize}
+Un enjeu essentiel réside dans la possibilité de prédire la réponse finale à partir d’images recueillies à des stades précoces, par exemple dès 24 heures après le traitement, alors même que les signes morphologiques majeurs de réponse ne sont pas encore apparents. Cela requiert d’abord de capturer des signaux subtils, tels que de légères variations d’intensité de certains marqueurs ou des altérations minimes de la morphologie cellulaire. Il est donc crucial de concevoir ou sélectionner des descripteurs (features) qui soient particulièrement sensibles à ces changements précoces, et de valider que la prédiction anticipée obtenue ainsi soit effectivement corrélée avec le devenir réel de l’organoïde à plus long terme.
 
-\textbf{Bénéfice clinique :}
-Réduction du temps d'attente de résultats de plusieurs jours à 24-48h, permettant ajustement thérapeutique plus rapide.
+Sur le plan clinique, cette capacité de prédiction rapide apporterait un bénéfice considérable, en réduisant le temps d’attente des résultats de plusieurs jours à seulement 24 à 48 heures, permettant ainsi d’ajuster beaucoup plus tôt la stratégie thérapeutique pour chaque patient.
+
 
 \subsection{Vers une analyse holistique multi-échelles}
 
@@ -313,62 +298,25 @@ Un framework multi-échelles unifié représenterait ces niveaux via des graphes
 
 \subsubsection{Intégration imagerie + omiques}
 
-\textbf{Spatial transcriptomics + imagerie :}
-Chaque nœud du graphe possède :
-\begin{itemize}
-    \item Position 3D (imagerie)
-    \item Morphologie (segmentation)
-    \item Intensités marqueurs (immunofluorescence)
-    \item Profil transcriptomique (10-1000 gènes)
-\end{itemize}
+L’intégration des données de transcriptomique spatiale et d’imagerie ouvre des perspectives inédites pour caractériser l’organisation des organoïdes avec une résolution et une profondeur inégalées. Dans ce contexte, chaque cellule, représentée par un nœud du graphe, se voit attribuer à la fois une position tridimensionnelle issue de l’imagerie, des informations morphologiques extraites par segmentation, l’intensité de divers marqueurs d’immunofluorescence signalant l’expression protéique, ainsi qu’un profil transcriptomique couvrant de dix à plusieurs centaines de gènes. Cette richesse informationnelle permet d’associer l’état moléculaire précis de chaque cellule à son architecture locale dans l’organoïde.
 
-\textbf{Challenges :}
-\begin{itemize}
-    \item Features hétérogènes (dimensions, échelles, significations différentes)
-    \item Normalisation et fusion appropriées
-    \item Interprétabilité cross-modal
-\end{itemize}
+Cependant, le traitement conjoint de ces modalités pose des défis importants. D’une part, la nature hétérogène des features—en termes de dimensions, d’échelles de mesure et de signification biologique—rend nécessaire le développement de stratégies de normalisation et de fusion adaptées, afin de construire des représentations intégratives cohérentes. D’autre part, l’interprétabilité transversale entre modalités demeure un enjeu, tant pour la compréhension biologique que pour la validation des modèles.
 
-\textbf{Potentiel :}
-Compréhension profonde des liens entre structure spatiale, état cellulaire, et expression génique. Identification de régulations spatiales, niches, interactions cell-cell.
+Mais le potentiel de cette approche est considérable : en rendant possible l’analyse des liens entre structure spatiale, état cellulaire et expression génique, elle favorise la découverte de régulations spatiales, l’identification de niches spécifiques ou encore la caractérisation des interactions cellulaires au sein de microenvironnements complexes.
 
 \subsubsection{Causal inference}
 
-Au-delà de la prédiction (correlation), viser l'inférence causale :
-\begin{itemize}
-    \item Quelles cellules/interactions causent un phénotype ?
-    \item Quel effet aurait l'ablation/perturbation d'une cellule spécifique ?
-    \item Quels sont les drivers vs passengers dans un processus pathologique ?
-\end{itemize}
-
-Approches : causal graphs, structural causal models, do-calculus adaptés aux graphes biologiques.
+Au-delà de la simple capacité prédictive, l’ambition est de s’orienter vers une véritable inférence causale. Il ne s’agit plus seulement de prédire des états ou des variations, mais d’identifier quels types cellulaires ou quelles interactions sont réellement à l’origine d’un phénotype particulier. Par exemple, il devient possible de s’interroger sur les conséquences de l’ablation ou de la perturbation d’une cellule spécifique : aurait-elle un effet systémique ou localisé au sein de l’organoïde ? De même, dans les processus pathologiques, il est essentiel de distinguer les cellules ou mécanismes qui jouent un rôle moteur (« drivers ») de ceux qui ne sont que des conséquences (« passengers »). Pour cela, des méthodes inspirées des modèles causaux structurels, des graphes causaux ou du do-calculus adaptés aux réseaux biologiques pourraient être mobilisées pour démêler les liens effectifs sous-jacents aux observations.
 
 \subsection{Applications en médecine de précision}
 
 \subsubsection{Biomarqueurs prédictifs}
 
-Identifier, via notre approche, de nouveaux biomarqueurs prédictifs :
-\begin{itemize}
-    \item Patterns spatiaux associés à pronostic
-    \item Signatures cellulaires prédictives de réponse à thérapies spécifiques
-    \item Biomarqueurs précoces de résistance émergente
-\end{itemize}
-
-\textbf{Validation prospective :}
-Cohortes de patients suivis longitudinalement pour confirmer valeur prédictive clinique.
+Notre approche ouvre la voie à l’identification de nouveaux biomarqueurs prédictifs, qu’il s’agisse de motifs spatiaux associés au pronostic, de signatures cellulaires indiquant la probabilité de réponse à une thérapie donnée, ou encore de marqueurs précoces annonçant l’émergence d’une résistance. La validation prospective de ces biomarqueurs s’appuierait idéalement sur des cohortes de patients suivis dans le temps, permettant d’évaluer leur réelle valeur prédictive en contexte clinique.
 
 \subsubsection{Essais virtuels}
 
-\textbf{Vision futuriste :}
-\begin{enumerate}
-    \item Générer organoïdes virtuels de patient (learned from real organoid + génomique)
-    \item Simuler traitements in silico (modèles prédictifs de réponse)
-    \item Tester rapidement des centaines de combinaisons thérapeutiques
-    \item Sélectionner stratégie optimale
-    \item Valider expérimentalement sur organoïdes réels uniquement le top-10
-\end{enumerate}
-
-Réduction drastique du temps et coût de screening personnalisé.
+Enfin, une des perspectives les plus ambitieuses est celle des essais virtuels. Dans cette vision futuriste, il deviendrait possible de générer, pour chaque patient, un organoïde virtuel apprenant des données biologiques réelles et du profil génomique. On pourrait alors simuler in silico diverses stratégies thérapeutiques à l’aide de modèles prédictifs, explorer en quelques heures ou jours des centaines de combinaisons de traitements, et sélectionner la stratégie la plus prometteuse, qui ne serait finalement validée expérimentalement, sur organoïdes réels, que pour un sous-ensemble restreint de solutions. Cette approche permettrait une réduction drastique du temps et des coûts liés au criblage personnalisé, ouvrant la voie à une médecine véritablement adaptée à chaque individu.
 
 \section{Impact scientifique et sociétal}
 
@@ -408,54 +356,23 @@ Organoïdes hépatiques/rénaux de patient pour prédire toxicité idiosyncrasiq
 
 \subsubsection{Principe des 3R}
 
-Notre approche contribue aux 3R (Russell et Burch, 1959) :
-\begin{itemize}
-    \item \textbf{Remplacer} : Organoïdes humains vs modèles animaux pour certaines questions
-    \item \textbf{Réduire} : Pré-screening in vitro réduit nombre d'animaux nécessaires
-    \item \textbf{Raffiner} : Tests plus pertinents (modèles humains) réduisent échecs translationnels
-\end{itemize}
+Notre approche s’inscrit pleinement dans le cadre du principe des 3R, formulé par Russell et Burch en 1959, qui guide l’expérimentation animale vers des pratiques plus éthiques et responsables. Premièrement, elle permet de \textbf{remplacer} les modèles animaux par des organoïdes humains lorsque cela est pertinent, ouvrant la voie à l’étude de nombreuses questions biologiques et pharmacologiques sur des systèmes in vitro plus proches de la physiologie humaine. Deuxièmement, en instaurant des stratégies de présélection et de criblage in vitro, il devient possible de \textbf{réduire} sensiblement le nombre d’animaux nécessaires aux étapes ultérieures du développement thérapeutique, n’employant l’expérimentation animale que pour valider les candidats les plus prometteurs. Enfin, l’utilisation de modèles humains permet de \textbf{raffiner} les protocoles expérimentaux : les tests gagnent en pertinence et en capacité prédictive, limitant ainsi les échecs translationnels lors du passage de l’animal à l’humain.
 
 \subsubsection{Impact éthique et réglementaire}
 
-\textbf{Acceptation croissante :}
-\begin{itemize}
-    \item Réglementation européenne encourage alternatives (REACH, directive cosmetiques)
-    \item Pression sociétale pour réduction expérimentation animale
-    \item Organoïdes humains plus pertinents que modèles murins pour prédire réponse humaine
-\end{itemize}
+Au-delà des apports scientifiques et techniques, l’intégration des organoïdes dans les workflows de recherche et développement bénéficie d’une acceptation éthique et réglementaire croissante. La réglementation européenne, à travers des textes tels que REACH ou la directive sur les cosmétiques, encourage le développement et l’adoption d’alternatives à l’expérimentation animale. Cette évolution est amplifiée par une pression sociétale de plus en plus forte, qui demande une réduction substantielle du recours aux animaux dans la recherche biomédicale. D’un point de vue scientifique, les organoïdes humains s’imposent progressivement comme des modèles plus pertinents et prédictifs que les systèmes murins pour évaluer les réponses humaines aux nouvelles thérapies.
 
-\textbf{Économies :}
-\begin{itemize}
-    \item Coût : Organoïde ~10-50€ vs souris ~500-2000€
-    \item Temps : Semaines vs mois
-    \item Échelle : Milliers d'organoïdes vs centaines d'animaux max
-\end{itemize}
+Par ailleurs, le recours aux organoïdes se justifie également par ses avantages économiques et pratiques : leur mise en œuvre est beaucoup moins coûteuse (de l’ordre de 10 à 50 € par organoïde, contre 500 à 2000 € pour une souris), les cycles expérimentaux sont plus rapides (quelques semaines contre plusieurs mois pour les modèles animaux), et il devient possible de travailler à bien plus grande échelle (des milliers d’organoïdes analysables simultanément, là où les études animales restent limitées à quelques centaines de spécimens au maximum).
 
 \subsection{Économie de la santé}
 
-\subsubsection{Réduction des coûts de drug development}
+\subsubsection{Réduction des coûts du développement de médicaments}
 
-\textbf{Problème actuel :}
-Développer un nouveau médicament coûte ~1-2 milliards € et prend 10-15 ans. Taux d'échec : > 90\%.
+Le processus actuel de développement d’un nouveau médicament représente un investissement colossal, avec des coûts évalués entre un et deux milliards d’euros et des durées allant de 10 à 15 ans, pour des taux d’échec dépassant 90 %. L’introduction conjointe des organoïdes et de l’intelligence artificielle promet de transformer radicalement cette équation économique. D’abord, la détection précoce de toxicités potentielles lors des phases initiales du développement, grâce à des modèles humains pertinents, permet d’éviter des investissements massifs dans des molécules vouées à l’échec, générant ainsi des économies de plusieurs centaines de millions d’euros. Ensuite, la capacité à prédire l’efficacité de candidats thérapeutiques avant même le lancement des essais cliniques humains permet de concentrer les efforts sur les molécules les plus prometteuses, limitant le gaspillage de ressources et de temps. Enfin, la stratification fine des patients, permise par l’analyse organoïde/IA, facilite la conduite d’essais cliniques sur des populations enrichies en répondeurs potentiels, ce qui accroît le taux de succès global des essais. Ces avancées combinées pourraient conduire à une réduction de 20 à 30 % des coûts et des délais associés au développement de nouveaux traitements.
 
-\textbf{Impact des organoïdes + IA :}
-\begin{itemize}
-    \item Identification précoce de toxicité (échec phase I) : économies de centaines de millions
-    \item Prédiction d'efficacité avant essais cliniques : réduction du nombre de molécules testées
-    \item Stratification patients : essais sur populations enrichies augmentent chances de succès
-\end{itemize}
+\subsubsection{Optimisation des traitements}
 
-Réduction potentielle de 20-30\% des coûts et temps de développement.
-
-\subsubsection{Optimisation de traitements}
-
-Pour cancers :
-\begin{itemize}
-    \item Éviter thérapies inefficaces (économie de traitements coûteux, effets secondaires évités)
-    \item Identification plus rapide de traitement efficace (survie améliorée)
-\end{itemize}
-
-Valeur économique estimée : [milliers €] par patient (économies + QALYs gagnés).
+Dans le contexte des cancers, les bénéfices économiques des approches fondées sur les organoïdes et l’intelligence artificielle sont également majeurs. Elles permettent d’éviter l’administration de traitements inefficaces, limitant ainsi le recours à des thérapies onéreuses tout en préservant les patients des effets secondaires inutiles. Par ailleurs, l’identification plus rapide de la stratégie thérapeutique optimale se traduit directement par une amélioration de la survie et de la qualité de vie des patients. L’ensemble de ces gains se traduit par une valeur économique importante, estimée à plusieurs milliers d’euros par patient, à travers les économies générées et les années de vie de qualité (QALYs) gagnées.
 
 \section{Conclusion finale}
 
