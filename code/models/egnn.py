@@ -88,9 +88,9 @@ class EGNN(nn.Module):
     def __init__(
         self,
         in_channels: int,
-        hidden_channels: int = 128,
-        num_layers: int = 4,
-        out_channels: int = 64,
+        hidden_channels: int = 256,
+        num_layers: int = 5,
+        out_channels: int = 128,
         edge_dim: int = 1,
     ):
         super(EGNN, self).__init__()
@@ -146,10 +146,10 @@ class EGNNClassifier(nn.Module):
     def __init__(
         self,
         in_channels: int,
-        hidden_channels: int = 128,
-        num_layers: int = 4,
+        hidden_channels: int = 256,
+        num_layers: int = 5,
         num_classes: int = 2,
-        dropout: float = 0.5,
+        dropout: float = 0.15,
     ):
         super(EGNNClassifier, self).__init__()
         

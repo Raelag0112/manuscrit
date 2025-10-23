@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from torch_geometric.data import Data
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import logging
 
 from .point_processes import (
@@ -22,7 +22,14 @@ from .point_processes import (
     StraussProcess,
     create_gradient_intensity
 )
-from ..utils.graph_builder import GraphBuilder
+try:
+    from ..utils.graph_builder import GraphBuilder
+except ImportError:
+    # Fallback pour les imports depuis le notebook
+    import sys
+    from pathlib import Path
+    sys.path.append(str(Path(__file__).parent.parent))
+    from utils.graph_builder import GraphBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -118,43 +125,68 @@ class SyntheticOrganoidGenerator:
     def generate_cell_features(
         self,
         positions: np.ndarray,
-        feature_dim: int = 10,
+        feature_dim: int = 5,
         add_noise: bool = True,
     ) -> np.ndarray:
         """
         Generate cell features based on positions
         
+        Implements the feature vector from Chapter 4:
+        f_i = [position (3), volume (1), sphericity (1)]^T ∈ ℝ^5
+        
         Args:
             positions: Cell positions (N, 3)
-            feature_dim: Number of features per cell
+            feature_dim: Number of features per cell (should be 5)
             add_noise: Add random noise to features
         
         Returns:
             features: Array (N, feature_dim)
         """
         num_cells = len(positions)
+        
+        if feature_dim != 5:
+            logger.warning(f"feature_dim={feature_dim} but Chapter 4 specifies 5 features. Using 5.")
+            feature_dim = 5
+        
         features = np.zeros((num_cells, feature_dim))
         
-        # Feature 0-2: Normalized positions
-        features[:, :3] = positions / self.radius
+        # Feature 0-2: 3D coordinates (x, y, z)
+        features[:, :3] = positions
         
-        # Feature 3: Distance from center
-        distances = np.linalg.norm(positions, axis=1)
-        features[:, 3] = distances / self.radius
-        
-        # Feature 4: Number of nearby neighbors (local density)
+        # Feature 3: Volume (approximated by Voronoi cell area)
+        # For synthetic data on sphere, use surface area as proxy for volume
         from scipy.spatial import distance_matrix
         dist_matrix = distance_matrix(positions, positions)
-        radius_threshold = 20.0
-        features[:, 4] = np.sum(dist_matrix < radius_threshold, axis=1) - 1
         
-        # Feature 5-9: Random features
-        if feature_dim > 5:
-            features[:, 5:] = np.random.randn(num_cells, feature_dim - 5)
+        # Estimate local volume using k-nearest neighbors
+        k_volume = 6  # Number of neighbors for volume estimation
+        sorted_distances = np.sort(dist_matrix, axis=1)
+        knn_distances = sorted_distances[:, 1:k_volume+1]  # Exclude self
+        mean_knn_dist = np.mean(knn_distances, axis=1)
         
-        # Add noise
+        # Volume proxy: sphere volume with radius = mean distance to k neighbors
+        volumes = (4/3) * np.pi * (mean_knn_dist ** 3)
+        features[:, 3] = volumes
+        
+        # Feature 4: Sphericity
+        # For synthetic cells, compute sphericity based on local point distribution
+        # Perfect sphere = 1.0, irregular shape < 1.0
+        sphericity = np.ones(num_cells)  # Default: perfect spheres
+        
+        # Add some variation based on local density irregularity
+        for i in range(num_cells):
+            local_points = positions[dist_matrix[i] < 2 * mean_knn_dist[i]]
+            if len(local_points) > 3:
+                # Compute variance of distances (irregularity measure)
+                local_dists = np.linalg.norm(local_points - positions[i], axis=1)
+                irregularity = np.std(local_dists) / (np.mean(local_dists) + 1e-8)
+                sphericity[i] = np.clip(1.0 - irregularity, 0.5, 1.0)
+        
+        features[:, 4] = sphericity
+        
+        # Add noise for realism
         if add_noise:
-            noise = np.random.randn(num_cells, feature_dim) * 0.1
+            noise = np.random.randn(num_cells, feature_dim) * 0.05
             features = features + noise
         
         return features.astype(np.float32)
@@ -213,7 +245,7 @@ class SyntheticOrganoidGenerator:
         num_cells: int,
         process_type: str,
         label: int,
-        feature_dim: int = 10,
+        feature_dim: int = 5,
         apply_transformation: bool = True,
         **process_kwargs
     ) -> Data:
@@ -271,7 +303,7 @@ class SyntheticOrganoidGenerator:
         num_organoids: int,
         num_cells_range: Tuple[int, int] = (100, 500),
         process_distribution: Optional[Dict[str, float]] = None,
-        feature_dim: int = 10,
+        feature_dim: int = 5,
     ) -> List[Data]:
         """
         Generate dataset of synthetic organoids
@@ -405,7 +437,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_test', type=int, default=15000)
     parser.add_argument('--num_cells_min', type=int, default=50)
     parser.add_argument('--num_cells_max', type=int, default=500)
-    parser.add_argument('--feature_dim', type=int, default=10)
+    parser.add_argument('--feature_dim', type=int, default=5)
     parser.add_argument('--seed', type=int, default=42)
     
     args = parser.parse_args()

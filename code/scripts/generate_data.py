@@ -29,8 +29,8 @@ def main():
                         help='Minimum number of cells per organoid')
     parser.add_argument('--num_cells_max', type=int, default=500,
                         help='Maximum number of cells per organoid')
-    parser.add_argument('--feature_dim', type=int, default=10,
-                        help='Feature dimension')
+    parser.add_argument('--feature_dim', type=int, default=5,
+                        help='Feature dimension (position 3D + volume + sphericity)')
     parser.add_argument('--radius', type=float, default=100.0,
                         help='Organoid radius')
     parser.add_argument('--edge_method', type=str, default='knn',

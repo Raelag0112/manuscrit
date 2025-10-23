@@ -11,11 +11,11 @@ data:
 # Model
 model:
   type: "gcn"  # gcn, gat, graphsage, gin, egnn
-  in_channels: 10
-  hidden_channels: 128
-  num_layers: 3
+  in_channels: 5
+  hidden_channels: 256
+  num_layers: 5
   num_classes: 3
-  dropout: 0.5
+  dropout: 0.15
   
 # Training
 training:
@@ -54,7 +54,7 @@ synthetic:
   num_test: 15000
   num_cells_min: 50
   num_cells_max: 500
-  feature_dim: 10
+  feature_dim: 5
   processes:
     - "poisson"
     - "matern"

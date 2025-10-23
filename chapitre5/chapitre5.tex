@@ -26,12 +26,12 @@ Bien que les organoïdes de type choux-fleur ne présentent pas naturellement un
 
 Nous générons deux classes de processus ponctuels sphériques correspondant aux phénotypes d'organoïdes de prostate observés :
 
-\textbf{Phénotype Cystique (Classe 0)} : Distribution uniforme sur la sphère (processus de Poisson homogène). Modélise les organoïdes cystiques où les cellules sont réparties aléatoirement à la périphérie d'une cavité centrale, suivant :
+\textbf{Phénotype Cystique} : Distribution uniforme sur la sphère (processus de Poisson homogène). Modélise les organoïdes cystiques où les cellules sont réparties aléatoirement à la périphérie d'une cavité centrale, suivant :
 \[
 f(x,y,z) = \frac{3}{4\pi}, \quad \text{avec } x^2+y^2+z^2 \leq 1
 \]
 
-\textbf{Phénotype Chou-fleur (Classe 1)} : Distribution agrégée (processus de Matérn avec 10 clusters, $\sigma = 0.15$). Modélise les organoïdes choux-fleurs caractérisés par des amas cellulaires irréguliers. Les centres d'agrégats sont distribués uniformément sur la sphère, puis autour de chaque centre, des points sont distribués selon une loi gaussienne tronquée.
+\textbf{Phénotype Chou-fleur} : Distribution agrégée (processus de Matérn avec 10 clusters, $\sigma = 0.15$). Modélise les organoïdes choux-fleurs caractérisés par des amas cellulaires irréguliers. Les centres d'agrégats sont distribués uniformément sur la sphère, puis autour de chaque centre, des points sont distribués selon une loi gaussienne tronquée.
 
 Chaque échantillon contient 100 points (cellules), un nombre calibré pour capturer les patterns spatiaux tout en restant computationnellement efficace pour l'étude paramétrique extensive.
 
@@ -67,7 +67,7 @@ Notre approche par GNN modélise la distribution cellulaire comme un graphe :
 
 \textbf{Construction du graphe} : Tessellation de Voronoï sphérique (\texttt{scipy.spatial.SphericalVoronoi}) — deux points sont connectés si leurs cellules de Voronoï sphériques partagent une arête (arc de grand cercle). Cette construction capture naturellement les relations de voisinage géométrique entre cellules sur la surface de la sphère, indépendamment de seuils de distance arbitraires.
 
-\textbf{Features des nœuds} : Coordonnées 3D + aire de la cellule de Voronoï sphérique (4 features par nœud).
+\textbf{Features des nœuds} : Coordonnées 3D + volume + sphéricité (5 features par nœud, correspondant au vecteur du Chapitre 4).
 
 \textbf{Architecture} : Graph Attention Network (GAT)~\cite{gatvcnn2018} avec :
 \begin{itemize}
@@ -194,7 +194,7 @@ Pour nos organoïdes réels, plusieurs facteurs justifient le choix des GNN :
 
 \textbf{Morphologies hétérogènes} : Les organoïdes cystiques sont quasi-sphériques, mais les choux-fleurs présentent des morphologies irrégulières avec excroissances, rendant l'hypothèse sphérique trop contraignante. Les GNN, par leur flexibilité géométrique, s'adaptent naturellement à cette diversité.
 
-\textbf{Features cellulaires riches} : Nous disposons de 27 features par cellule (morphologie, intensités, texture), que les GNN peuvent exploiter pleinement, tandis que les statistiques spatiales se limitent aux positions.
+\textbf{Features cellulaires riches} : Nous disposons de 5 features par cellule (position 3D, volume, sphéricité), que les GNN peuvent exploiter pleinement, tandis que les statistiques spatiales se limitent aux positions.
 
 \textbf{Classification multi-classes} : Notre dataset comprend 4 phénotypes (Cystiques, Choux-fleurs, Compact, Kératinisés), une tâche où les GNN excellent grâce à leur capacité d'apprentissage non-linéaire.
 
@@ -223,15 +223,18 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
         \item Processus de Poisson homogène (organoïdes cystiques)
         \item Continuum de processus de Matérn avec clustering variable (organoïdes choux-fleurs)
     \end{itemize}
+    \item \textbf{Tâche d'entraînement} : Régression du coefficient de clustering (variable continue)
     \item \textbf{Taille} : 50-500 cellules par organoïde (moyenne : 250, médiane : 230)
     \item \textbf{Partition} : Train (70~000), validation (15~000), test (15~000)
 \end{itemize}
+
+\textit{Note méthodologique :} Bien que les données synthétiques soient générées le long d'un continuum (comme décrit au Chapitre 4), pour l'étude comparative avec les statistiques spatiales (Section 5.1), nous discrétisons le continuum en 5 niveaux distincts pour permettre une évaluation par classification multi-classes. Cette simplification facilite la comparaison des approches mais ne reflète pas la tâche de régression continue utilisée pour le pré-entraînement.
 
 \textbf{Caractéristiques :}
 \begin{itemize}
     \item Rayon sphère : 100-200 μm (distribution gaussienne)
     \item Densité cellulaire : $\sim$0.01 cellules/μm² de surface
-    \item Features : 27 dimensions (position, morphologie, intensités simulées)
+    \item Features : 5 dimensions (coordonnées 3D, volume, sphéricité)
     \item Graphes : K-NN avec k=10, symétrisés
 \end{itemize}
 
@@ -259,13 +262,15 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
 \begin{itemize}
     \item \textbf{Échantillons imagés} : 1,311 échantillons
     \item \textbf{Organoïdes extraits} : 2,272 organoïdes individuels (après clustering DBSCAN)
-    \item \textbf{Classes} : 4 phénotypes majeurs d'organoïdes de prostate
+    \item \textbf{Classes} : 4 phénotypes observés, avec 2 classes principales
     \begin{enumerate}
         \item \textbf{Chouxfleurs} : 1,404 organoïdes (61.8\%) - morphologie en chou-fleur, surface irrégulière
         \item \textbf{Cystiques} : 817 organoïdes (36.0\%) - formation kystes/cavités, épithélium polarisé
         \item \textbf{Compact} : 41 organoïdes (1.8\%) - structure dense, arrangement serré
         \item \textbf{Kératinisés} : 10 organoïdes (0.4\%) - différenciation kératinique spécialisée
     \end{enumerate}
+    \item \textbf{Tâche principale} : Classification binaire Chouxfleurs vs Cystiques (97.8\% des données, Chapitre 4)
+    \item \textbf{Tâche étendue} : Classification 4-classes incluant phénotypes rares (évaluation complète)
     \item \textbf{Distribution} : Déséquilibre marqué, 97.8\% dans 2 classes dominantes (Chouxfleurs + Cystiques)
     \item \textbf{Annotateurs} : 2 biologistes experts (Paris + Nice), désaccords résolus par consensus
     \item \textbf{Accord inter-annotateurs} : Cohen's κ = 0.78 (bon accord)
@@ -283,8 +288,8 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
 \textbf{Pipeline de traitement :}
 \begin{itemize}
     \item Segmentation : Faster Cellpose (notre optimisation, F1=0.95)
-    \item Extraction features : 27 dimensions par cellule
-    \item Construction graphes : K-NN (k=10) avec features positionnelles et morphologiques
+    \item Extraction features : 5 dimensions par cellule (3D position + volume + sphéricité)
+    \item Construction graphes : K-NN (k=10) avec features géométriques
     \item Clustering spatial : DBSCAN pour séparation organoïdes (eps=30 μm, min\_samples=20)
 \end{itemize}
 
@@ -723,7 +728,7 @@ Optimal : 0.15. Sans dropout : légère surapprentissage (gap train-val +2\%). D
 
 \subsubsection{Résultats 5-fold cross-validation}
 
-\textbf{EGNN with pre-training} (pré-entraîné sur OrganoSynth-5K, fine-tuné sur OrganoProstate-2K) :
+\textbf{EGNN with pre-training} (pré-entraîné sur OrganoSynth-100K, fine-tuné sur OrganoProstate-2K) :
 \begin{itemize}
     \item \textbf{Accuracy} : 84.6 ± 2.1\%
     \item \textbf{F1 macro} : 0.742 ± 0.035 (pénalisé par classes minoritaires)
