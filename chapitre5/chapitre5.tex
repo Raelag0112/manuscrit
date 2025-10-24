@@ -2,7 +2,7 @@
 
 \chapter{Expérimentations et résultats}
 
-Ce chapitre présente les résultats expérimentaux obtenus avec la méthodologie décrite au Chapitre 4. Nous commençons par justifier le choix des Graph Neural Networks via une étude comparative approfondie avec les méthodes statistiques classiques. Ensuite, nous validons nos données synthétiques, évaluons les performances sur ces données, avant de passer aux données réelles et à l'approche hybride. Enfin, nous analysons l'interprétabilité et discutons les résultats de manière critique.
+Ce chapitre présente les résultats expérimentaux obtenus avec la méthodologie décrite au Chapitre 4. Nous commençons par justifier le choix des Graph Neural Networks via une étude comparative approfondie avec les méthodes statistiques classiques. Ensuite, nous évaluons les performances sur les données synthétiques, avant de passer aux données réelles et à l'approche hybride. Enfin, nous discutons les résultats de manière critique.
 
 \section{Justification de l'approche GNN : étude comparative avec les statistiques spatiales}
 
@@ -220,11 +220,11 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
     \item \textbf{Total} : ~100~000 organoïdes synthétiques
     \item \textbf{Processus ponctuels} : Continuum Poisson-Matérn
     \begin{itemize}
-        \item Processus de Poisson homogène (clustering = 0, organoïdes cystiques)
-        \item Processus de Matérn cluster avec clustering variable (organoïdes choux-fleurs)
-        \item Distribution continue du coefficient de clustering dans $[0, 1]$
+        \item Processus de Poisson homogène ($\bar{C} \approx 0.1$-$0.2$, faible agrégation, organoïdes cystiques)
+        \item Processus de Matérn cluster ($\bar{C} \approx 0.7$-$0.9$, forte agrégation, organoïdes choux-fleurs)
+        \item Continuum intermédiaire couvrant uniformément $\bar{C} \in [0, 1]$
     \end{itemize}
-    \item \textbf{Tâche d'entraînement} : Régression du coefficient de clustering (variable continue dans $[0,1]$)
+    \item \textbf{Tâche d'entraînement} : Régression du coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ (variable continue dans $[0,1]$)
     \item \textbf{Taille} : 50-500 cellules par organoïde (moyenne : 250, médiane : 230)
     \item \textbf{Partition} : Train (70~000), validation (15~000), test (15~000)
 \end{itemize}
@@ -275,12 +275,20 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
     \item \textbf{Validation} : 100 organoïdes validés indépendamment (échantillon stratifié)
 \end{itemize}
 
-\textbf{Caractéristiques :}
+\textbf{Sélection des données pour l'étude :}
+
+Bien que le dataset complet contienne 2,272 organoïdes extraits, nous avons observé une importante variabilité intra-batch : certains organoïdes étiquetés "choux-fleurs" ne présentaient pas de différenciation morphologique claire. Pour garantir la qualité des annotations et la fiabilité de l'apprentissage supervisé, nous avons sélectionné un sous-ensemble de 500 organoïdes bien différenciés (250 par classe) présentant des phénotypes morphologiques clairs et non-ambigus.
+
+Les 1,772 organoïdes restants, bien que présentant une incohérence suspectée entre leur label batch et leur morphologie observée, constituent néanmoins une ressource précieuse pour des approches non supervisées futures (clustering, apprentissage de représentations, détection d'anomalies) permettant de découvrir la vraie structure morphologique indépendamment des labels batch potentiellement bruités.
+
+\textbf{Caractéristiques du dataset utilisé :}
 \begin{itemize}
+    \item \textbf{Total utilisé (supervisé)} : 500 organoïdes bien différenciés (~250 Chouxfleurs, ~250 Cystiques)
+    \item \textbf{Réserve (non supervisé)} : ~1,772 organoïdes avec incohérence label-morphologie
     \item Taille organoïdes : 20-5,000 cellules (moyenne : 250, médiane : 180)
     \item Distribution : Log-normale (queue lourde vers grandes tailles)
-    \item Split : Stratifié par phénotype, 70\% train (1,590 org), 15\% val (340 org), 15\% test (342 org)
-    \item Stratégies déséquilibre : Weighted cross-entropy, oversampling classes minoritaires
+    \item Split : Stratifié par phénotype, 70\% train (~350 org), 15\% val (~75 org), 15\% test (~75 org)
+    \item Équilibrage : Classes parfaitement équilibrées dans la sélection supervisée
 \end{itemize}
 
 \textbf{Pipeline de traitement :}
@@ -358,128 +366,12 @@ Pour assurer la reproductibilité complète :
     \item Code versionné (git) avec tags pour chaque expérience
 \end{itemize}
 
-\section{Validation des données synthétiques}
-
-Avant d'utiliser les données synthétiques pour l'entraînement, nous validons leur réalisme via analyses statistiques.
-
-\subsection{Analyse des statistiques spatiales}
-
-\subsubsection{Fonctions de Ripley : validation théorique}
-
-Nous calculons les fonctions K, F, G pour 100 réalisations de chaque processus et comparons aux valeurs théoriques.
-
-\textbf{Processus de Poisson :}
-\begin{itemize}
-    \item $K_{\text{simulé}}(r)$ s'écarte de $K_{\text{théorique}}(r) = 2\pi(1-\cos(r/R))$ par < 3\% (erreur d'estimation finie)
-    \item $F$ et $G$ dans enveloppes de confiance à 95\%
-    \item Conclusion : Simulation correcte
-\end{itemize}
-
-\textbf{Processus de Matérn :}
-\begin{itemize}
-    \item $K(r) > K_{\text{Poisson}}(r)$ pour $r < 50$ μm, confirmant clustering
-    \item Peak de $K(r)$ à $r \approx r_{\text{cluster}}$ (30 μm) comme attendu
-    \item Différence claire entre high et low clustering
-\end{itemize}
-
-\textbf{Visualisation :}
-Des graphiques montrant $K(r)$, $F(r)$, $G(r)$ avec enveloppes théoriques confirment visuellement la conformité.
-
-\subsubsection{Comparaison avec données réelles}
-
-Nous calculons les fonctions de Ripley pour [N] organoïdes réels et comparons aux synthétiques.
-
-\textbf{Résultats :}
-\begin{itemize}
-    \item Les organoïdes réels présentent une légère agrégation (Matérn-like)
-    \item $K_{\text{réel}}(r)$ se situe entre Poisson et Matérn low clustering
-    \item Conclusion : Les processus Poisson et Matérn low encadrent les données réelles
-\end{itemize}
-
-Cette observation valide la pertinence de nos classes synthétiques : elles couvrent un spectre incluant le comportement réel.
-
-\subsection{Distribution des métriques topologiques}
-
-\subsubsection{Métriques de graphes}
-
-Pour chaque graphe (synthétique et réel), nous calculons :
-\begin{itemize}
-    \item Degré moyen : $\bar{d} = \frac{1}{N}\sum_i d_i$
-    \item Coefficient de clustering moyen : $\bar{C}$
-    \item Diamètre : diam$(G)$
-    \item Nombre de composantes connexes (devrait être 1)
-\end{itemize}
-
-\textbf{Comparaison distributions :}
-\begin{itemize}
-    \item Degré moyen : Synthétique 10.2 ± 0.8, Réel 9.8 ± 1.2 (p = 0.15, KS test)
-    \item Clustering : Synthétique 0.32 ± 0.08, Réel 0.35 ± 0.10 (p = 0.42)
-    \item Diamètre : Synthétique 15.3 ± 3.2, Réel 14.8 ± 3.8 (p = 0.58)
-\end{itemize}
-
-Aucune différence statistiquement significative, confirmant que les graphes synthétiques et réels ont des propriétés topologiques comparables.
-
-\subsection{Réalisme morphologique}
-
-\subsubsection{Distributions de features cellulaires}
-
-Comparaison des distributions de features morphologiques :
-
-\begin{center}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Feature} & \textbf{Synthétique} & \textbf{Réel} & \textbf{KS p-value} \\
-\hline
-Volume (μm³) & 450 ± 120 & 480 ± 150 & 0.23 \\
-Excentricité & 0.45 ± 0.15 & 0.48 ± 0.18 & 0.31 \\
-\hline
-\end{tabular}
-\end{center}
-
-Les distributions sont statistiquement indistinguables (p > 0.05), confirmant le réalisme morphologique.
-
-\subsubsection{Validation visuelle}
-
-Une inspection visuelle comparative entre organoïdes synthétiques et réels révèle une forte similarité morphologique.
-
-\textbf{Observations :}
-\begin{itemize}
-    \item Les distributions de caractéristiques (taille, densité, forme) sont comparables
-    \item Certains organoïdes synthétiques présentent une régularité géométrique légèrement excessive (artefact des formes Voronoï)
-    \item L'ajout de perturbations géométriques stochastiques améliore le réalisme visuel
-\end{itemize}
-
-L'analyse suggère que les données synthétiques capturent bien les caractéristiques morphologiques principales des organoïdes réels.
-
-\subsection{Diversité et couverture de l'espace phénotypique}
-
-\subsubsection{Analyse en composantes principales}
-
-PCA sur features des graphes (synthétiques + réels) montre :
-\begin{itemize}
-    \item Les organoïdes synthétiques forment un continuum dans l'espace PC, du Poisson (faible clustering) au Matérn fort (clustering élevé)
-    \item Les données réelles se situent dans une région correspondant à clustering modéré ($[0.3, 0.7]$)
-    \item Les axes PC1-PC2 capturent 65\% de la variance
-    \item PC1 corrèle fortement avec le coefficient de clustering ($r = 0.89$)
-    \item PC2 corrèle avec la variance locale de densité ($r = -0.72$)
-\end{itemize}
-
-\textbf{Conclusion :}
-Les données synthétiques couvrent un espace phénotypique plus large que les données réelles, incluant des extrêmes (clustering 0 et 1), ce qui est idéal pour un pré-entraînement robuste.
-
-\subsubsection{t-SNE et UMAP}
-
-Visualisations non-linéaires (t-SNE, UMAP) confirment :
-\begin{itemize}
-    \item Gradient continu dans l'espace latent des synthétiques, du Poisson au Matérn fort
-    \item Les réels forment un groupe cohérent positionné dans la zone de clustering modéré
-    \item Pas de discontinuité majeure entre synthétiques et réels
-    \item La transition est fluide, validant l'approche de pré-entraînement sur continuum
-\end{itemize}
 
 \section{Résultats sur données synthétiques}
 
-\subsection{Performances de régression du coefficient de clustering}
+\subsection{Performances de régression du coefficient de clustering global}
+
+La tâche consiste à prédire le coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ à partir de sa structure. Ce coefficient, variant de 0 (Poisson homogène) à 1 (Matérn fortement agrégé), quantifie le degré d'organisation spatiale cellulaire.
 
 \subsubsection{Résultats principaux}
 
@@ -491,18 +383,20 @@ Visualisations non-linéaires (t-SNE, UMAP) confirment :
 \textbf{Modèle} & \textbf{MSE} & \textbf{$R^2$} & \textbf{Params} \\
 \hline
 GCN baseline & 0.0198 ± 0.0021 & 0.872 ± 0.018 & 250K \\
-GAT baseline & 0.0156 ± 0.0018 & 0.902 ± 0.014 & 320K \\
-EGNN (ours) & \textbf{0.0089 ± 0.0011} & \textbf{0.945 ± 0.009} & 800K \\
+DeepSets & 0.0145 ± 0.0019 & 0.908 ± 0.015 & 280K \\
+EGNN (équivariant) & 0.0137 ± 0.0017 & 0.915 ± 0.013 & 800K \\
+GAT (meilleur) & \textbf{0.0118 ± 0.0014} & \textbf{0.928 ± 0.011} & 320K \\
 \hline
 \end{tabular}
 \end{center}
 
 \textbf{Observations :}
 \begin{itemize}
-    \item EGNN surpasse significativement les baselines (MSE réduit de 55\% vs GCN, 43\% vs GAT)
-    \item $R^2 = 0.945$ indique que le modèle capture 94.5\% de la variance du coefficient de clustering
+    \item GAT obtient les meilleures performances (MSE = 0.0118, $R^2 = 0.928$), démontrant l'efficacité du mécanisme d'attention
+    \item DeepSets atteint de bons résultats (MSE = 0.0145, $R^2 = 0.908$) malgré une architecture plus simple
+    \item EGNN présente un trade-off intéressant : performances légèrement inférieures à GAT (MSE = 0.0137 vs 0.0118) mais garantit l'équivariance E(3), cruciale pour la robustesse aux rotations
+    \item GCN baseline reste significativement moins performant, validant le besoin d'architectures plus sophistiquées
     \item Écarts-types faibles indiquent robustesse sur splits différents
-    \item Le gain justifie l'augmentation du nombre de paramètres (×3)
 \end{itemize}
 
 \subsubsection{Analyse des prédictions}
@@ -556,7 +450,7 @@ Fort ($[0.67, 1.0]$) & 0.0118 & 0.079 & 0.921 \\
 
 \subsubsection{Impact de l'attention (GCN vs GAT)}
 
-GAT surpasse GCN avec une réduction de MSE de 21\% (0.0198 → 0.0156), démontrant l'utilité du mécanisme d'attention pour pondérer les contributions des voisins dans la prédiction du coefficient de clustering.
+GAT surpasse significativement GCN avec une réduction de MSE de 40\% (0.0198 → 0.0118), démontrant l'utilité majeure du mécanisme d'attention pour pondérer les contributions des voisins dans la prédiction du coefficient de clustering.
 
 \textbf{Analyse des poids d'attention :}
 Les coefficients $\alpha_{ij}$ appris montrent que :
@@ -566,9 +460,13 @@ Les coefficients $\alpha_{ij}$ appris montrent que :
     \item L'attention varie selon le degré de clustering local (poids différents pour zones denses vs homogènes)
 \end{itemize}
 
-\subsubsection{Impact de l'équivariance (GAT vs EGNN)}
+\subsubsection{DeepSets : simplicité et efficacité}
 
-EGNN surpasse GAT avec une réduction de MSE de 43\% (0.0156 → 0.0089), démontrant le bénéfice majeur de l'équivariance géométrique pour capturer les patterns spatiaux.
+DeepSets obtient des performances intermédiaires (MSE = 0.0145, $R^2 = 0.908$) avec une architecture plus simple que GAT. L'agrégation globale par ensemble capture efficacement les patterns statistiques sans modéliser explicitement les relations de voisinage local. Cette approche offre un bon compromis entre performance et simplicité, particulièrement utile pour des applications nécessitant une inférence rapide.
+
+\subsubsection{EGNN : le trade-off équivariance-performance}
+
+EGNN présente des performances légèrement inférieures à GAT (MSE = 0.0137 vs 0.0118) mais apporte un avantage crucial : l'équivariance E(3) garantie par construction.
 
 \textbf{Expérience contrôlée :}
 \begin{enumerate}
@@ -578,22 +476,28 @@ EGNN surpasse GAT avec une réduction de MSE de 43\% (0.0156 → 0.0089), démon
 
 \textbf{Résultats :}
 \begin{itemize}
-    \item GAT : MSE augmente de 0.0156 → 0.0487 (×3.1, dégradation majeure)
-    \item EGNN : MSE reste 0.0091 (quasi-identique, +0.0002)
+    \item GAT : MSE augmente de 0.0118 → 0.0421 (×3.6, dégradation majeure)
+    \item EGNN : MSE reste 0.0139 (quasi-identique, +0.0002)
 \end{itemize}
 
-L'équivariance garantit robustesse parfaite aux rotations, sans apprentissage nécessaire, préservant la précision de régression indépendamment de l'orientation.
+\textbf{Conclusion :} L'équivariance garantit une robustesse parfaite aux rotations sans apprentissage nécessaire. Ce trade-off est particulièrement avantageux lorsque :
+\begin{itemize}
+    \item Les données d'entraînement ne couvrent pas toutes les orientations possibles
+    \item La robustesse géométrique est cruciale pour la généralisation
+    \item Les performances légèrement inférieures (16\% de MSE supplémentaire) sont acceptables au regard de la garantie théorique d'équivariance
+\end{itemize}
 
 \subsubsection{Courbes d'apprentissage}
 
 Évolution de la loss (MSE) d'entraînement et de validation en fonction des époques :
 \begin{itemize}
     \item \textbf{GCN} : Convergence en ~80 époques, gap train-val modéré (train MSE: 0.0145, val MSE: 0.0198)
-    \item \textbf{GAT} : Convergence en ~100 époques, gap légèrement réduit (train MSE: 0.0118, val MSE: 0.0156)
-    \item \textbf{EGNN} : Convergence en ~120 époques, gap minimal (train MSE: 0.0071, val MSE: 0.0089, régularisation effective)
+    \item \textbf{DeepSets} : Convergence rapide en ~60 époques (train MSE: 0.0112, val MSE: 0.0145)
+    \item \textbf{GAT} : Convergence en ~100 époques, gap minimal (train MSE: 0.0089, val MSE: 0.0118, régularisation effective)
+    \item \textbf{EGNN} : Convergence en ~120 époques (train MSE: 0.0101, val MSE: 0.0137)
 \end{itemize}
 
-EGNN nécessite plus d'époques mais atteint une généralisation supérieure (MSE validation plus faible, gap train-val plus faible).
+GAT atteint les meilleures performances avec une bonne généralisation. EGNN nécessite plus d'époques et son gap train-val légèrement supérieur reflète la contrainte architecturale de l'équivariance.
 
 \subsection{Études d'ablation}
 
@@ -734,17 +638,15 @@ Optimal : 0.15. Sans dropout : légère surapprentissage (gap train-val +25\% MS
 \hline
 \textbf{Phénotype} & \textbf{Précision} & \textbf{Rappel} & \textbf{F1} & \textbf{Support} \\
 \hline
-Chouxfleurs & 0.89 & 0.92 & 0.91 & 211 \\
-Cystiques & 0.91 & 0.87 & 0.89 & 123 \\
-Compact & 0.67 & 0.50 & 0.57 & 6 \\
-Kératinisés & 0.33 & 0.50 & 0.40 & 2 \\
+Chouxfleurs & 0.89 & 0.92 & 0.91 & 38 \\
+Cystiques & 0.91 & 0.87 & 0.89 & 37 \\
 \hline
-\textbf{Moyenne/Total} & 0.87 & 0.85 & 0.84 & 342 \\
+\textbf{Moyenne/Total} & 0.90 & 0.90 & 0.90 & 75 \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Observation :} Classes minoritaires (Compact, Kératinisés) souffrent du faible nombre d'exemples (6 et 2 dans le test set). Performances excellentes sur les deux classes majoritaires.
+\textbf{Observation :} Performances excellentes et équilibrées sur les deux classes. La sélection d'organoïdes bien différenciés permet d'obtenir des résultats robustes et fiables.
 
 \textbf{EGNN from scratch} (sans pré-entraînement) :
 \begin{itemize}
@@ -765,69 +667,50 @@ Le pré-entraînement sur données synthétiques améliore significativement les
 
 \subsubsection{Matrice de confusion sur données réelles}
 
-\textbf{EGNN pré-entraîné sur test set (342 organoïdes)} :
+\textbf{GAT pré-entraîné sur test set (75 organoïdes)} :
 
 \begin{center}
-\begin{tabular}{|l|cccc|}
+\begin{tabular}{|l|cc|}
 \hline
-\multicolumn{1}{|c|}{\textbf{Vrai $\backslash$ Prédit}} & \textbf{Choux} & \textbf{Cyst} & \textbf{Comp} & \textbf{Kérat} \\
+\multicolumn{1}{|c|}{\textbf{Vrai $\backslash$ Prédit}} & \textbf{Choux-fleurs} & \textbf{Cystiques} \\
 \hline
-Chouxfleurs (211) & \textbf{194} & 13 & 3 & 1 \\
-Cystiques (123) & 11 & \textbf{107} & 4 & 1 \\
-Compact (6) & 2 & 1 & \textbf{3} & 0 \\
-Kératinisés (2) & 0 & 1 & 0 & \textbf{1} \\
+Chouxfleurs (38) & \textbf{35} & 3 \\
+Cystiques (37) & 5 & \textbf{32} \\
 \hline
 \end{tabular}
 \end{center}
 
 \textbf{Analyse des confusions :}
 \begin{itemize}
-    \item \textbf{Confusion Chouxfleurs ↔ Cystiques} (24 cas, 7.0\%) : Principale source d'erreur. Correspond à une ambiguïté biologique réelle : certains organoïdes présentent des caractéristiques mixtes (surface irrégulière + cavités internes), représentant des phénotypes intermédiaires difficiles à classifier.
+    \item \textbf{Confusion Chouxfleurs ↔ Cystiques} (8 cas sur 75, soit 10.7\%) : Principale source d'erreur. Ces confusions correspondent à des organoïdes présentant des caractéristiques morphologiques intermédiaires ou des transitions entre phénotypes.
     
-    \item \textbf{Classes minoritaires} : Compact (3/6 correct, 50\%) et Kératinisés (1/2 correct, 50\%) souffrent du faible nombre d'exemples d'entraînement. L'augmentation de données ciblée améliore légèrement (Compact : 67\% avec oversampling ×5).
+    \item \textbf{Analyse détaillée des erreurs Chouxfleurs → Cystiques (3 cas)} : La majorité de ces faux positifs cystiques concernent des organoïdes choux-fleurs présentant une faible déformation morphologique. Ces organoïdes, bien qu'étiquetés comme choux-fleurs, exhibent une géométrie quasi-sphérique et une surface relativement lisse, s'éloignant du phénotype typiquement irrégulier des choux-fleurs bien différenciés. Le modèle, se basant principalement sur les patterns d'organisation spatiale et la morphologie globale, les interprète ainsi comme cystiques en raison de cette régularité géométrique.
     
-    \item \textbf{Diagonale forte} : 305/342 = 89.2\% correctement classifiés, démontrant la capacité discriminative du modèle malgré le déséquilibre.
+    \item \textbf{Diagonale forte} : 67/75 = 89.3\% correctement classifiés, démontrant l'excellente capacité discriminative du modèle sur des phénotypes bien différenciés.
     
-    \item \textbf{Erreurs rares vers Kératinisés} : Seulement 3 faux positifs, indiquant que ce phénotype rare est bien caractérisé et peu confondu.
+    \item \textbf{Équilibre des erreurs} : Les confusions sont relativement symétriques entre les deux classes (3 vs 5), indiquant l'absence de biais majeur vers une classe particulière.
 \end{itemize}
 
 \textbf{Interprétation :}
-L'analyse des cas mal classifiés montre que la majorité correspondent à des phénotypes intermédiaires ou ambigus, plutôt qu'à des erreurs manifestes du modèle.
+La sélection d'organoïdes bien différenciés permet d'obtenir une accuracy proche de 90\%, validant l'efficacité de l'approche tout en reconnaissant l'existence de cas limites biologiquement ambigus.
 
 \subsection{Comparaison avec méthodes de référence}
 
-\subsubsection{Baseline : Classification manuelle}
+\subsubsection{Avantages de l'automatisation}
 
-\textbf{Référence :}
-L'analyse manuelle d'organoïdes par microscope nécessite typiquement 15-30 minutes par organoïde pour l'annotation complète (sans la segmentation cellulaire préalable).
+\textbf{Reproductibilité :}
+Les prédictions du modèle sont déterministes et constantes, éliminant la variabilité inter-observateur et intra-observateur inhérente à l'annotation subjective.
 
-\textbf{Avantages du modèle EGNN :}
+\textbf{Scalabilité et parallélisme :}
 \begin{itemize}
-    \item Temps de traitement : 0.1 sec/organoïde (100-300× plus rapide)
-    \item Reproductibilité : prédictions constantes, sans variabilité inter/intra-observateur
-    \item Scalabilité : milliers d'organoïdes analysables en batch
-    \item Automatisation : pipeline end-to-end sans intervention manuelle
+    \item Temps d'inférence : 0.1 sec/organoïde (CPU) à 0.005 sec/organoïde (GPU batché)
+    \item Throughput : 200+ organoïdes/minute en mode batch GPU
+    \item Traitement parallèle : milliers d'organoïdes analysables simultanément
+    \item Pipeline end-to-end entièrement automatisé
 \end{itemize}
 
-\textbf{Interprétation :}
-Le modèle permet une analyse à haut débit tout en maintenant une performance élevée (84.6\% accuracy), rendant possible le criblage de larges cohortes d'organoïdes.
-
-\subsubsection{CNN 3D}
-
-\textbf{Architecture :}
-ResNet3D-18 adapté (entrée 128×128×128, downsamplée depuis 2048×2048×200).
-
-\textbf{Résultats :}
-\begin{itemize}
-    \item Accuracy : 81.2 ± 2.8\%
-    \item F1 weighted : 0.806 ± 0.024
-    \item Temps entraînement : ~12 heures (vs 1.5h pour EGNN, 8× plus long)
-    \item Mémoire GPU : 28 Go (vs 8 Go pour EGNN, 3.5× plus gourmand)
-    \item Downsampling obligatoire : perte information haute résolution
-\end{itemize}
-
-\textbf{Analyse :}
-EGNN surpasse CNN 3D (+3.4 points d'accuracy) malgré une empreinte mémoire 3.5× plus faible, démontrant l'efficacité de la représentation graphe. Le CNN 3D souffre du downsampling nécessaire (128³ vs 2048×2048×200 original), perdant des détails cellulaires fins. L'approche graphe préserve l'information structurelle tout en réduisant drastiquement la dimensionnalité.
+\textbf{Implications pratiques :}
+L'automatisation permet des études à haut débit précédemment inaccessibles : criblages pharmacologiques sur milliers de composés, CRISPR screens génome-entier, caractérisation de biobanques complètes. La performance de 84.6\% accuracy, combinée à la reproductibilité parfaite et au throughput élevé, rend envisageable l'analyse systématique de larges cohortes.
 
 \subsubsection{Random Forest sur descripteurs}
 
@@ -996,115 +879,6 @@ Confirme que le modèle apprend des représentations sémantiquement cohérentes
 
 Les premières couches (extraient patterns spatiaux) sont similaires entre modèle pré-entraîné et fine-tuned (cosine similarity > 0.9), confirmant que le pré-entraînement capture des features spatiales générales réutilisables.
 
-\section{Interprétabilité et validation biologique}
-
-\subsection{Identification de cellules importantes}
-
-\subsubsection{Méthodes d'attribution}
-
-\textbf{GradCAM pour graphes :}
-Calculer les gradients de la prédiction par rapport aux features de nœuds :
-\[
-\text{Importance}_i = \|\nabla_{\mathbf{h}_i^{(K)}} y_c\|
-\]
-
-où $y_c$ est le logit de la classe prédite.
-
-\textbf{Attention weights (GAT) :}
-Les coefficients $\alpha_{ij}$ révèlent quelles connexions sont importantes.
-
-\textbf{Perturbation analysis :}
-Supprimer itérativement chaque nœud et mesurer le changement de prédiction. Les nœuds causant le plus grand changement sont les plus importants.
-
-\subsubsection{Résultats}
-
-\textbf{Patterns identifiés :}
-\begin{itemize}
-    \item \textbf{Clustering} : Cellules dans régions denses reçoivent haute importance
-    \item \textbf{Régularité} : Cellules à forte régularité locale (voisinage régulièrement espacé) sont clés
-    \item \textbf{Périphérie} : Cellules de surface souvent importantes (accessibilité visuelle, marquage différentiel)
-\end{itemize}
-
-\textbf{Visualisation 3D :}
-Heat maps sur structure 3D de l'organoïde montrant les cellules importantes en rouge/jaune, peu importantes en bleu, facilitant l'interprétation biologique.
-
-\subsection{Patterns spatiaux discriminants}
-
-\subsubsection{Motifs topologiques récurrents}
-
-Analyse des sous-graphes (motifs de 3-5 nœuds) enrichis dans chaque classe :
-
-\textbf{Matérn clustering (phénotype choux-fleurs) :}
-\begin{itemize}
-    \item Triangles fermés (3 cellules mutuellement voisines) sur-représentés
-    \item Cliques de taille 4-5 fréquentes
-    \item Coefficient de clustering local élevé dans certaines régions
-    \item Hétérogénéité spatiale marquée (zones denses alternant avec zones moins denses)
-\end{itemize}
-
-\textbf{Poisson homogène (phénotype cystique) :}
-\begin{itemize}
-    \item Graphes plus réguliers avec degré moyen stable
-    \item Distribution de distances inter-cellulaires uniforme
-    \item Pas de formation de clusters locaux marqués
-    \item Homogénéité spatiale caractéristique
-\end{itemize}
-
-Ces observations confirment que le modèle capture effectivement les propriétés structurelles des processus ponctuels du continuum Poisson-Matérn.
-
-\subsubsection{Features les plus discriminantes}
-
-\textbf{Importance de features :}
-Via SHAP values ou permutation importance, les features les plus discriminantes sont :
-\begin{enumerate}
-    \item Degré des nœuds (reflète densité locale)
-    \item Variance des distances aux voisins (régularité)
-    \item Coefficient de clustering local
-    \item [Pour réels : intensités de marqueurs biologiques]
-\end{enumerate}
-
-\subsection{Corrélation avec biomarqueurs}
-
-[Sur données réelles avec marqueurs biologiques]
-
-\subsubsection{Analyse de corrélation}
-
-Pour des phénotypes biologiques (ex : prolifératif vs quiescent) :
-\begin{itemize}
-    \item Cellules importantes identifiées par le modèle
-    \item Mesure de leur intensité Ki67 (marqueur prolifération)
-    \item Calcul de corrélation
-\end{itemize}
-
-\textbf{Hypothèse :}
-Les cellules importantes pour prédire "prolifératif" devraient être Ki67-positives.
-
-\textbf{Résultats attendus :}
-Corrélation positive significative (r > 0.6, p < 0.001), validant la pertinence biologique des cellules identifiées.
-
-\subsection{Analyse qualitative des explications}
-
-\subsubsection{Cohérence des cellules importantes}
-
-Les mécanismes d'attention du modèle permettent d'identifier les cellules ayant le plus contribué à chaque prédiction. Une analyse qualitative de ces cellules révèle des patterns cohérents :
-
-\textbf{Pour les organoïdes Chouxfleurs :}
-\begin{itemize}
-    \item Cellules importantes concentrées dans les zones de haute densité cellulaire périphérique
-    \item Identification des régions avec forte prolifération
-    \item Attention portée aux structures multi-lobées caractéristiques
-\end{itemize}
-
-\textbf{Pour les organoïdes Cystiques :}
-\begin{itemize}
-    \item Cellules importantes localisées en périphérie des cavités internes
-    \item Détection des zones de faible densité centrale
-    \item Attention sur l'organisation en monocouche épithéliale
-\end{itemize}
-
-\subsubsection{Interprétation biologique}
-
-L'analyse des explications suggère que le modèle a appris à identifier des caractéristiques morphologiques et spatiales cohérentes avec les phénotypes observés. Les visualisations 3D interactives permettent d'explorer ces patterns et facilitent la compréhension des décisions du modèle.
 
 \section{Discussion des résultats}
 
@@ -1117,33 +891,20 @@ L'analyse des explications suggère que le modèle a appris à identifier des ca
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Méthode} & \textbf{Mémoire GPU} & \textbf{Temps/organoïde} & \textbf{Throughput} \\
+\textbf{Métriques} & \textbf{Mémoire GPU} & \textbf{Temps/organoïde} & \textbf{Throughput} \\
 \hline
-CNN 3D & 28 Go & 5 sec & 12 org/min \\
 GNN (ours) & 8 Go & 0.1 sec (batch) & 200+ org/min \\
-Manuel & N/A & 15-30 min & 2-4 org/heure \\
 \hline
 \end{tabular}
 \end{center}
 
-Notre approche est :
+Notre approche offre :
 \begin{itemize}
-    \item 100-300× plus rapide que l'analyse manuelle
-    \item 15× plus rapide que CNN 3D
-    \item 3.5× moins gourmande en mémoire que CNN 3D
+    \item Automatisation complète (pipeline end-to-end sans intervention)
+    \item Empreinte mémoire réduite (~8 Go GPU, infrastructure standard)
+    \item Throughput élevé pour criblage à haut débit (200+ organoïdes/min)
+    \item Traitement parallélisable sur GPU pour larges cohortes
 \end{itemize}
-
-\subsubsection{Interprétabilité}
-
-\textbf{Avantages :}
-\begin{itemize}
-    \item Identification de cellules individuelles importantes (impossible avec CNN global)
-    \item Visualisation 3D intuitive des contributions
-    \item Patterns topologiques interprétables biologiquement
-    \item Explications validées par experts comme cohérentes
-\end{itemize}
-
-Par rapport aux CNN (boîtes noires), notre approche offre une transparence appréciable pour adoption par biologistes.
 
 \subsubsection{Robustesse aux variations}
 
@@ -1205,23 +966,53 @@ Effectuer validation croisée sur un sous-ensemble pour déterminer $k$ optimal 
 
 Malgré le pré-entraînement sur synthétiques, un minimum de données réelles annotées (~ 100-200) reste nécessaire pour fine-tuning effectif. L'approche n'élimine pas complètement le besoin d'annotation mais le réduit drastiquement.
 
+\subsubsection{Absence de validation statistique rigoureuse des données synthétiques}
+
+\textbf{Limitation méthodologique :}
+Cette étude n'inclut pas de validation statistique approfondie des données synthétiques générées par processus ponctuels. Bien que le continuum Poisson-Matérn soit théoriquement fondé, nous n'avons pas vérifié formellement si les distributions spatiales générées correspondent statistiquement aux données réelles via des tests tels que les fonctions de Ripley (K, F, G) ou des tests de Kolmogorov-Smirnov.
+
+\textbf{Implications :}
+\begin{itemize}
+    \item Le réalisme des données synthétiques repose sur des hypothèses non vérifiées empiriquement
+    \item Le transfert des connaissances depuis le domaine synthétique vers le domaine réel pourrait être sous-optimal si les distributions diffèrent substantiellement
+    \item Impossibilité de quantifier précisément le domain gap entre synthétiques et réels
+\end{itemize}
+
+\textbf{Justification :}
+Cette validation aurait nécessité un développement méthodologique substantiel supplémentaire, incluant l'adaptation des fonctions de statistiques spatiales aux surfaces sphériques et ellipsoïdales, ainsi que la définition de métriques de distance appropriées entre processus ponctuels 3D.
+
+\subsubsection{Absence d'analyse d'interprétabilité}
+
+\textbf{Limitation méthodologique :}
+Cette étude ne fournit pas d'analyse d'interprétabilité permettant d'identifier quelles cellules ou régions spatiales contribuent le plus aux prédictions du modèle. Les techniques classiques (GradCAM pour graphes, analyse des poids d'attention, perturbation analysis) n'ont pas été implémentées.
+
+\textbf{Implications :}
+\begin{itemize}
+    \item Impossibilité de valider biologiquement les patterns appris par le modèle
+    \item Difficulté à identifier les biomarqueurs spatiaux discriminants entre phénotypes
+    \item Limitation de l'acceptabilité par les biologistes, le modèle restant une "boîte noire"
+    \item Pas de retour qualitatif sur la pertinence biologique des décisions
+\end{itemize}
+
+\textbf{Justification :}
+Le focus de cette étude était sur la comparaison de performances quantitatives entre architectures et la démonstration du gain apporté par le pré-entraînement sur synthétiques. L'interprétabilité, bien que cruciale pour le déploiement clinique, représente un axe de recherche complémentaire nécessitant des développements méthodologiques spécifiques.
+
 \subsection{Comparaison critique avec l'état de l'art}
 
 \subsubsection{Positionnement performance}
 
 \begin{center}
-\begin{tabular}{|l|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Critère} & \textbf{GNN} & \textbf{Stats spatiales} & \textbf{CNN 3D} & \textbf{Handcrafted} \\
+\textbf{Critère} & \textbf{GNN (ours)} & \textbf{Stats spatiales} & \textbf{Handcrafted} \\
 \hline
-Accuracy (géo régulière) & ++ & +++ & +++ & + \\
-Accuracy (géo variable) & +++ & + & ++ & + \\
-Robustesse au bruit & ++ & +++ & ++ & + \\
-Mémoire GPU & +++ & N/A & - & N/A \\
-Vitesse inférence & +++ & +++ & + & +++ \\
-Interprétabilité & ++ & +++ & - & + \\
-Data efficiency & ++ (pre-train) & +++ (0-shot) & - & + \\
-Robustesse géométrique & +++ (équiv) & - (sphère) & + (augm) & ++ \\
+Accuracy (géo régulière) & ++ & +++ & + \\
+Accuracy (géo variable) & +++ & + & + \\
+Robustesse au bruit & ++ & +++ & + \\
+Mémoire GPU & +++ & N/A & N/A \\
+Vitesse inférence & +++ & +++ & +++ \\
+Data efficiency & ++ (pre-train) & +++ (0-shot) & + \\
+Robustesse géométrique & +++ (équiv) & - (sphère) & ++ \\
 \hline
 \end{tabular}
 \end{center}
@@ -1232,57 +1023,55 @@ Robustesse géométrique & +++ (équiv) & - (sphère) & + (augm) & ++ \\
 \begin{itemize}
     \item Criblage à haut débit (vitesse, efficacité mémoire)
     \item Données annotées limitées (pré-entraînement)
-    \item Nécessité d'interprétabilité (recherche exploratoire)
     \item Organoïdes de tailles très variables
+    \item Exploitation de la structure spatiale locale
+    \item Robustesse géométrique garantie (équivariance E(3))
 \end{itemize}
 
-\textbf{CNN 3D préférable si :}
+\textbf{Statistiques spatiales préférables si :}
 \begin{itemize}
-    \item Large dataset annoté disponible (milliers)
-    \item Patterns sub-cellulaires critiques (texture intra-cellulaire)
-    \item Infrastructure GPU abondante
+    \item Géométrie sphérique parfaite
+    \item Patterns spatiaux très réguliers
+    \item Aucune donnée annotée disponible (approche 0-shot)
+    \item Robustesse maximale au bruit de segmentation requise
 \end{itemize}
 
-\subsection{Compromis précision-interprétabilité-efficacité}
+\subsection{Compromis précision-efficacité}
 
-Le \textbf{triangle impossible} du machine learning :
+Les compromis fondamentaux du machine learning :
 \begin{itemize}
     \item \textbf{Précision} : Performances de prédiction
-    \item \textbf{Interprétabilité} : Compréhensibilité des décisions
-    \item \textbf{Efficacité} : Coût computationnel, données nécessaires
+    \item \textbf{Efficacité computationnelle} : Coût mémoire, vitesse d'inférence
+    \item \textbf{Efficacité des données} : Nombre d'échantillons annotés nécessaires
 \end{itemize}
-
-Généralement, optimiser un sommet dégrade les autres.
 
 \textbf{Notre positionnement :}
 \begin{itemize}
-    \item \textbf{Précision} : Compétitive (comparable ou supérieure aux alternatives)
-    \item \textbf{Interprétabilité} : Supérieure aux CNN, identification cellulaire
-    \item \textbf{Efficacité} : Excellente (mémoire, vitesse, data efficiency)
+    \item \textbf{Précision} : Excellente (89.3\% accuracy), GAT atteignant les meilleures performances
+    \item \textbf{Efficacité computationnelle} : Excellente (empreinte mémoire réduite ~8 Go GPU, throughput 200+ organoïdes/min)
+    \item \textbf{Efficacité des données} : Très bonne grâce au pré-entraînement sur synthétiques (réduction de 75\% des annotations nécessaires)
 \end{itemize}
 
-Notre approche se positionne favorablement sur ce triangle, offrant un compromis équilibré particulièrement adapté aux contraintes des applications biomédicales.
+Notre approche se positionne favorablement sur ces trois dimensions, offrant un compromis équilibré particulièrement adapté aux contraintes des applications biomédicales où les données annotées sont rares et coûteuses.
 
 \section{Synthèse}
 
 Ce chapitre a démontré empiriquement :
 
 \begin{enumerate}
-    \item \textbf{Réalisme des synthétiques} : Validation statistique rigoureuse (fonctions K/F/G, métriques topologiques) confirmant que le continuum Poisson-Matérn capture les patterns observés dans les données réelles
+    \item \textbf{Justification des GNN} : Étude comparative rigoureuse montrant que les GNN offrent une meilleure flexibilité géométrique (+17 points à ratio 5:1) que les statistiques spatiales, bien que ces dernières soient plus robustes au bruit (+10-15\% accuracy)
     
-    \item \textbf{Performances sur synthétiques} : $R^2 = 0.945$ pour la régression du coefficient de clustering, MSE réduit de 55\% vs GCN grâce à l'équivariance
-    
-    \item \textbf{Supériorité de EGNN} : Sur GCN (MSE -55\%) et GAT (MSE -43\%), justifiant la complexité accrue
+    \item \textbf{Hiérarchie des architectures sur synthétiques} : GAT obtient les meilleures performances ($R^2 = 0.928$, MSE = 0.0118), suivi de DeepSets ($R^2 = 0.908$) et EGNN ($R^2 = 0.915$). EGNN présente un trade-off intéressant : légèrement moins performant mais garantit l'équivariance E(3) cruciale pour la robustesse aux rotations (dégradation ×3.6 pour GAT vs quasi-nulle pour EGNN)
     
     \item \textbf{Importance de la géométrie} : Ablation montre MSE ×4 sans positions 3D, confirmant que l'information spatiale est critique
     
-    \item \textbf{Performances sur réels} : 84.6\% accuracy en classification binaire, surpassant CNN 3D (81\%) et Random Forest (72\%)
+    \item \textbf{Performances sur réels (500 organoïdes sélectionnés)} : 89.3\% accuracy en classification binaire sur organoïdes bien différenciés, surpassant Random Forest (72\%)
     
     \item \textbf{Gain du pré-entraînement} : Data efficiency 3-4×, convergence 3× plus rapide, amélioration de +8.3\% accuracy vs from scratch
     
-    \item \textbf{Interprétabilité} : Cellules/patterns identifiés morphologiquement cohérents avec les phénotypes
+    \item \textbf{Sélection de données} : La sélection de ~500 organoïdes bien différenciés (~250 par classe) parmi les 2272 extraits garantit la concordance entre labels batch et morphologie observée, permettant des performances robustes. Les ~1772 restants (incohérence label-morphologie suspectée) sont réservés pour des approches non supervisées futures
     
-    \item \textbf{Efficacité computationnelle} : 100× plus rapide que manuel, 15× que CNN 3D
+    \item \textbf{Efficacité computationnelle} : Throughput de 200+ organoïdes/min en mode batch GPU, empreinte mémoire réduite (~8 Go GPU), permettant criblage à haut débit sur infrastructure standard
 \end{enumerate}
 
-Ces résultats valident notre hypothèse centrale : les Graph Neural Networks géométriques équivariants, pré-entraînés sur des données synthétiques générées via processus ponctuels contrôlés, constituent une approche puissante et efficace pour l'analyse automatisée d'organoïdes 3D, surpassant les méthodes alternatives sur plusieurs critères simultanément.
+Ces résultats valident notre hypothèse centrale : les Graph Neural Networks, en particulier GAT avec son mécanisme d'attention, pré-entraînés sur des données synthétiques générées via processus ponctuels contrôlés, constituent une approche puissante et efficace pour l'analyse automatisée d'organoïdes 3D. Le trade-off entre performance brute (GAT) et robustesse géométrique garantie (EGNN) offre une flexibilité selon les contraintes applicatives.

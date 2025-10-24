@@ -73,7 +73,7 @@ Notre choix d'architectures équivariantes au groupe euclidien E(3), notamment E
 
 L'efficacité computationnelle du pipeline constitue un critère essentiel pour son adoption pratique. Sur une configuration standard (CPU Intel Core i7, GPU NVIDIA RTX 3080), le traitement d'un organoïde typique se décompose temporellement comme suit. Le prétraitement de l'image (normalisation, débruitage, corrections) s'exécute en moins d'une seconde sur CPU, tirant parti d'implémentations vectorisées efficaces. La segmentation cellulaire via Faster Cellpose requiert environ 20 minutes sur GPU selon la taille de l'organoïde — un temps considérablement réduit comparé aux 2.5 heures du Cellpose original. L'extraction des features morphologiques et intensimétriques opère rapidement en 1 à 2 secondes (CPU), suivie de la construction du graphe qui s'exécute en moins d'une seconde grâce aux structures de données spatiales efficaces (k-d trees). Enfin, l'inférence GNN elle-même ne prend qu'une fraction de seconde (moins de 0.1 sec) lorsque les graphes sont traités en batch sur GPU.
 
-Le temps total s'établit ainsi à approximativement 20 minutes par organoïde, dominé par la segmentation cellulaire. Bien que ce temps puisse paraître important, il représente une accélération substantielle comparé à l'analyse manuelle par un expert biologiste (typiquement 15 à 30 minutes par organoïde pour l'annotation seule, sans la segmentation cellulaire préalable nécessaire). De plus, contrairement à l'analyse manuelle qui requiert une attention constante, le pipeline automatisé peut traiter des dizaines d'organoïdes en parallèle de manière non supervisée, rendant envisageable le criblage à haut débit de milliers d'organoïdes et ouvrant des perspectives pour des études statistiquement puissantes impossibles avec annotation manuelle.
+Le temps total s'établit ainsi à approximativement 20 minutes par organoïde, dominé par la segmentation cellulaire. L'avantage majeur du pipeline automatisé réside dans sa capacité à traiter des dizaines d'organoïdes en parallèle de manière non supervisée sur infrastructure GPU multi-cartes ou cluster de calcul. Cette parallélisation massive, combinée à l'automatisation complète (aucune intervention humaine requise) et à la reproductibilité parfaite des prédictions (élimination de la variabilité inter/intra-observateur), rend envisageable le criblage à haut débit de milliers d'organoïdes et ouvre des perspectives pour des études statistiquement puissantes à l'échelle de larges cohortes.
 
 \subsubsection{Scalabilité}
 
@@ -91,7 +91,7 @@ Dans le cadre du projet ANR Morpheus et en collaboration avec l'IPMC (Nice) et l
 
 \subsubsection{Caractéristiques du dataset}
 
-Notre dataset constitue une ressource substantielle pour la recherche sur organoïdes, fruit de 22 mois de collecte continue entre mai 2023 et février 2025. Le volume total comprend 1311 échantillons imagés, dont l'analyse par clustering DBSCAN a permis d'extraire approximativement 2272 organoïdes individuels — reflétant la présence moyenne de 1.7 organoïdes par champ de vue. Le pipeline génère environ 10310 fichiers au total, incluant les images TIF originales, les graphes au format JSON, et diverses visualisations PNG pour le contrôle qualité. En termes de stockage, les graphes compressés ne nécessitent qu'environ 200 Mo malgré leur richesse informationnelle, tandis que les images brutes volumétriques occupent approximativement 1To — illustrant une fois de plus la compression spectaculaire offerte par l'abstraction graphique.
+Notre dataset constitue une ressource substantielle pour la recherche sur organoïdes, fruit de 22 mois de collecte continue entre mai 2023 et février 2025. Le volume total comprend 1311 échantillons imagés, dont l'analyse par clustering DBSCAN a permis d'extraire approximativement 2272 organoïdes individuels — reflétant la présence moyenne de 1.7 organoïdes par champ de vue. Pour cette étude, nous avons sélectionné 500 organoïdes bien différenciés présentant une concordance claire entre leur label batch et leur morphologie observée, les 1772 organoïdes restants (présentant une incohérence suspectée entre label et phénotype réel) étant réservés pour des approches non supervisées futures. Le pipeline génère environ 10310 fichiers au total, incluant les images TIF originales, les graphes au format JSON, et diverses visualisations PNG pour le contrôle qualité. En termes de stockage, les graphes compressés ne nécessitent qu'environ 200 Mo malgré leur richesse informationnelle, tandis que les images brutes volumétriques occupent approximativement 1To — illustrant une fois de plus la compression spectaculaire offerte par l'abstraction graphique.
 
 \subsubsection{Phénotypes et distribution}
 
@@ -111,7 +111,7 @@ Au-delà de la classification de phénotypes, notre pipeline adresse une seconde
 Distinction choux-fleurs vs cystiques sur les données réelles. Cette tâche de classification supervisée constitue l'objectif applicatif principal, avec des métriques d'évaluation incluant accuracy, F1-score, et matrices de confusion.
 
 \textbf{Régression du coefficient de clustering (tâche auxiliaire) :}
-Sur les données synthétiques, nous entraînons les modèles à prédire le coefficient de clustering du processus de Matérn ayant généré chaque organoïde — une variable continue dans $[0, 1]$ caractérisant le degré d'agrégation spatiale. Cette tâche de régression sert de pré-entraînement auto-supervisé : le modèle apprend à extraire des représentations géométriques fines des patterns spatiaux cellulaires, représentations qui se transfèrent ensuite efficacement à la classification de phénotypes réels. L'erreur quadratique moyenne (MSE) et le coefficient de détermination $R^2$ servent de métriques d'évaluation pour cette tâche.
+Sur les données synthétiques, nous entraînons les modèles à prédire le coefficient de clustering global du graphe — une variable continue dans $[0, 1]$ caractérisant le degré d'agrégation spatiale. Ce coefficient, défini comme la moyenne des coefficients de clustering locaux $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ où $C_i$ mesure la densité de triangles autour du nœud $i$, quantifie la tendance des cellules voisines à former des triades fermées. Pour les organoïdes générés par processus de Poisson homogène, $\bar{C} \approx 0$ (répartition aléatoire), tandis que pour les processus de Matérn avec forte agrégation, $\bar{C} \rightarrow 1$ (clusters denses). Cette tâche de régression sert de pré-entraînement auto-supervisé : le modèle apprend à extraire des représentations géométriques fines des patterns spatiaux cellulaires, représentations qui se transfèrent ensuite efficacement à la classification de phénotypes réels. L'erreur quadratique moyenne (MSE) et le coefficient de détermination $R^2$ servent de métriques d'évaluation pour cette tâche.
 
 \textbf{Régression de la déformation morphologique (données réelles) :}
 Pour les organoïdes réels, nous annotons également un score de déformation continue capturant le degré d'irrégularité morphologique — une mesure quantitative de l'écart par rapport à une sphère idéale. Cette métrique varie continûment entre les extrêmes cystiques (déformation faible, score ~0) et choux-fleurs (déformation forte, score ~1). La régression de ce score offre une granularité supérieure à la classification binaire, permettant de capturer les phénotypes intermédiaires et de quantifier finement les variations morphologiques intra-classe. Cette tâche utilise également la MSE comme loss et le $R^2$ comme métrique d'évaluation.
@@ -230,21 +230,18 @@ Chaque fichier JSON contient des métadonnées structurées :
 \subsubsection{Usage pour l'entraînement}
 
 \textbf{Splits train/val/test :}
-Stratification par phénotype pour préserver les distributions :
+Stratification par phénotype pour préserver les distributions (sur les 500 organoïdes sélectionnés) :
 \begin{itemize}
-    \item \textbf{Train} : 70\% (~1,590 organoïdes)
-    \item \textbf{Validation} : 15\% (~340 organoïdes)
-    \item \textbf{Test} : 15\% (~342 organoïdes)
+    \item \textbf{Train} : 70\% (~350 organoïdes)
+    \item \textbf{Validation} : 15\% (~75 organoïdes)
+    \item \textbf{Test} : 15\% (~75 organoïdes)
 \end{itemize}
 
-\textbf{Stratégies pour le déséquilibre :}
-\begin{itemize}
-    \item Weighted cross-entropy loss (poids inversement proportionnels aux fréquences : $w_{\text{choux-fleurs}} = 0.44$, $w_{\text{cystiques}} = 0.56$)
-    \item Augmentation de données légèrement biaisée vers la classe minoritaire (cystiques)
-    \item Monitoring séparé des métriques par classe pour détecter les biais éventuels
-\end{itemize}
+\textbf{Équilibrage des classes :}
 
-Ce dataset, bien que substantiel pour le domaine des organoïdes, reste modeste comparé aux standards du deep learning (ImageNet : 14M images). Nous pallions cette limitation via la génération de données synthétiques (Section 4.6) et le transfer learning.
+La sélection de ~250 organoïdes par classe assure un parfait équilibre, éliminant les problèmes de déséquilibre de classes et permettant un apprentissage sans biais. Cette stratégie simplifie l'entraînement et garantit des performances équitables sur les deux phénotypes.
+
+Ce dataset, bien que modeste (~500 organoïdes) comparé aux standards du deep learning (ImageNet : 14M images), est substantiel pour le domaine des organoïdes. Nous pallions cette limitation via la génération de données synthétiques (Section 4.6) et le transfer learning.
 
 \subsection{Normalisation d'intensité}
 
@@ -805,6 +802,37 @@ Pour les données synthétiques générées sur la sphère, l'aire de la cellule
 
 Cette cohérence dans l'extraction des features entre données synthétiques et réelles garantit la transférabilité des représentations apprises. Les mêmes métriques géométriques calculées sur les tessellations de Voronoï sphériques des données réelles et synthétiques permettent une comparaison directe et un apprentissage cohérent.
 
+\subsubsection{Calcul du coefficient de clustering pour la régression}
+
+Une fois le graphe construit par tessellation de Voronoï, nous calculons son coefficient de clustering global $\bar{C}$, qui sert de label pour la tâche de régression sur données synthétiques.
+
+\textbf{Définition mathématique :}
+
+Pour chaque nœud $i$, le coefficient de clustering local mesure la proportion de triangles réalisés parmi ceux possibles dans son voisinage :
+\[
+C_i = \frac{2|\{(v_j, v_k) : v_j, v_k \in \mathcal{N}(i), (v_j, v_k) \in E\}|}{d_i(d_i-1)}
+\]
+où $\mathcal{N}(i)$ est l'ensemble des voisins du nœud $i$, $d_i$ son degré, et le numérateur compte le nombre d'arêtes reliant les voisins entre eux (formant des triangles avec $i$).
+
+Le coefficient de clustering global du graphe est la moyenne sur tous les nœuds :
+\[
+\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i
+\]
+
+\textbf{Relation avec le continuum Poisson-Matérn :}
+
+Ce coefficient quantifie la tendance des cellules voisines à former des groupes densément connectés, capturant ainsi le degré d'agrégation spatiale :
+
+\begin{itemize}
+    \item \textbf{Poisson homogène} : Les cellules sont distribuées aléatoirement sur la sphère. Les voisins d'une cellule ont peu de chance d'être eux-mêmes voisins $\Rightarrow$ $\bar{C} \approx 0.1$-$0.2$ (faible clustering)
+    
+    \item \textbf{Matérn cluster} : Les cellules forment des amas locaux. Les voisins d'une cellule appartiennent souvent au même cluster et sont donc connectés entre eux $\Rightarrow$ $\bar{C} \approx 0.7$-$0.9$ (fort clustering)
+    
+    \item \textbf{Continuum intermédiaire} : En variant les paramètres du processus de Matérn ($\lambda_{\text{parent}}$, $\lambda_{\text{cluster}}$, $r$), nous générons des patterns avec des degrés d'agrégation variables, produisant des valeurs de $\bar{C}$ couvrant uniformément l'intervalle $[0, 1]$
+\end{itemize}
+
+\textbf{Propriété clé :} Le coefficient de clustering $\bar{C}$ est calculé \textit{a posteriori} sur le graphe généré, après application du processus ponctuel et construction de la tessellation. Il capture implicitement les corrélations spatiales induites par les paramètres du processus, offrant ainsi une métrique univoque et continue du degré d'organisation spatiale, idéale pour une tâche de régression supervisée.
+
 \subsection{Validation statistique des synthétiques}
 
 \subsubsection{Fonctions de Ripley}
@@ -1205,12 +1233,12 @@ Ce chapitre a décrit en détail chaque composante de notre pipeline innovant po
 
 \textbf{Prétraitement et segmentation} : Le pipeline débute par un prétraitement robuste (normalisation d'intensité par percentiles, débruitage) suivi d'une segmentation state-of-the-art via Faster Cellpose
 
-\textbf{Données réelles et tâches} : Notre dataset collaboratif comprend 1311 échantillons imagés (2272 organoïdes extraits), dominés par deux phénotypes : choux-fleurs (55.9\%, agrégation spatiale forte) et cystiques (40.3\%, répartition homogène). Nous adressons trois tâches complémentaires : classification binaire choux-fleurs vs cystiques (tâche principale), régression du coefficient de clustering sur synthétiques (pré-entraînement), et régression de la déformation morphologique sur réels (quantification fine).
+\textbf{Données réelles et tâches} : Notre dataset collaboratif comprend 1311 échantillons imagés (2272 organoïdes extraits), dont nous avons sélectionné ~500 organoïdes bien différenciés (~250 par classe) pour l'apprentissage supervisé. Les phénotypes étudiés sont : choux-fleurs (agrégation spatiale forte) et cystiques (répartition homogène). Nous adressons trois tâches complémentaires : classification binaire choux-fleurs vs cystiques (tâche principale), régression du coefficient de clustering sur synthétiques (pré-entraînement), et régression de la déformation morphologique sur réels (quantification fine).
 
 \textbf{Génération synthétique} : Contribution majeure, nos ~100~000 organoïdes synthétiques sont générés via processus ponctuels (Poisson homogène et Matérn cluster) formant un continuum contrôlé de patterns spatiaux. La génération initiale sur la sphère permet la validation statistique rigoureuse (fonctions de Ripley, tests KS) ; le dataset GNN final subit ensuite une transformation spatiale étendant les coordonnées au-delà de la sphère proportionnellement à la densité locale, simulant les protubérances "chou-fleur" tout en préservant les aires cellulaires. Ces synthétiques servent au pré-entraînement et à l'apprentissage de représentations géométriques transférables.
 
 \textbf{Construction de graphes} : Extraction de 4 features par cellule (coordonnées 3D, volume), puis construction via stratégie K-NN hybride (k=10) équilibrant connectivité, signification biologique et efficacité computationnelle.
 
-\textbf{Architectures et entraînement} : EGNN équivariant comme modèle principal exploitant pleinement la géométrie 3D, comparé à baselines GNN standards (GCN, GAT, GIN) pour ablations. Stratégie d'entraînement en deux phases : pré-entraînement sur synthétiques (régression clustering) puis fine-tuning sur réels (classification/régression), avec validation croisée 5-fold et recherche d'hyperparamètres systématique.
+\textbf{Architectures et entraînement} : Nous comparons plusieurs architectures GNN : GAT (Graph Attention Network), DeepSets, EGNN équivariant, et GCN comme baseline. Les résultats montrent que GAT obtient les meilleures performances brutes, suivi de DeepSets, tandis qu'EGNN présente un trade-off intéressant avec des performances légèrement inférieures mais une garantie d'équivariance E(3) cruciale pour la robustesse géométrique. Stratégie d'entraînement en deux phases : pré-entraînement sur synthétiques (régression clustering) puis fine-tuning sur réels (classification/régression), avec validation croisée 5-fold et recherche d'hyperparamètres systématique.
 
 Le Chapitre 5 présentera les résultats expérimentaux obtenus avec cette méthodologie, validant empiriquement les choix effectués et quantifiant les performances sur les tâches de classification et de régression.

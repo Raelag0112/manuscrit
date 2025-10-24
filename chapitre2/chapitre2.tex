@@ -417,7 +417,7 @@ Plutôt qu'un ensemble d'outils dispersés, nous proposons un pipeline cohérent
 
 \subsection{Verrous scientifiques et techniques adressés}
 
-Cette thèse s'attaque à quatre verrous majeurs, formant les contributions principales.
+Cette thèse s'attaque à trois verrous majeurs, formant les contributions principales.
 
 \subsubsection{Verrou 1 : Représentation adaptée}
 
@@ -440,17 +440,7 @@ Cette thèse s'attaque à quatre verrous majeurs, formant les contributions prin
     \item Pré-entraînement sur synthétiques puis fine-tuning sur réels (transfer learning)
 \end{itemize}
 
-\subsubsection{Verrou 3 : Interprétabilité biologiquement significative}
-
-\textbf{Question scientifique :} Comment rendre les prédictions exploitables par les biologistes et identifier les mécanismes sous-jacents ?
-
-\textbf{Notre réponse :}
-\begin{itemize}
-    \item Mécanismes d'attention identifiant les cellules et les interactions importantes
-    \item Visualisation 3D des contributions cellulaires
-\end{itemize}
-
-\subsubsection{Verrou 4 : Robustesse et généralisation}
+\subsubsection{Verrou 3 : Robustesse et généralisation}
 
 \textbf{Question scientifique :} Comment assurer la robustesse aux variations expérimentales et la généralisation inter-laboratoires ?
 
@@ -472,7 +462,6 @@ Cette thèse s'attaque à quatre verrous majeurs, formant les contributions prin
 Automatisation & - & ++ & +++ & +++ \\
 Scalabilité & - & ++ & + & +++ \\
 Empreinte mémoire & N/A & +++ & - & +++ \\
-Interprétabilité & +++ & ++ & - & ++ \\
 Features apprises & - & - & +++ & +++ \\
 Invariances géométriques & ++ & + & + & +++ \\
 Besoin en données & N/A & + & --- & ++ \\
@@ -500,13 +489,11 @@ Cette thèse cherche à répondre aux questions suivantes :
 \begin{enumerate}
     \item \textbf{Q1 - Représentation} : Les graphes géométriques constituent-ils une représentation efficace des organoïdes pour l'apprentissage automatique ?
     
-    \item \textbf{Q2 - Architecture} : Les GNNs équivariants apportent-ils un gain significatif par rapport aux GNNs standards et aux CNN 3D ?
+    \item \textbf{Q2 - Architecture} : Les GNNs équivariants apportent-ils un gain significatif par rapport aux GNNs standards ?
     
     \item \textbf{Q3 - Données synthétiques} : Les données synthétiques générées par processus ponctuels sont-elles réalistes et utiles pour le pré-entraînement ?
     
     \item \textbf{Q4 - Transfer learning} : Le pré-entraînement sur synthétiques améliore-t-il significativement les performances et la data efficiency sur données réelles ?
     
-    \item \textbf{Q5 - Interprétabilité} : Les cellules et patterns identifiés comme importants par le modèle correspondent-ils à des mécanismes biologiques connus ?
-    
-    \item \textbf{Q6 - Généralisation} : L'approche est-elle robuste aux variations expérimentales et généralisable à différents types d'organoïdes ?
+    \item \textbf{Q5 - Généralisation} : L'approche est-elle robuste aux variations expérimentales et généralisable à différents types d'organoïdes ?
 \end{enumerate}
