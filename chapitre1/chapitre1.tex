@@ -87,9 +87,9 @@ Cette hétérogénéité multi-échelles constitue à la fois une richesse biolo
 
 Les images 3D haute résolution d'organoïdes peuvent atteindre plusieurs gigaoctets par échantillon (typiquement 2048×2048×200 voxels × 3-4 canaux fluorescents × 16 bits = 2-4 Go). Pour une expérience de criblage à haut débit impliquant des centaines d'organoïdes imagés à plusieurs temps, le volume de données total peut dépasser le téraoctet.
 
-Ces contraintes de stockage, de traitement et d'analyse posent des défis infrastructurels :
+Ces contraintes de stockage, de traitement et d'analyse posent des défis structurels :
 \begin{itemize}
-    \item \textbf{Temps de calcul prohibitifs} pour approches naïves (plusieurs heures par organoïde)
+    \item \textbf{Temps de calcul prohibitifs} pour les approches naïves (plusieurs heures par organoïde)
     \item \textbf{Limitations mémoire} empêchant l'utilisation de certaines architectures de deep learning
     \item \textbf{Coûts de stockage et de calcul} (cloud computing) importants
     \item \textbf{Nécessité d'optimisations algorithmiques et computationnelles}
@@ -126,6 +126,13 @@ Dans le cadre de cette thèse et du projet ANR Morpheus, nous avons constitué u
             \item \textit{Kératinisés} (différenciation kératinique) : 10 échantillons (10 organoïdes)
         \end{itemize}
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../img/3Dviz.png}
+    \caption{Vision 3D de deux organoïdes représentatifs de notre dataset : organoïde cystique (à gauche) présentant une morphologie saine avec formation d'une cavité centrale, et organoïde choux-fleurs (à droite) caractérisé par une structure plus irrégulière.}
+    \label{fig:3Dviz}
+\end{figure}
+
 \textbf{Protocole} : Imagerie confocale 8-bit, magnifications 20× et 40×, analyse au 7ème jour de culture (J7)
 
 \textbf{Pipeline} : Images brutes → Segmentation → Nuage de points 3D → Clustering DBSCAN → Création du graphe → Classification GNN
@@ -160,7 +167,7 @@ Cependant, cette approche souffre de limitations majeures qui limitent son utili
     \item \textbf{Subjectivité} : Les critères d'évaluation peuvent varier selon l'expertise et l'expérience de l'annotateur
     \item \textbf{Variabilité inter-observateur} : Des experts différents peuvent aboutir à des classifications divergentes
     \item \textbf{Variabilité intra-observateur} : Un même expert peut classifier différemment le même organoïde à différents moments
-    \item \textbf{Biais cognitifs} : Effets d'ancrage, biais de confirmation peuvent influencer les jugements
+    \item \textbf{Biais cognitifs} : Des effets d'ancrage et des biais de confirmation peuvent influencer les jugements
 \end{itemize}
 
 Ces limitations rendent l'analyse manuelle inadaptée aux études à haut débit modernes où des milliers voire dizaines de milliers d'organoïdes doivent être analysés de manière systématique et reproductible.
@@ -189,6 +196,7 @@ Les réseaux de neurones convolutifs (CNN) ont révolutionné l'analyse d'images
 Une approche alternative consiste à extraire manuellement des descripteurs quantifiant divers aspects des organoïdes, puis à appliquer des algorithmes de machine learning classique (Random Forest, SVM, etc.).
 
 Les descripteurs typiques incluent :
+
 \textbf{Morphologie globale} : Volume, sphéricité, excentricité, surface, compacité
 
 \textbf{Texture} : Matrices de co-occurrence de Haralick (contraste, corrélation, entropie), Local Binary Patterns 3D, moments de Zernike
@@ -261,7 +269,6 @@ Cette thèse propose un pipeline complet et automatisé pour l'analyse d'organo�
     \item \textbf{Extraction de features} : propriétés morphologiques pour chaque cellule
     \item \textbf{Construction de graphes} : Graphes géométriques 3D via K-NN
     \item \textbf{Classification par GNN} : Comparaisons de différentes architectures GNN
-    \item \textbf{Interprétation} : GNNExplainer pour l'identification des cellules critiques
 \end{enumerate}
 
 \subsection{Contribution 2 : Optimisation de la segmentation pour grand débit}
@@ -317,17 +324,12 @@ Pour pallier le manque crucial de données annotées, nous proposons une approch
 En simulant différents processus stochastiques de distribution spatiale de points~\cite{Illian2008,Diggle2013} sur des géométries sphériques, nous générons des arrangements cellulaires aux propriétés statistiques contrôlées et connues :
 
 \textbf{Processus de Poisson homogène} : Distribution aléatoire complète, référence de hasard
+
 \textbf{Processus de Matérn} : Clustering contrôlé, représentant l'agrégation cellulaire
-\textbf{Processus de Strauss} : Répulsion entre points, modélisant l'exclusion stérique entre cellules
 
 \subsubsection{Construction d'organoïdes synthétiques}
 
-À partir des distributions de points générées, nous construisons des organoïdes synthétiques complets :
-\begin{itemize}
-    \item Génération de centroides cellulaires selon un processus ponctuel choisi
-    \item Construction de diagrammes de Voronoï sur la sphère pour créer des segmentations cellulaires réalistes
-    \item Validation statistique : comparaison des fonctions K, F, G de Ripley aux valeurs théoriques et observées sur données réelles
-\end{itemize}
+À partir des distributions de points obtenues, nous procédons à la construction d’organoïdes synthétiques en deux étapes principales. D’abord, les centroïdes des cellules sont générés selon le processus ponctuel sélectionné, ce qui permet de contrôler précisément la structure spatiale de l’assemblage cellulaire. Ensuite, à partir de ces positions, nous réalisons une partition de la sphère en diagrammes de Voronoï, aboutissant à des segmentations cellulaires aux frontières réalistes, proches de celles observées expérimentalement.
 
 \subsubsection{Stratégie de pré-entraînement et transfer learning}
 
@@ -373,8 +375,6 @@ Nous formalisons rigoureusement les fondements mathématiques des GNN géométri
 
 \textbf{Garanties théoriques} : Propriétés d'équivariance par construction
 
-\textbf{Expressivité} : Capacités représentationnelles et limitations (tests de Weisfeiler-Lehman)
-
 \subsubsection{Panorama des architectures}
 
 La revue couvre les architectures majeures de complexité croissante :
@@ -403,17 +403,17 @@ Le \textbf{Chapitre 3} établit les fondements mathématiques et algorithmiques 
 
 \subsection{Chapitre 4 : Méthodologie}
 
-Le \textbf{Chapitre 4} décrit en détail la méthodologie proposée dans cette thèse. Nous commençons par présenter l'architecture générale de notre approche, en justifiant nos choix de conception. Le chapitre aborde ensuite les protocoles de prétraitement, incluant les méthodes d'imagerie, les techniques de normalisation et la correction d'artefacts. Nous détaillons nos deux contributions méthodologiques pour la segmentation optimisée, avant d'expliquer la construction de graphes géométriques 3D via l'algorithme K-NN. Le chapitre présente également notre approche de génération synthétique basée sur les processus ponctuels et les diagrammes de Voronoï 3D, ainsi que les méthodes de validation employées. Enfin, nous comparons différentes architectures GNN adaptées à notre problématique. Ce chapitre constitue le cœur technique de la thèse, détaillant nos contributions algorithmiques.
+Le \textbf{Chapitre 4} décrit en détail la méthodologie proposée dans cette thèse. Nous commençons par présenter l'architecture générale de notre approche, en justifiant nos choix de conception. Le chapitre aborde ensuite les protocoles de prétraitement, incluant les méthodes d'imagerie, les techniques de normalisation et la correction d'artefacts. Nous détaillons nos deux contributions méthodologiques pour la segmentation optimisée, avant d'expliquer la construction de graphes géométriques 3D via l'algorithme K-NN. Le chapitre présente également notre approche de génération synthétique basée sur les processus ponctuels et les diagrammes de Voronoï, ainsi que les méthodes de validation employées. Enfin, nous comparons différentes architectures GNN adaptées à notre problématique. Ce chapitre constitue le cœur technique de la thèse, détaillant nos contributions algorithmiques.
 
 \subsection{Chapitre 5 : Résultats}
 
-Le \textbf{Chapitre 5} présente les résultats expérimentaux obtenus au cours de cette thèse. Nous commençons par une étude comparative entre approches statistiques spatiales et GNN, dont les résultats ont été publiés au GRETSI 2025, démontrant la robustesse au bruit et la capacité de généralisation géométrique des GNN. Nous évaluons ensuite les performances des différentes architectures GNN (GAT, DeepSets, EGNN, GCN) sur les données synthétiques, en réalisant des analyses d'ablation pour identifier les composants essentiels et caractériser les trade-offs entre performance brute et robustesse géométrique. Nous reportons ensuite les performances obtenues sur données réelles (500 organoïdes bien différenciés sélectionnés) via transfer learning et fine-tuning. Une discussion critique analysant les forces, les limitations et le positionnement de notre approche conclut ce chapitre.
+Le \textbf{Chapitre 5} présente les résultats expérimentaux obtenus au cours de cette thèse. Nous commençons par une étude comparative entre approches statistiques spatiales et GNN, dont les résultats ont été publiés au GRETSI 2025, démontrant la robustesse au bruit et la capacité de généralisation géométrique des GNN. Nous évaluons ensuite les performances des différentes architectures GNN (GAT, DeepSets, EGNN, GCN) sur les données synthétiques, en réalisant des analyses d'ablation pour identifier les composants essentiels et caractériser les trade-offs entre performance brute et robustesse géométrique. Nous reportons ensuite les performances obtenues sur les données réelles (500 organoïdes bien différenciés sélectionnés) via transfer learning et fine-tuning. Une discussion critique analysant les forces, les limitations et le positionnement de notre approche conclut ce chapitre.
 
 \subsection{Chapitre 6 : Conclusion}
 
 Le \textbf{Chapitre 6} conclut le manuscrit en synthétisant les contributions scientifiques et méthodologiques apportées par ce travail. Nous y discutons les limitations et défis persistants de notre approche, avant de proposer des perspectives à court terme incluant des extensions méthodologiques et des validations cliniques. Le chapitre esquisse également des directions de recherche à long terme, notamment l'analyse spatio-temporelle, le développement de modèles génératifs et l'intégration multi-modale de données hétérogènes. Enfin, nous évaluons l'impact scientifique et sociétal potentiel de nos contributions pour la communauté de la biologie des organoïdes et de la médecine personnalisée.
 
-\subsection{Annexes}
+%\subsection{Annexes}
 
-Les cinq annexes fournissent des compléments techniques et théoriques indispensables à la compréhension approfondie de notre travail. L'\textbf{Annexe A} présente les fondamentaux du deep learning, incluant l'historique du domaine, les architectures classiques, les techniques d'optimisation et les méthodes de régularisation. L'\textbf{Annexe B} offre des compléments sur les graphes et les GNNs, abordant notamment les hypergraphes, le cadre théorique du Geometric Deep Learning et les résultats d'expressivité. L'\textbf{Annexe C} développe la théorie des processus ponctuels, couvrant les processus de Poisson, Cox et Gibbs, les méthodes d'estimation et leur application sur surfaces courbes. L'\textbf{Annexe D} détaille les aspects d'implémentation, incluant les technologies employées, l'architecture logicielle développée, les optimisations effectuées et les mesures prises pour garantir la reproductibilité. Enfin, l'\textbf{Annexe E} décrit les données et benchmarks utilisés, les protocoles d'annotation développés et les modalités d'accès au code source et aux données pour favoriser la reproductibilité de nos résultats.
+%Les cinq annexes fournissent des compléments techniques et théoriques indispensables à la compréhension approfondie de notre travail. L'\textbf{Annexe A} présente les fondamentaux du deep learning, incluant l'historique du domaine, les architectures classiques, les techniques d'optimisation et les méthodes de régularisation. L'\textbf{Annexe B} offre des compléments sur les graphes et les GNNs, abordant notamment les hypergraphes, le cadre théorique du Geometric Deep Learning et les résultats d'expressivité. L'\textbf{Annexe C} développe la théorie des processus ponctuels, couvrant les processus de Poisson, Cox et Gibbs, les méthodes d'estimation et leur application sur surfaces courbes. L'\textbf{Annexe D} détaille les aspects d'implémentation, incluant les technologies employées, l'architecture logicielle développée, les optimisations effectuées et les mesures prises pour garantir la reproductibilité. Enfin, l'\textbf{Annexe E} décrit les données et benchmarks utilisés, les protocoles d'annotation développés et les modalités d'accès au code source et aux données pour favoriser la reproductibilité de nos résultats.
 

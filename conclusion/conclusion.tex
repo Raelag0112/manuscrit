@@ -180,6 +180,28 @@ L'extension à des géométries non-sphériques ouvrirait l'applicabilité de l'
 
 Enfin, la simulation réaliste de marqueurs d'imagerie doit évoluer au-delà des intensités aléatoires actuelles. Modéliser explicitement les corrélations biologiques entre position spatiale, morphologie cellulaire et expression de marqueurs — par exemple des cellules Ki67-positives concentrées en périphérie pour refléter la prolifération, ou des marqueurs de différenciation gradués radialement — renforcerait le réalisme biologique et donc l'efficacité du transfer learning.
 
+\subsubsection{Caractérisation morphologique par alpha-shapes}
+
+Une perspective méthodologique prometteuse consiste à enrichir la représentation des organoïdes par des descripteurs de forme globale basés sur la théorie des alpha-shapes. Cette approche géométrique computationnelle, introduite par Edelsbrunner et collaborateurs, permet de reconstruire une enveloppe externe précise d'un nuage de points 3D en contrôlant finement le niveau de détail capturé via le paramètre $\alpha$.
+
+\textbf{Principe des alpha-shapes :}
+
+Contrairement à l'enveloppe convexe classique qui englobe tous les points dans le polyèdre convexe minimal, les alpha-shapes permettent de modéliser des formes non-convexes en autorisant des concavités contrôlées. Le paramètre $\alpha$ définit le rayon d'une sphère de sondage : seules les régions de l'espace accessibles à une sphère de rayon $\alpha$ sans toucher de points font partie de l'intérieur de la forme. Géométriquement, l'alpha-shape pour un paramètre $\alpha$ donné correspond à l'union des simplexes de Delaunay (tétraèdres en 3D) dont la sphère circonscrite a un rayon inférieur ou égal à $\alpha$.
+
+Cette paramétrisation offre une famille de formes imbriquées : pour $\alpha \to \infty$, on retrouve l'enveloppe convexe complète ; pour $\alpha$ petit, la forme capture les irrégularités fines et les protubérances locales caractéristiques des organoïdes choux-fleurs ; pour $\alpha$ très petit, on obtient les points individuels isolés.
+
+\textbf{Applications aux organoïdes :}
+
+Pour les organoïdes, les alpha-shapes permettraient d'extraire des descripteurs de forme globale complémentaires à notre analyse cellulaire locale actuelle. Le volume de l'alpha-shape caractériserait la compacité globale et la présence de cavités internes, tandis que l'aire de surface externe quantifierait la rugosité et l'irrégularité morphologique. Le ratio surface/volume discriminerait les formes compactes sphériques (cystiques) des formes irrégulières avec protubérances (choux-fleurs). La courbure moyenne et gaussienne calculées sur la surface de l'alpha-shape localiseraient les régions de forte déformation morphologique, signalant potentiellement des zones de prolifération active. La distribution des courbures locales fournirait une signature statistique globale de la complexité morphologique.
+
+Ces descripteurs morphologiques globaux pourraient enrichir le vecteur de features au niveau graphe, soit par concaténation avec le pooling global des embeddings de nœuds, soit via un mécanisme d'attention pondérant leur contribution relative à la prédiction finale. Cette approche hybride combinerait les forces complémentaires de l'analyse locale cellulaire (via les GNN sur graphes) et de la caractérisation morphologique globale (via les alpha-shapes), capturant simultanément l'organisation interne et la forme externe des organoïdes.
+
+\textbf{Défis techniques :}
+
+L'application pratique nécessitera de résoudre plusieurs défis méthodologiques. La sélection du paramètre $\alpha$ optimal, probablement par validation croisée ou via des critères géométriques (nombre de composantes connexes, ratio volume/volume convexe), conditionne la qualité des descripteurs extraits. Le calcul efficace des alpha-shapes pour des milliers d'organoïdes requiert des implémentations optimisées exploitant la triangulation de Delaunay sous-jacente. La robustesse au bruit de segmentation et aux cellules aberrantes doit être évaluée systématiquement, potentiellement via prétraitement par outlier removal. Enfin, l'extension aux formes ellipsoïdales plutôt que sphériques, plus représentatives de certains types d'organoïdes, nécessiterait des adaptations algorithmiques.
+
+Cette direction méthodologique s'inscrit naturellement dans notre framework existant, enrichissant la représentation graphique cellulaire par une caractérisation géométrique globale complémentaire, et offrant potentiellement une amélioration des performances de classification via l'exploitation de cette information multi-échelle.
+
 \subsection{Intégration de données multi-modales}
 
 \subsubsection{Transcriptomique spatiale}

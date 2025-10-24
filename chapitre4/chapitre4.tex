@@ -89,6 +89,13 @@ Concrètement, pour traiter 1000 organoïdes, un workflow séquentiel sur une se
 
 Dans le cadre du projet ANR Morpheus et en collaboration avec l'IPMC (Nice) et l'équipe Metatox (Université Paris Cité), nous avons constitué un dataset d'organoïdes de prostate acquis entre mai 2023 et février 2025.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../img/cumulative_organoids.png}
+    \caption{Évolution cumulative du nombre d'échantillons acquis au cours du temps (mai 2023 - février 2025).}
+    \label{fig:cumulative_organoids}
+\end{figure}
+
 \subsubsection{Caractéristiques du dataset}
 
 Notre dataset constitue une ressource substantielle pour la recherche sur organoïdes, fruit de 22 mois de collecte continue entre mai 2023 et février 2025. Le volume total comprend 1311 échantillons imagés, dont l'analyse par clustering DBSCAN a permis d'extraire approximativement 2272 organoïdes individuels — reflétant la présence moyenne de 1.7 organoïdes par champ de vue. Pour cette étude, nous avons sélectionné 500 organoïdes bien différenciés présentant une concordance claire entre leur label batch et leur morphologie observée, les 1772 organoïdes restants (présentant une incohérence suspectée entre label et phénotype réel) étant réservés pour des approches non supervisées futures. Le pipeline génère environ 10310 fichiers au total, incluant les images TIF originales, les graphes au format JSON, et diverses visualisations PNG pour le contrôle qualité. En termes de stockage, les graphes compressés ne nécessitent qu'environ 200 Mo malgré leur richesse informationnelle, tandis que les images brutes volumétriques occupent approximativement 1To — illustrant une fois de plus la compression spectaculaire offerte par l'abstraction graphique.
@@ -427,6 +434,20 @@ Cellpose & 0.99 & 0.96 & 0.98 & 30 \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/3Dreco.png}
+    \caption{Visualisation 3D de la reconstruction par détection d'ellipses. Les ellipses détectées sur chaque coupe 2D sont empilées et appariées en 3D pour former les objets cellulaires complets. Chaque couleur représente une cellule individuelle identifiée par l'algorithme d'appariement 3D basé sur la distance combinée (position, taille, orientation).}
+    \label{fig:3Dreco}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{../img/Comp.png}
+    \caption{Comparaison qualitative des méthodes de segmentation sur une coupe représentative. De gauche à droite : image originale, segmentation par ellipses (notre méthode géométrique), StarDist, et Cellpose. Notre méthode géométrique par ellipses capture correctement la majorité des noyaux avec une précision acceptable (F1=0.88 après reconstruction 3D) tout en offrant une vitesse 10× supérieure à Cellpose.}
+    \label{fig:comp}
+\end{figure}
+
 \textbf{Avantages :}
 \begin{itemize}
     \item \textbf{Rapidité exceptionnelle} : 15× plus rapide que Cellpose
@@ -450,6 +471,13 @@ Cellpose & 0.99 & 0.96 & 0.98 & 30 \\
 
 \textbf{Cas d'usage :}
 Cette méthode est adaptée pour le criblage primaire à très haut débit où le volume d'échantillons prime sur la précision absolue. Cependant, elle n'a pas été retenue pour notre pipeline final car la qualité de segmentation impacte directement la qualité des graphes et les performances des GNN en aval.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../img/graph_comparison.png}
+    \caption{Comparaison des graphes générés selon la méthode de segmentation utilisée. À gauche : graphe obtenu par la méthode géométrique par ellipses (3 sec/coupe, F1=0.88) montrant une topologie légèrement simplifiée avec quelques cellules manquées ou fusionnées. À droite : graphe obtenu par Faster Cellpose (6 sec/coupe, F1=0.95) présentant une structure plus dense et précise, capturant mieux les relations de voisinage cellulaire réelles. La qualité de segmentation impacte directement la topologie du graphe et donc les performances des GNN en aval, justifiant notre choix de Faster Cellpose comme méthode principale malgré un coût computationnel doublé.}
+    \label{fig:graph_comparison}
+\end{figure}
 
 \subsubsection{Contribution 2 : Faster Cellpose via Knowledge Distillation}
 
@@ -746,6 +774,13 @@ En faisant varier les paramètres $\lambda_{\text{parent}}$, $\lambda_{\text{clu
 
 Cette paramétrisation permet de générer des organoïdes synthétiques couvrant le spectre des architectures spatiales observées dans les données réelles, du phénotype cystique relativement homogène au phénotype choux-fleur fortement agrégé.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../img/distrib2.png}
+    \caption{Comparaison visuelle des deux processus ponctuels implémentés sur la sphère. À gauche : processus de Poisson homogène (CSR) générant une distribution uniforme et aléatoire des points représentant le phénotype cystique. À droite : processus de Matérn cluster produisant une distribution agrégée avec clusters locaux denses caractéristique du phénotype choux-fleur. Ces distributions sphériques servent de base pour la génération des organoïdes synthétiques et permettent l'application des statistiques spatiales sphériques pour validation.}
+    \label{fig:distrib2}
+\end{figure}
+
 \subsection{Construction du graphe via tessellation de Voronoï sphérique}
 
 À partir des positions cellulaires générées sur la sphère, nous construisons le graphe de connectivité en utilisant la tessellation de Voronoï sphérique, une structure naturelle capturant les relations de voisinage géométrique.
@@ -884,6 +919,13 @@ où $\mathcal{N}_r(i)$ désigne le voisinage de rayon $r$ autour de $i$, $|\math
 
 \textbf{Principe et conservation :}
 Cruciale, cette transformation préserve l'aire associée initiale à chaque cellule (telle que déterminée par le diagramme de Voronoï ou les méthodes de segmentation), ne modifiant que les coordonnées spatiales. Ainsi, les features géométriques liées aux aires cellulaires demeurent cohérentes avec la distribution initiale sur la sphère, tandis que la structure spatiale 3D reflète mieux la réalité morphologique des organoïdes cultivés. Cette dualité permet d'exploiter la rigueur théorique des statistiques spatiales sphériques pour la validation tout en entraînant les GNN sur des géométries plus réalistes.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{../img/Modelisation.png}
+    \caption{Pipeline complet de génération des organoïdes synthétiques. En haut : distributions initiales sur la sphère générées par processus de Poisson homogène (gauche) et Matérn cluster (droite). En bas : organoïdes synthétiques étendus correspondants après transformation spatiale proportionnelle à la densité locale. Cette transformation préserve les aires cellulaires de Voronoï tout en créant des protubérances dans les zones de forte densité (clusters), reproduisant ainsi la morphologie irrégulière "chou-fleur" observée dans les organoïdes réels. Le processus de Poisson conserve une forme quasi-sphérique régulière (phénotype cystique), tandis que le processus de Matérn produit une structure fortement irrégulière avec excroissances multiples (phénotype choux-fleur).}
+    \label{fig:modelisation}
+\end{figure}
 
 Ce dataset synthétique sert deux objectifs majeurs : le pré-entraînement de nos architectures GNN pour acquérir des représentations robustes des patterns spatiaux cellulaires, et l'entraînement de régresseurs prédisant le coefficient de clustering à partir de la structure graphique — une tâche auxiliaire favorisant l'apprentissage de features géométriques pertinentes transférables à la classification de phénotypes réels.
 

@@ -110,6 +110,13 @@ La Figure~\ref{fig:noise_gaussian} présente l'évolution de l'accuracy en fonct
 
 \textbf{Conclusion bruit gaussien :} Les statistiques spatiales sont significativement plus robustes (+10-15 points d'accuracy) au bruit gaussien sur toute la plage testée. Cette supériorité s'explique par la nature analytique des fonctions K, F, G qui moyennent intrinsèquement le bruit sur de nombreuses paires de points, offrant une stabilité naturelle. Les GNN, bien que performants en conditions nominales, souffrent de la propagation du bruit à travers les couches de message passing.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../img/noise.png}
+    \caption{Robustesse au bruit gaussien : comparaison entre statistiques spatiales (courbe verte) et GNN de différentes profondeurs (courbes colorées). Les statistiques spatiales maintiennent une accuracy supérieure (+10-15 points) sur toute la plage de bruit, démontrant leur robustesse intrinsèque au bruit de localisation.}
+    \label{fig:noise_gaussian}
+\end{figure}
+
 \subsubsection{Bruit poivre et sel}
 
 La Figure~\ref{fig:noise_pepper} présente l'évolution de l'accuracy face au bruit poivre et sel $\sigma_{ps}$.
@@ -125,6 +132,13 @@ Les résultats sont qualitativement similaires au bruit gaussien, mais la dégra
 \end{itemize}
 
 \textbf{Interprétation :} Le bruit poivre et sel altère directement la topologie du graphe (suppression de nœuds, ajout de nœuds aberrants), perturbant fortement le message passing des GNN. Les statistiques spatiales, en moyennant sur l'ensemble des points, sont plus résilientes à ces modifications locales.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../img/pepper.png}
+    \caption{Robustesse au bruit poivre et sel : évolution de l'accuracy en fonction du taux de bruit structurel. Le bruit d'ajout/suppression de points s'avère plus perturbateur que le bruit gaussien, mais les statistiques spatiales conservent leur avantage (> 0.90 jusqu'à $\sigma_{ps}=0.3$).}
+    \label{fig:noise_pepper}
+\end{figure}
 
 \subsection{Résultats : généralisation géométrique}
 
@@ -148,6 +162,13 @@ Les statistiques spatiales (K, F, G) dépendent intrinsèquement de la géométr
 Les GNN, en revanche, apprennent une représentation topologique abstraite basée sur la structure du graphe de voisinage. Cette représentation est intrinsèquement indépendante de la forme globale du domaine : un motif d'agrégation cellulaire locale (cluster de 5-10 cellules proches) possède une signature topologique identique qu'il se trouve sur une sphère, un ellipsoïde, ou toute autre surface. Les GNN capturent ces invariants topologiques locaux, conférant une flexibilité géométrique naturelle.
 
 \textbf{Implication pratique :} Pour les organoïdes réels, dont les morphologies varient considérablement (cystiques quasi-sphériques, choux-fleurs irréguliers, formes intermédiaires), cette flexibilité topologique des GNN constitue un avantage décisif justifiant leur adoption.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../img/accuracy_vs_ratio.png}
+    \caption{Généralisation géométrique : accuracy en fonction du rapport d'aspect ellipsoïdal. Les GNN (courbes bleues/rouges) montrent une dégradation gracieuse et conservent une bonne performance même sur des ellipsoïdes très allongés (ratio 5:1), tandis que les statistiques spatiales (courbe verte) s'effondrent rapidement en dehors de l'hypothèse sphérique. L'inversion des performances (GNN > stats spatiales) survient dès un ratio d'aspect > 2.5, démontrant la supériorité de la flexibilité topologique des GNN pour des morphologies variées.}
+    \label{fig:ratio_aspect}
+\end{figure}
 
 \subsection{Synthèse de l'étude comparative}
 

@@ -314,7 +314,7 @@ Une approche courante consiste à projeter le volume 3D en une image 2D en calcu
 \textbf{Multi-slice analysis :}
 Une approche dite "multi-slice" consiste à extraire plusieurs coupes bidimensionnelles à différentes profondeurs du volume, puis à appliquer un classifieur à chacune de ces images individuelles. Les résultats obtenus pour chaque coupe sont ensuite agrégés, typiquement par un vote majoritaire ou une moyenne des scores de prédiction, afin d’obtenir une décision globale sur le volume analysé. Cette méthode permet de récupérer plus d’informations que les simples projections 2D puisqu’elle exploite la diversité des plans à travers l’organoïde, mais elle ne prend pas réellement en compte la continuité spatiale et les relations entre coupes, la cohérence tridimensionnelle n’étant donc pas modélisée.
 
-\textbf{2.5D approaches :}
+\textbf{Approches 2.5D :}
 Une approche dite « 2.5D » consiste à empiler trois coupes adjacentes d’un volume pour former une image pseudo-RGB, qui peut alors être traitée par un réseau de neurones convolutifs 2D standard. Cette méthode permet de capturer une partie de l’information tridimensionnelle tout en conservant l’efficacité computationnelle des architectures 2D, constituant ainsi un compromis entre richesse spatiale et coût de calcul.
 
 \subsubsection{CNN 3D : extension naturelle mais coûteuse}
