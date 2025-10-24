@@ -79,7 +79,7 @@ Le temps total s'établit ainsi à approximativement 20 minutes par organoïde, 
 
 L'architecture du pipeline a été conçue pour une parallélisation naturelle et efficace. Chaque organoïde constituant une unité de traitement indépendante, le pipeline peut traiter simultanément de multiples échantillons sans aucune dépendance ou communication inter-processus. Le batching de graphes pour l'inférence GNN exploite pleinement le parallélisme massif des GPUs modernes via le formalisme de graphes disjoints de PyTorch Geometric. Le déploiement sur clusters de calcul devient ainsi trivial : la charge de travail se distribue simplement entre nœuds de calcul sans nécessiter d'orchestration complexe.
 
-Concrètement, pour traiter 1000 organoïdes, un workflow séquentiel sur une seule GPU nécessiterait approximativement 330 heures (environ 14 jours). Avec un déploiement parallèle sur 20 GPUs, ce temps se réduit à environ 17 heures, rendant praticable le retraitement complet d'un dataset dans des délais raisonnables. Cette scalabilité s'est révélée cruciale lors de nos campagnes d'ablation et d'optimisation d'hyperparamètres, où des centaines de configurations devaient être évaluées sur l'ensemble du dataset.
+Concrètement, pour traiter 1000 organoïdes, un workflow séquentiel sur une seule GPU nécessiterait approximativement 330 heures (environ 14 jours). Avec un déploiement parallèle sur 20 GPUs, ce temps se réduit à environ 17 heures, rendant praticable le retraitement complet d'un dataset dans des délais raisonnables. Cette scalabilité s'est révélée cruciale lors de nos campagnes d'optimisation d'hyperparamètres, où des centaines de configurations devaient être évaluées sur l'ensemble du dataset.
 
 \section{Acquisition et prétraitement des images}
 
@@ -674,9 +674,7 @@ Le choix des features d'arêtes dépend de l'architecture employée. Pour EGNN, 
 
 \subsection{Analyse de sensibilité}
 
-Une étude systématique détaillée au Chapitre 5 évalue l'impact des différents choix de construction sur les performances finales. Cette analyse explore plusieurs dimensions du design des graphes. Premièrement, nous comparons les stratégies de connectivité (K-NN pur, rayon fixe, triangulation de Delaunay, et notre approche hybride) pour identifier la plus performante. Deuxièmement, nous testons différentes valeurs du paramètre $k \in \{5, 8, 10, 12, 15, 20\}$ pour déterminer le nombre optimal de voisins. Troisièmement, nous explorons plusieurs rayons de coupure $r \in \{30, 50, 75, 100\}$ pour le filtrage des arêtes aberrantes. Quatrièmement, nous évaluons l'impact de la normalisation des coordonnées en comparant les performances avec et sans cette étape. Enfin, nous réalisons des études d'ablation sur les features morphologiques pour identifier celles qui contribuent le plus à la discrimination des phénotypes.
-
-Cette analyse de sensibilité exhaustive guide nos choix finaux de conception et révèle les facteurs critiques influençant les performances, permettant d'optimiser chaque composante du pipeline de construction de graphes.
+Le paramètre $k$ (nombre de voisins) est fixé empiriquement à $k=10$ sur la base d'expérimentations préliminaires, offrant un bon compromis entre connectivité locale et complexité computationnelle. Les autres choix architecturaux (normalisation des coordonnées, features morphologiques) sont validés au Chapitre 5 par des évaluations de performances sur les tâches de classification et régression.
 
 \section{Génération de données synthétiques}
 

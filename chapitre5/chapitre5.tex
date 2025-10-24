@@ -733,21 +733,6 @@ Les prédictions du modèle sont déterministes et constantes, éliminant la var
 \textbf{Implications pratiques :}
 L'automatisation permet des études à haut débit précédemment inaccessibles : criblages pharmacologiques sur milliers de composés, CRISPR screens génome-entier, caractérisation de biobanques complètes. La performance de 84.6\% accuracy, combinée à la reproductibilité parfaite et au throughput élevé, rend envisageable l'analyse systématique de larges cohortes.
 
-\subsubsection{Random Forest sur descripteurs}
-
-\textbf{Features :}
-30 descripteurs handcrafted globaux (morphologie organoïde entier, statistiques de texture, moments).
-
-\textbf{Résultats :}
-\begin{itemize}
-    \item Accuracy : 72.4 ± 3.1\%
-    \item F1 weighted : 0.701 ± 0.028
-    \item Entraînement rapide (< 30 sec)
-    \item Pas de GPU requis
-\end{itemize}
-
-\textbf{Analyse :}
-Performances significativement inférieures à EGNN (-12.2 points) malgré la rapidité d'entraînement. Confirme que l'apprentissage automatique de features (GNN) surpasse les descripteurs manuels. Cependant, cette baseline reste utile pour applications à ressources limitées ou comme pré-filtrage rapide.
 
 \subsection{Courbes d'apprentissage (data efficiency)}
 
@@ -1083,10 +1068,8 @@ Ce chapitre a démontré empiriquement :
     \item \textbf{Justification des GNN} : Étude comparative rigoureuse montrant que les GNN offrent une meilleure flexibilité géométrique (+17 points à ratio 5:1) que les statistiques spatiales, bien que ces dernières soient plus robustes au bruit (+10-15\% accuracy)
     
     \item \textbf{Hiérarchie des architectures sur synthétiques} : GAT obtient les meilleures performances ($R^2 = 0.928$, MSE = 0.0118), suivi de DeepSets ($R^2 = 0.908$) et EGNN ($R^2 = 0.915$). EGNN présente un trade-off intéressant : légèrement moins performant mais garantit l'équivariance E(3) cruciale pour la robustesse aux rotations (dégradation ×3.6 pour GAT vs quasi-nulle pour EGNN)
-    
-    \item \textbf{Importance de la géométrie} : Ablation montre MSE ×4 sans positions 3D, confirmant que l'information spatiale est critique
-    
-    \item \textbf{Performances sur réels (500 organoïdes sélectionnés)} : 89.3\% accuracy en classification binaire sur organoïdes bien différenciés, surpassant Random Forest (72\%)
+
+    \item \textbf{Performances sur réels (500 organoïdes sélectionnés)} : 89.3\% accuracy en classification binaire sur organoïdes bien différenciés
     
     \item \textbf{Gain du pré-entraînement} : Data efficiency 3-4×, convergence 3× plus rapide, amélioration de +8.3\% accuracy vs from scratch
     
