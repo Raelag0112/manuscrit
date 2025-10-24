@@ -370,8 +370,8 @@ Diviser prédictions en bins de confiance, calculer l'écart entre confiance moy
 \subsubsection{Hardware}
 
 \begin{itemize}
-    \item GPU : NVIDIA Tesla V100 (32 Go VRAM)
-    \item CPU : Intel Xeon Gold 6230 (20 cores)
+    \item GPU : NVIDIA RTX 3080 (10 Go VRAM)
+    \item CPU : Intel Core i7-10700K (8 cores)
     \item RAM : 128 Go
     \item Stockage : SSD NVMe 2 To
 \end{itemize}
@@ -831,7 +831,7 @@ EGNN pre-trained & 84.6\% & 79.2\% & -5.4\% \\
     \item Entraîner EGNN sur 70~000 organoïdes synthétiques (train set)
     \item 200 époques, learning rate $10^{-3}$
     \item Sauvegarder les poids atteignant meilleure validation accuracy
-    \item Durée : ~48 heures (GPU V100)
+    \item Durée : ~48 heures (GPU NVIDIA RTX 3080)
 \end{enumerate}
 
 \textbf{Phase 2 - Fine-tuning sur réels :}

@@ -8,24 +8,24 @@ Ce chapitre décrit en détail la méthodologie proposée pour l'analyse automat
 
 \subsection{Vue d'ensemble}
 
-Notre pipeline transforme des images 3D brutes d'organoïdes en prédictions de phénotypes via une séquence d'étapes automatisées (Figure~[À compléter]). Le flux de données est le suivant :
+Notre pipeline transforme des images 3D brutes d'organoïdes en prédictions de phénotypes via une séquence d'étapes automatisées. Le flux de données est le suivant :
 
 \begin{enumerate}
     \item \textbf{Input} : Image 3D confocale ($\sim$2 Go, 2048×2048×200 voxels)
     \item \textbf{Prétraitement} : Normalisation, débruitage, correction → Image nettoyée
     \item \textbf{Segmentation} : Faster Cellpose → Masques de segmentation (labels par cellule)
-    \item \textbf{Extraction features} : Calcul propriétés morphologiques → Table de features cellulaires
+    \item \textbf{Extraction features} : Calcul des propriétés morphologiques → Table de features cellulaires
     \item \textbf{Clustering spatial} : DBSCAN → Séparation des organoïdes individuels
-    \item \textbf{Construction graphes} : epsilon-K-NN → Graphes géométriques ($\sim$10 Mo)
-    \item \textbf{Classification GNN} : GNN → Prédiction de phénotype et explicabilité
-    \item \textbf{Output} : Labels prédits, scores de confiance, cellules importantes
+    \item \textbf{Construction graphes} : $\epsilon$-K-NN → Graphes géométriques ($\sim$10 Mo)
+    \item \textbf{Classification GNN} : GNN → Prédiction du phénotype
+    \item \textbf{Output} : Labels prédits
 \end{enumerate}
 
 Cette pipeline réduit la dimensionnalité de ~1000× (Go → Mo) tout en préservant l'information structurelle biologiquement pertinente.
 
 \subsection{Choix de conception et compromis}
 
-Chaque étape de notre pipeline résulte de choix méthodologiques minutieusement motivés par des contraintes scientifiques, techniques et pratiques. Ces choix impliquent inévitablement des compromis que nous explicitons et justifions ici.
+Chaque étape de notre pipeline résulte de choix méthodologiques motivés par des contraintes scientifiques, techniques et pratiques. Ces choix impliquent inévitablement des compromis que nous explicitons et justifions ici.
 
 \subsubsection{Segmentation instance-based vs semantic}
 
@@ -61,17 +61,17 @@ PointNet++~\cite{Qi2017b} adresse partiellement cette limitation via des agréga
 
 \textbf{Choix justifié :}
 
-Pour notre application, les GNNs offrent le meilleur compromis : compression mémoire (comme DeepSets), capture explicite de la structure spatiale locale (contrairement à DeepSets), efficacité computationnelle (graphe pré-construit), et équivariance géométrique formelle (EGNN). Les ablations du Chapitre 5 confirmeront empiriquement la supériorité des GNNs sur les baselines DeepSets.
+Pour notre application, les GNNs offrent le meilleur compromis : compression mémoire (comme DeepSets), capture explicite de la structure spatiale locale (contrairement à DeepSets), efficacité computationnelle (graphe pré-construit), et équivariance géométrique formelle (EGNN).
 
 \subsubsection{EGNN vs GNN standard}
 
-Notre choix d'architectures équivariantes au groupe euclidien E(3), notamment EGNN, plutôt que de GNN standards (GCN, GAT) mérite justification. Les organoïdes cultivés en suspension 3D n'ont aucune orientation absolue privilégiée : leur position et orientation dans le milieu de culture sont entièrement aléatoires, dictées par les conditions physiques locales lors de l'ensemencement. Cette absence d'orientation canonique rend l'équivariance géométrique non pas simplement utile, mais véritablement indispensable pour des performances robustes. Un modèle équivariant garantit par construction que la prédiction reste identique quelle que soit l'orientation de l'organoïde dans l'espace — une propriété qu'un GNN standard devrait apprendre laborieusement via des augmentations de données exhaustives. Cette équivariance structurelle améliore également l'efficacité de l'utilisation des données : le modèle n'a pas besoin d'observer toutes les rotations possibles pour généraliser, réduisant les besoins en données annotées. Les études d'ablation présentées au Chapitre 5 quantifieront précisément le gain de performance apporté par l'équivariance comparé aux baselines standards.
+Notre choix d'architectures équivariantes au groupe euclidien E(3), notamment EGNN, plutôt que de GNN standards (GCN, GAT) mérite justification. Les organoïdes cultivés en suspension 3D n'ont aucune orientation absolue privilégiée : leur position et orientation dans le milieu de culture sont entièrement aléatoires, dictées par les conditions physiques locales lors de l'ensemencement. Cette absence d'orientation canonique rend l'équivariance géométrique non pas simplement utile, mais véritablement indispensable pour des performances robustes. Un modèle équivariant garantit par construction que la prédiction reste identique quelle que soit l'orientation de l'organoïde dans l'espace — une propriété qu'un GNN standard devrait apprendre laborieusement via des augmentations de données exhaustives. Cette équivariance structurelle améliore également l'efficacité de l'utilisation des données : le modèle n'a pas besoin d'observer toutes les rotations possibles pour généraliser, réduisant les besoins en données annotées.
 
 \subsection{Considérations pratiques}
 
 \subsubsection{Temps d'exécution}
 
-L'efficacité computationnelle du pipeline constitue un critère essentiel pour son adoption pratique. Sur une configuration standard (CPU Intel Core i7, GPU NVIDIA RTX 3080), le traitement d'un organoïde typique se décompose temporellement comme suit. Le prétraitement de l'image (normalisation, débruitage, corrections) s'exécute en moins d'une seconde sur CPU, tirant parti d'implémentations vectorisées efficaces. La segmentation cellulaire via Faster Cellpose requiert environ 20 minutes sur GPU selon la taille de l'organoïde — un temps considérablement réduit comparé aux 2.5 heures du Cellpose original. L'extraction des features morphologiques et intensimétriques opère rapidement en 1 à 2 secondes (CPU), suivie de la construction du graphe qui s'exécute en moins d'une seconde grâce aux structures de données spatiales efficaces (k-d trees). Enfin, l'inférence GNN elle-même ne prend qu'une fraction de seconde (moins de 0.1 sec) lorsque les graphes sont traités en batch sur GPU.
+L'efficacité computationnelle du pipeline constitue un critère essentiel pour son adoption pratique. Sur une configuration standard (la nôtre : CPU Intel Core i7, GPU NVIDIA RTX 3080), le traitement d'un organoïde typique se décompose temporellement comme suit. Le prétraitement de l'image (normalisation, débruitage, corrections) s'exécute en moins d'une seconde sur CPU, tirant parti d'implémentations vectorisées efficaces. La segmentation cellulaire via Faster Cellpose requiert environ 20 minutes sur GPU selon la taille de l'organoïde — un temps considérablement réduit comparé aux 2.5 heures du Cellpose original. L'extraction des features morphologiques et intensimétriques opère rapidement en 1 à 2 secondes (CPU), suivie de la construction du graphe qui s'exécute en moins d'une seconde grâce aux structures de données spatiales efficaces (k-d trees). Enfin, l'inférence GNN elle-même ne prend qu'une fraction de seconde (moins de 0.1 sec) lorsque les graphes sont traités en batch sur GPU.
 
 Le temps total s'établit ainsi à approximativement 20 minutes par organoïde, dominé par la segmentation cellulaire. L'avantage majeur du pipeline automatisé réside dans sa capacité à traiter des dizaines d'organoïdes en parallèle de manière non supervisée sur infrastructure GPU multi-cartes ou cluster de calcul. Cette parallélisation massive, combinée à l'automatisation complète (aucune intervention humaine requise) et à la reproductibilité parfaite des prédictions (élimination de la variabilité inter/intra-observateur), rend envisageable le criblage à haut débit de milliers d'organoïdes et ouvre des perspectives pour des études statistiquement puissantes à l'échelle de larges cohortes.
 
@@ -306,19 +306,7 @@ La segmentation cellulaire constitue une étape critique, transformant l'image b
 
 \subsection{Revue et comparaison des méthodes}
 
-Nous avons évalué systématiquement plusieurs méthodes de segmentation sur un sous-ensemble annoté manuellement de 50 organoïdes (~3000 cellules). Pour une revue complète des méthodes de segmentation cellulaire et leurs applications au diagnostic, voir~\cite{Nunes2024,Rayed2024,Wang2022Segmentation}.
-
-\subsubsection{Watershed classique}
-
-\textbf{Algorithme :}
-\begin{enumerate}
-    \item Détection de markers (maxima locaux après filtrage)
-    \item Marker-controlled watershed sur gradient morphologique
-    \item Post-traitement (suppression petits objets, fusion)
-\end{enumerate}
-
-\textbf{Analyse :}
-Sur-segmentation fréquente (faux positifs), nécessite tuning manuel des seuils par dataset. Moins robuste que les approches deep learning. Non retenu pour notre pipeline final.
+Nous avons évalué systématiquement plusieurs méthodes de segmentation sur un sous-ensemble annoté manuellement de 50 organoïdes. Pour une revue complète des méthodes de segmentation cellulaire et leurs applications au diagnostic, voir~\cite{Nunes2024,Rayed2024,Wang2022Segmentation}.
 
 \subsubsection{StarDist}
 
@@ -370,10 +358,10 @@ Cellpose~\cite{Stringer2021}, bien qu'état de l'art en précision (F1=0.98), pr
     \item \textbf{Par coupe} : 30 secondes (GPU)
     \item \textbf{Par organoïde} : 30 sec × 300 coupes ≈ 2.5 heures
     \item \textbf{Pour 1000 organoïdes} : \textbf{2,500 heures (104 jours)}
-    \item \textbf{Pour dataset complet (2272 organoïdes)} : \textbf{5,680 heures (237 jours)}
+    \item \textbf{Pour le dataset complet (2272 organoïdes)} : \textbf{5,680 heures (237 jours)}
 \end{itemize}
 
-Même avec parallélisation sur 10 GPUs, cela représente plus de 3 semaines de calcul continu.
+Même avec une parallélisation sur 10 GPUs, cela représente plus de 3 semaines de calcul continu.
 
 \textbf{Nécessité d'optimisation :}
 Pour rendre le pipeline praticable sur nos milliers d'organoïdes, nous avons développé deux approches complémentaires de segmentation rapide.
@@ -472,13 +460,6 @@ Cellpose & 0.99 & 0.96 & 0.98 & 30 \\
 \textbf{Cas d'usage :}
 Cette méthode est adaptée pour le criblage primaire à très haut débit où le volume d'échantillons prime sur la précision absolue. Cependant, elle n'a pas été retenue pour notre pipeline final car la qualité de segmentation impacte directement la qualité des graphes et les performances des GNN en aval.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{../img/graph_comparison.png}
-    \caption{Comparaison des graphes générés selon la méthode de segmentation utilisée. À gauche : graphe obtenu par la méthode géométrique par ellipses (3 sec/coupe, F1=0.88) montrant une topologie légèrement simplifiée avec quelques cellules manquées ou fusionnées. À droite : graphe obtenu par Faster Cellpose (6 sec/coupe, F1=0.95) présentant une structure plus dense et précise, capturant mieux les relations de voisinage cellulaire réelles. La qualité de segmentation impacte directement la topologie du graphe et donc les performances des GNN en aval, justifiant notre choix de Faster Cellpose comme méthode principale malgré un coût computationnel doublé.}
-    \label{fig:graph_comparison}
-\end{figure}
-
 \subsubsection{Contribution 2 : Faster Cellpose via Knowledge Distillation}
 
 \textbf{Collaboration :}
@@ -535,6 +516,13 @@ L'impact de ces optimisations sur le temps de traitement est considérable. Pour
 
 \subsubsection{Choix final : Faster Cellpose}
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../img/graph_comparison.png}
+    \caption{Comparaison des graphes générés selon la méthode de segmentation utilisée. À gauche : graphe obtenu par la méthode géométrique par ellipses (3 sec/coupe, F1=0.88) montrant une topologie légèrement simplifiée avec quelques cellules manquées ou fusionnées. À droite : graphe obtenu par Faster Cellpose (6 sec/coupe, F1=0.95) présentant une structure plus dense et précise, capturant mieux les relations de voisinage cellulaire réelles. La qualité de segmentation impacte directement la topologie du graphe et donc les performances des GNN en aval, justifiant notre choix de Faster Cellpose comme méthode principale malgré un coût computationnel doublé.}
+    \label{fig:graph_comparison}
+\end{figure}
+
 \textbf{Méthode retenue pour notre pipeline} : Faster Cellpose (distillation + pruning + optimisations)
 
 \textbf{Justification :}
@@ -590,14 +578,14 @@ DBSCAN a été choisi en raison de ses atouts spécifiques pour notre problémat
 
 Les clusters identifiés sont filtrés selon :
 \begin{itemize}
-    \item \textbf{Taille minimale} : ≥ 20 cellules (exclure débris, fragments)
-    \item \textbf{Taille maximale} : ≤ 5000 cellules (exclure agrégats aberrants)
-    \item \textbf{Centrage} : Rejet si trop proche des bords image (organoïdes coupés)
+    \item \textbf{Taille minimale} : ≥ 20 cellules (pour exclure les débris, fragments)
+    \item \textbf{Taille maximale} : ≤ 5000 cellules (pour exclure les agrégats aberrants)
+    \item \textbf{Centrage} : Rejet si trop proche des bords image (pour exclure les organoïdes coupés)
 \end{itemize}
 
 \subsubsection{Statistiques de séparation}
 
-Sur un dataset de 50 images contenant 2-5 organoïdes par image :
+Sur un dataset de 50 images contenant 2-5 organoïdes par image, nous obtenons les résultats suivants :
 \begin{itemize}
     \item Recall : 97\% (organoïdes manqués : très petits ou collés au bord)
     \item Précision : 99\% (faux positifs : agrégats de débris passant les filtres)
@@ -647,9 +635,9 @@ Le vecteur de features d'un nœud est constitué de quatre descripteurs géomét
 comprenant les coordonnées 3D du centroïde $(x_i, y_i, z_i)$ et le volume cellulaire $V_i$.
 
 \textbf{Normalisation :}
-Chaque type de feature est z-score normalisé sur le dataset d'entraînement :
+Le volume cellulaire est z-score normalisé sur le dataset d'entraînement :
 \[
-f'_{ij} = \frac{f_{ij} - \mu_j}{\sigma_j}
+V'_i = \frac{V_i - \mu_V}{\sigma_V}
 \]
 
 pour assurer une contribution équilibrée et faciliter l'apprentissage.
@@ -797,7 +785,7 @@ Contrairement au diagramme de Voronoï euclidien 3D qui partitionne le volume $\
 
 \subsubsection{Implémentation : scipy.spatial.SphericalVoronoi}
 
-Nous utilisons l'implémentation de \texttt{scipy.spatial.SphericalVoronoi}~\cite{scipy} qui calcule efficacement cette tessellation. L'algorithme :
+Nous utilisons l'implémentation de la classe SphericalVoronoi de la bibliothèque scipy qui calcule efficacement cette tessellation. L'algorithme :
 \begin{enumerate}
     \item Prend en entrée les positions des points sur $\mathbb{S}^2$ (coordonnées cartésiennes 3D normalisées)
     \item Calcule le dual de l'enveloppe convexe 3D (triangulation de Delaunay) projeté sur la sphère
@@ -868,18 +856,6 @@ Ce coefficient quantifie la tendance des cellules voisines à former des groupes
 
 \textbf{Propriété clé :} Le coefficient de clustering $\bar{C}$ est calculé \textit{a posteriori} sur le graphe généré, après application du processus ponctuel et construction de la tessellation. Il capture implicitement les corrélations spatiales induites par les paramètres du processus, offrant ainsi une métrique univoque et continue du degré d'organisation spatiale, idéale pour une tâche de régression supervisée.
 
-\subsection{Validation statistique des synthétiques}
-
-\subsubsection{Fonctions de Ripley}
-
-La validation rigoureuse des organoïdes synthétiques repose sur l'analyse des fonctions de statistique spatiale de Ripley (K, F, G) calculées pour chaque processus simulé. Ces fonctions caractérisent quantitativement les patterns spatiaux (agrégation, régularité) et permettent trois niveaux de comparaison complémentaires. D'abord, nous confrontons les fonctions K observées aux valeurs théoriques attendues pour chaque type de processus ponctuel, dérivées analytiquement lorsque disponibles. Ensuite, nous construisons des enveloppes de confiance par simulation Monte Carlo (100 réalisations du processus) pour capturer la variabilité stochastique intrinsèque. Enfin, nous comparons aux fonctions observées sur nos données réelles d'organoïdes pour évaluer si les synthétiques capturent fidèlement les distributions spatiales biologiques.
-
-Les critères de validation que nous appliquons sont exigeants. La fonction K simulée doit rester dans les enveloppes théoriques à 99\% sur toute la plage de distances testées — un critère strict garantissant la cohérence statistique. Les patterns qualitatifs (agrégation vs régularité) doivent être visuellement corrects lors de l'inspection de réalisations échantillonnées. Enfin, les distributions de distances inter-cellulaires (histogrammes, fonctions de densité) doivent être comparables aux distributions réelles, validées par des métriques quantitatives (divergence de Kullback-Leibler, distance de Wasserstein).
-
-\subsubsection{Comparaison avec données réelles}
-
-Au-delà des statistiques spatiales pures, nous validons que les graphes synthétiques possèdent des propriétés topologiques similaires aux graphes réels. Les distributions des métriques topologiques — degré moyen par nœud, coefficient de clustering, diamètre du graphe, longueur de chemin moyenne — sont extraites des graphes synthétiques et réels, puis comparées rigoureusement. Des tests de Kolmogorov-Smirnov (KS) évaluent si les distributions proviennent de la même loi sous-jacente, avec un seuil d'acceptation de $p > 0.05$ indiquant une similarité statistiquement non-distinguable. Ces tests quantitatifs sont complétés par des visualisations exploratoires : histogrammes superposés et Q-Q plots révèlent visuellement les concordances ou divergences entre distributions synthétiques et réelles, guidant les ajustements paramétriques des processus ponctuels si nécessaire.
-
 \subsection{Stratégies d'augmentation}
 
 Au-delà de la génération de base via processus ponctuels, nous appliquons des transformations stochastiques additionnelles pour diversifier le dataset synthétique et améliorer sa représentativité de la variabilité biologique réelle.
@@ -923,7 +899,7 @@ Cruciale, cette transformation préserve l'aire associée initiale à chaque cel
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{../img/Modelisation.png}
-    \caption{Pipeline complet de génération des organoïdes synthétiques. En haut : distributions initiales sur la sphère générées par processus de Poisson homogène (gauche) et Matérn cluster (droite). En bas : organoïdes synthétiques étendus correspondants après transformation spatiale proportionnelle à la densité locale. Cette transformation préserve les aires cellulaires de Voronoï tout en créant des protubérances dans les zones de forte densité (clusters), reproduisant ainsi la morphologie irrégulière "chou-fleur" observée dans les organoïdes réels. Le processus de Poisson conserve une forme quasi-sphérique régulière (phénotype cystique), tandis que le processus de Matérn produit une structure fortement irrégulière avec excroissances multiples (phénotype choux-fleur).}
+    \caption{Distributions de points sur la sphère (à droite) et les organoïdes synthétiques étendus (à gauche) après transformation spatiale proportionnelle à la densité locale.}
     \label{fig:modelisation}
 \end{figure}
 
@@ -937,10 +913,10 @@ Toutes nos architectures partagent une structure modulaire :
 
 \textbf{Schéma général :}
 \begin{enumerate}
-    \item \textbf{Input embedding} : $\mathbf{h}_i^{(0)} = \text{MLP}_{\text{in}}(\mathbf{f}_i)$, projette features initiales dans espace latent
+    \item \textbf{Input embedding} : $\mathbf{h}_i^{(0)} = \text{MLP}_{\text{in}}(\mathbf{f}_i)$, projette les features initiales dans l'espace latent
     \item \textbf{Couches de message passing} : $K$ couches transformant $\mathbf{h}_i^{(k-1)} \rightarrow \mathbf{h}_i^{(k)}$
-    \item \textbf{Pooling global} : $\mathbf{h}_G = \text{POOL}(\{\mathbf{h}_i^{(K)}\})$, agrège au niveau graphe
-    \item \textbf{Classification head} : $\mathbf{y} = \text{MLP}_{\text{out}}(\mathbf{h}_G)$, prédit distribution sur classes
+    \item \textbf{Pooling global} : $\mathbf{h}_G = \text{POOL}(\{\mathbf{h}_i^{(K)}\})$, agrège au niveau du graphe
+    \item \textbf{Classification head} : $\mathbf{y} = \text{MLP}_{\text{out}}(\mathbf{h}_G)$, prédit la distribution sur les classes
 \end{enumerate}
 
 \subsection{GCN baseline}
@@ -988,7 +964,7 @@ Référence simple et établie pour évaluer l'apport des architectures plus sop
 \subsection{EGNN principal}
 
 \textbf{Motivation :}
-Architecture principale, exploite pleinement la géométrie 3D et garantit équivariance E(3).
+Architecture principale, exploite pleinement la géométrie 3D et garantit l'équivariance E(3).
 
 \subsubsection{Couche EGNN}
 
@@ -1021,7 +997,7 @@ où $\phi_h$ est un MLP.
 \subsubsection{Hyper paramètres}
 
 \begin{itemize}
-    \item Nombre de couches : 5 (plus profond que baselines car moins over-smoothing)
+    \item Nombre de couches : 5 (plus profond que les baselines car moins d'over-smoothing)
     \item Dimension cachée : 256
     \item Message dimension : 128
     \item Activation : SiLU (Swish)
@@ -1037,7 +1013,7 @@ où $\phi_h$ est un MLP.
 Nous proposons des modifications à l'EGNN standard :
 
 \textbf{Attention géométrique :}
-Pondération des messages par fonction de distance :
+Pondération des messages par une fonction de distance :
 \[
 \mathbf{m}_{ij}' = \mathbf{m}_{ij} \cdot \exp(-d_{ij}^2 / 2\sigma^2)
 \]
@@ -1050,11 +1026,11 @@ Agrégation à différents niveaux de voisinage (1-hop, 2-hop) :
 \mathbf{m}_i = \mathbf{m}_i^{(1)} \| \mathbf{m}_i^{(2)}
 \]
 
-Capture patterns locaux et plus globaux simultanément.
+Capture les patterns locaux et plus globaux simultanément.
 
 \subsection{Variante : GNN hiérarchique}
 
-Pour les très grands organoïdes, nous implémentons un pooling hiérarchique.
+Pour les très grands organoïdes, nous implémentons un pooling hiérarchique :
 
 \textbf{Architecture :}
 \begin{enumerate}
@@ -1064,7 +1040,7 @@ Pour les très grands organoïdes, nous implémentons un pooling hiérarchique.
     \item Pooling global : Agrégation finale
 \end{enumerate}
 
-\textbf{Avantage :} Réduction de complexité pour organoïdes > 1000 cellules.
+\textbf{Avantage :} Réduction de la complexité pour les organoïdes de plus de 1000 cellules.
 
 \section{Entraînement et optimisation}
 
@@ -1081,7 +1057,7 @@ où $B$ est la taille du batch, $C$ le nombre de classes, $y_{bc}$ le label one-
 
 \subsubsection{Pondération pour déséquilibre de classes}
 
-En cas de déséquilibre (rare dans notre cas, classes plutôt équilibrées), nous utilisons une pondération :
+En cas de déséquilibre, nous utilisons une pondération :
 \[
 \mathcal{L}_{\text{weighted}} = -\frac{1}{B}\sum_{b=1}^B \sum_{c=1}^C w_c \cdot y_{bc} \log(\hat{y}_{bc})
 \]
@@ -1136,7 +1112,7 @@ Nous arrêtons l'entraînement si la métrique de validation ne s'améliore pas 
     \item Dataset : 70~000 organoïdes synthétiques (train)
     \item Batch size : 32 graphes
     \item Époques : 200
-    \item Durée : ~48 heures (GPU V100)
+    \item Durée : ~48 heures (GPU NVIDIA RTX 3080)
 \end{itemize}
 
 \subsubsection{Fine-tuning sur réels}
@@ -1144,7 +1120,7 @@ Nous arrêtons l'entraînement si la métrique de validation ne s'améliore pas 
 \textbf{Phase 2 : Adaptation au réel}
 \begin{itemize}
     \item Initialisation : Poids pré-entraînés (sauf classification head, réinitialisée)
-    \item Dataset : N organoïdes réels annotés (typiquement N = 2000)
+    \item Dataset : N organoïdes réels annotés (typiquement N = 500)
     \item Learning rate réduit : $10^{-4}$ (fine-tuning)
     \item Époques : 100
     \item Régularisation accrue : dropout 0.2, weight decay $10^{-4}$
@@ -1153,7 +1129,7 @@ Nous arrêtons l'entraînement si la métrique de validation ne s'améliore pas 
 \subsubsection{Entraînement from scratch sur réels}
 
 \textbf{Baseline sans pré-entraînement :}
-Pour comparaison, nous entraînons également des modèles directement sur les 2000 organoïdes réels annotés depuis une initialisation aléatoire.
+Pour comparaison, nous entraînons également des modèles directement sur les 500 organoïdes réels annotés depuis une initialisation aléatoire.
 
 \subsection{Validation croisée}
 
@@ -1214,61 +1190,6 @@ Accuracy moyenne sur le validation set du inner cross-validation loop.
 \textbf{Sensibilité :}
 La dimension cachée et le nombre de couches sont les plus impactants. Le learning rate et le dropout ont un effet modéré dans les plages explorées.
 
-\section{Implémentation}
-
-\subsection{Stack technologique}
-
-\textbf{Langages et frameworks :}
-\begin{itemize}
-    \item Python 3.9
-    \item PyTorch~\cite{Paszke2019} 2.0 pour deep learning
-    \item PyTorch Geometric~\cite{Fey2019} (PyG) 2.3 pour GNNs
-    \item NumPy, SciPy pour calculs scientifiques
-    \item scikit-image~\cite{VanDerWalt2014} pour traitement d'image
-    \item scikit-learn pour ML classique et métriques
-\end{itemize}
-
-\textbf{Segmentation :}
-\begin{itemize}
-    \item Cellpose 2.2
-    \item Interface programmatique (Python API)
-\end{itemize}
-
-\textbf{Visualisation :}
-\begin{itemize}
-    \item Matplotlib, Seaborn pour figures 2D
-    \item Plotly pour visualisations 3D interactives
-    \item napari pour inspection interactive de segmentations
-    \item TensorBoard pour monitoring d'entraînement
-\end{itemize}
-
-\subsection{Structures de données}
-
-\subsubsection{Format des graphes}
-
-Nous utilisons la structure suivante pour chaque graphe (format \texttt{torch\allowbreak\_\allowbreak geometric.\allowbreak data.\allowbreak Data}) :
-
-\begin{center}
-\begin{tabular}{ll}
-\textbf{Champ} & \textbf{Description} \\
-\hline
-\texttt{x}         & Features des nœuds (Tensor $[N, D_f]$) \\
-\texttt{edge\string_index} & Indices des arêtes, COO (Tensor $[2,\,|E|]$) \\
-\texttt{edge\string_attr}  & Features des arêtes (Tensor $[|E|, D_e]$) \\
-\texttt{pos}       & Coordonnées 3D des nœuds (Tensor $[N,\,3]$) \\
-\texttt{y}         & Label du graphe (Tensor scalaire ou vecteur) \\
-\end{tabular}
-\end{center}
-
-\vspace{1em}
-
-\textbf{Batching :}
-PyG gère automatiquement le batching de graphes de tailles différentes via graphe disjoint (union de graphes dans un grand graphe sparse).
-
-\subsubsection{Sauvegarde et chargement}
-
-Les graphes pré-calculés sont sauvegardés en format PyTorch (`.pt`) ou pickle compressé pour accélérer l'entraînement (éviter recalcul de segmentation et graphe construction à chaque run).
-
 \section{Récapitulatif méthodologique}
 
 Ce chapitre a décrit en détail chaque composante de notre pipeline innovant pour l'analyse automatisée d'organoïdes 3D via Graph Neural Networks.
@@ -1281,6 +1202,6 @@ Ce chapitre a décrit en détail chaque composante de notre pipeline innovant po
 
 \textbf{Construction de graphes} : Extraction de 4 features par cellule (coordonnées 3D, volume), puis construction via stratégie K-NN hybride (k=10) équilibrant connectivité, signification biologique et efficacité computationnelle.
 
-\textbf{Architectures et entraînement} : Nous comparons plusieurs architectures GNN : GAT (Graph Attention Network), DeepSets, EGNN équivariant, et GCN comme baseline. Les résultats montrent que GAT obtient les meilleures performances brutes, suivi de DeepSets, tandis qu'EGNN présente un trade-off intéressant avec des performances légèrement inférieures mais une garantie d'équivariance E(3) cruciale pour la robustesse géométrique. Stratégie d'entraînement en deux phases : pré-entraînement sur synthétiques (régression clustering) puis fine-tuning sur réels (classification/régression), avec validation croisée 5-fold et recherche d'hyperparamètres systématique.
+\textbf{Architectures et entraînement} : Nous comparons plusieurs architectures GNN : GAT (Graph Attention Network), DeepSets, EGNN équivariant, et GCN comme baseline. Stratégie d'entraînement en deux phases : pré-entraînement sur synthétiques (régression clustering) puis fine-tuning sur réels (classification/régression), avec validation croisée 5-fold et recherche d'hyperparamètres systématique.
 
 Le Chapitre 5 présentera les résultats expérimentaux obtenus avec cette méthodologie, validant empiriquement les choix effectués et quantifiant les performances sur les tâches de classification et de régression.
