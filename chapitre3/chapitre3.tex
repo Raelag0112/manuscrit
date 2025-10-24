@@ -214,12 +214,15 @@ Les architectures de deep learning standard ne sont pas adaptées aux graphes. L
 \subsubsection{Propriétés désirées}
 
 Une architecture pour les graphes devrait satisfaire :
-\begin{enumerate}
-    \item \textbf{Invariance par permutation des nœuds} : $f(P \cdot G) = f(G)$ pour toute permutation $P$ des nœuds
-    \item \textbf{Localité} : Exploiter l'information du voisinage local
-    \item \textbf{Partage des poids} : Même transformation appliquée à chaque nœud/arête
-    \item \textbf{Taille variable} : Traiter des graphes de tailles différentes sans modification
-\end{enumerate}
+
+\textbf{Invariance par permutation des nœuds} : $f(P \cdot G) = f(G)$ pour toute permutation $P$ des nœuds
+
+\textbf{Localité} : Exploiter l'information du voisinage local
+
+\textbf{Partage des poids} : Même transformation appliquée à chaque nœud/arête
+
+\textbf{Taille variable} : Traiter des graphes de tailles différentes sans modification
+
 Les GNNs satisfont ces propriétés par construction.
 
 \subsection{Paradigme du Message Passing Neural Network}
@@ -732,7 +735,7 @@ Les nœuds de haut degré dominent, généralement instable.
 
 \textbf{Permutation-équivariance} : Garantie par la formulation matricielle : $f(P \cdot G) = P \cdot f(G)$ pour toute permutation $P$.
 
-\textbf{Scalabilité} : Peut s'appliquer à des graphes de millions de nœuds avec techniques de mini-batching.
+\textbf{Scalabilité} : Peut s'appliquer à des graphes de millions de nœuds avec des techniques de mini-batching.
 
 \subsubsection{Implémentation pratique}
 
@@ -754,7 +757,7 @@ Une architecture GCN typique pour classification de graphes :
 
 \textbf{Expressivité limitée} : Au mieux équivalent au 1-WL test (Weisfeiler-Lehman), ne peut distinguer certains graphes non-isomorphes.
 
-\textbf{Sensibilité à la structure} : Performance dépend fortement de la topologie du graphe et du choix de construction pour graphes géométriques.
+\textbf{Sensibilité à la structure} : La performance dépend fortement de la topologie du graphe et du choix de construction pour les graphes géométriques.
 
 \subsubsection{Variantes et améliorations}
 
@@ -830,7 +833,7 @@ La moyenne évite l'explosion de dimensionnalité en couche finale.
 
 \subsubsection{Propriétés et avantages}
 
-\textbf{Pondération adaptative} : Voisins importants reçoivent plus d'attention. Par exemple, dans un organoïde, les cellules structurellement similaires peuvent recevoir plus de poids.
+\textbf{Pondération adaptative} : Les voisins importants reçoivent plus d'attention. Par exemple, dans un organoïde, les cellules structurellement similaires peuvent recevoir plus de poids.
 
 \textbf{Parallélisation} : Le calcul des coefficients d'attention est parallélisable sur les arêtes.
 
@@ -864,7 +867,7 @@ L'activation non-linéaire est appliquée après la transformation, permettant u
 
 \textbf{Over-smoothing} : Toujours présent avec de nombreuses couches.
 
-\textbf{Attention locale uniquement} : Pas d'attention globale sur tout le graphe (par design, pour scalabilité).
+\textbf{Attention locale uniquement} : Pas d'attention globale sur tout le graphe (par design, pour la scalabilité).
 
 \subsection{GraphSAGE : sampling et agrégation}
 
@@ -967,13 +970,13 @@ Les fonctions d'agrégation sont apprises. Pour un nouveau nœud, on applique si
 
 \textbf{Avec sampling (GraphSAGE) :} $\mathcal{O}(S \cdot |V_{\text{batch}}| \cdot D^2)$ où $V_{\text{batch}}$ est le mini-batch
 
-Pour grands graphes avec $|E| \gg S \cdot |V|$, gain substantiel.
+Pour les grands graphes avec $|E| \gg S \cdot |V|$, il y a un gain substantiel.
 
 \subsubsection{Limitations}
 
-\textbf{Variance due au sampling} : Différents échantillons donnent différents résultats, nécessite moyenne sur plusieurs forward passes pour stabilité
+\textbf{Variance due au sampling} : Des échantillons différents donnent des résultats différents, nécessite la moyenne sur plusieurs forward passes pour la stabilité
 
-\textbf{Choix de $S$} : Hyperparamètre critique affectant trade-off précision/vitesse
+\textbf{Choix de $S$} : Hyperparamètre critique affectant le trade-off précision/vitesse
 
 \textbf{Explosion de voisinage} : Avec $K$ couches, $S^K$ nœuds échantillonnés, peut exploser pour $K$ grand
 
@@ -1051,10 +1054,9 @@ GIN avec MLPs universels est aussi expressif que le 1-WL test. Plus précisémen
 \mathbf{h}_i^{(k+1)} = \text{MLP}\left(\mathbf{h}_i^{(k)} + \sum_{j \in \mathcal{N}(i)} \mathbf{h}_j^{(k)}\right)
 \]
 
-\textbf{GIN-$\epsilon$ :} $\epsilon$ appris
-Permet d'apprendre le poids relatif du nœud central vs voisinage.
+\textbf{GIN-$\epsilon$ :} $\epsilon$ appris, permettant d'apprendre le poids relatif du nœud central vis-à-vis des voisins.
 
-\subsubsection{Comparaison avec autres GNNs}
+\subsubsection{Comparaison avec les autres GNNs}
 
 \begin{table}[h]
 \centering
@@ -1070,21 +1072,21 @@ GIN & Sum + MLP & $=$ 1-WL \\
 \end{tabular}
 \end{table}
 
-GAT, bien qu'utilisant l'attention, utilise une somme pondérée qui n'est pas injective sur multisets (différents ensembles de poids peuvent donner même résultat).
+GAT, bien qu'utilisant l'attention, utilise une somme pondérée qui n'est pas injective sur les multisets (différents ensembles de poids peuvent donner le même résultat).
 
 \subsubsection{Applications et performances}
 
-GIN obtient typiquement des performances state-of-the-art sur benchmarks de classification de graphes (MUTAG, PROTEINS, IMDB, etc.) grâce à son expressivité maximale. Pour les organoïdes, GIN est une baseline théorique forte.
+GIN obtient typiquement des performances state-of-the-art sur benchmarks de classification de graphes (MUTAG, PROTEINS, IMDB, etc.) grâce à son expressivité maximale. Pour les organoïdes, GIN peut être une baseline théorique forte.
 
 \subsubsection{Limitations}
 
-\textbf{Over-smoothing} : Toujours présent, même avec expressivité maximale
+\textbf{Over-smoothing} : Toujours présent, même avec l'expressivité maximale
 
-\textbf{Limitation 1-WL} : Ne peut distinguer certains graphes non-isomorphes (ex: graphes réguliers fortement réguliers)
+\textbf{Limitation 1-WL} : Ne peut distinguer certains graphes non-isomorphes (ex: graphes fortement réguliers)
 
-\textbf{Pas d'information géométrique} : Ne tire pas parti des coordonnées 3D (pour nos organoïdes)
+\textbf{Pas d'information géométrique} : Ne tire pas parti des coordonnées 3D (pour les organoïdes)
 
-\textbf{Complexité du MLP} : Plus de paramètres que GCN simple, risque de sur-apprentissage sur petits datasets
+\textbf{Complexité du MLP} : Plus de paramètres que GCN simple, risque de sur-apprentissage sur les petits datasets
 
 \subsection{Autres architectures notables}
 
@@ -1118,7 +1120,7 @@ où $\bigoplus$ dénote la concaténation, et :
     \item Atténuation : $s(\mathbf{x}) = \mathbf{x} / (|\mathcal{N}(i)| + 1)$
 \end{itemize}
 
-Les scalers compensent les différences de degré entre nœuds, évitant le biais vers nœuds de haut degré.
+Les scalers compensent les différences de degré entre les nœuds, évitant le biais vers les nœuds de haut degré.
 
 \textbf{Avantages :}
 \begin{itemize}
@@ -1174,23 +1176,23 @@ Utilise les vecteurs propres du Laplacien comme encodage positionnel.
 Intègre explicitement les plus courts chemins et la structure locale.
 
 \textbf{Graphormer~\cite{Ying2021} :}
-Utilise encodages de centralité, distances spatiales, et biais d'arêtes.
+Utilise des encodages de centralité, distances spatiales, et biais d'arêtes.
 
 \textbf{Avantages :}
 \begin{itemize}
-    \item Attention globale : capture dépendances longue distance sans empiler couches
+    \item Attention globale : capture les dépendances à longue distance sans empiler des couches
     \item Expressivité : peut dépasser 1-WL avec bons encodages structurels
     \item Pas d'over-squashing : information flow global
 \end{itemize}
 
 \textbf{Limitations :}
 \begin{itemize}
-    \item Complexité $\mathcal{O}(N^2)$ : prohibitif pour très grands graphes
-    \item Nécessite encodages structurels soigneusement conçus
-    \item Plus de paramètres que MPNNs standards
+    \item Complexité $\mathcal{O}(N^2)$ : prohibitif pour les grands graphes
+    \item Nécessite des encodages structurels soigneusement conçus
+    \item Plus de paramètres que les MPNNs standards
 \end{itemize}
 
-Des analyses récentes~\cite{Cai2023} établissent des connections théoriques entre MPNNs classiques et Graph Transformers, montrant que sous certaines conditions, ils sont équivalents.
+Des analyses récentes~\cite{Cai2023} établissent des connexions théoriques entre les MPNNs classiques et les Graph Transformers, montrant que sous certaines conditions, ils sont équivalents.
 
 \subsubsection{Jumping Knowledge Networks}
 
@@ -1345,7 +1347,7 @@ Cette propriété est garantie par construction, sans besoin d'augmentation.
 
 \textbf{Avantages :}
 \begin{itemize}
-    \item Simplicité d'implémentation (environ 100 lignes de code)
+    \item Simplicité d'implémentation
     \item Garanties théoriques d'équivariance par construction
     \item Efficacité computationnelle comparable aux GNN standards
     \item Pas besoin d'augmentation de données pour la géométrie
@@ -1359,7 +1361,7 @@ Développé pour la prédiction de propriétés moléculaires en chimie quantiqu
 Au lieu d'utiliser une connectivité discrète (arêtes binaires), SchNet opère sur un graphe dense avec des filtres radiaux continus.
 
 \textbf{Radial Basis Function (RBF) expansion :}
-Les distances euclidiennes $r_{ij} = \|\mathbf{x}_i - \mathbf{x}_j\|$ sont expand uses dans une base de fonctions gaussiennes :
+Les distances euclidiennes $r_{ij} = \|\mathbf{x}_i - \mathbf{x}_j\|$ sont représentées par leur projection sur une base de fonctions de type gaussienne :
 \[
 \mathbf{e}_{ij} = [e^{-(r_{ij} - \mu_1)^2/\sigma^2}, \ldots, e^{-(r_{ij} - \mu_K)^2/\sigma^2}]
 \]
@@ -1375,7 +1377,7 @@ où :
 \begin{itemize}
     \item $\mathbf{W}^{(k)} \in \mathbb{R}^{D \times K}$ transforme l'encodage RBF en poids de filtre
     \item $\odot$ est le produit element-wise (modulation)
-    \item La somme agrège sur le voisinage (typiquement cutoff radius de 5-10 Å)
+    \item La somme agrège sur le voisinage (typiquement le rayon de coupure est de 5-10 Å)
 \end{itemize}
 
 \textbf{Interaction block SchNet :}
@@ -1559,11 +1561,11 @@ où $\otimes$ est le produit tensoriel de Clebsch-Gordan, $Y^{(l'')}$ sont les h
 
 \textbf{Pertinence pour les organoïdes :}
 
-Pour notre application (classification d'organoïdes), ces architectures tensorielles sont probablement sur-dimensionnées :
+Pour notre application (classification d'organoïdes), ces architectures tensorielles sont très probablement sur-dimensionnées :
 \begin{itemize}
     \item La géométrie des organoïdes est moins contrainte que celle des molécules
-    \item Output scalaire (classe) ne nécessite pas équivariance complète
-    \item Coût computationnel prohibitif pour de grands graphes de 1000+ nœuds
+    \item L'output scalaire (classe) ne nécessite pas l'équivariance complète
+    \item Coût computationnel prohibitif pour les grands graphes de 1000+ nœuds
     \item Difficulté d'interpréter les représentations tensorielles abstraites
 \end{itemize}
 
@@ -1654,10 +1656,10 @@ Les deux surveys identifient des compromis clés :
 Ces surveys suggèrent plusieurs directions pour notre application aux organoïdes :
 
 \textbf{1. Choix d'architecture :}
-Pour classification (output scalaire), des modèles invariants simples (type EGNN avec features scalaires) suffisent. L'équivariance complète avec features vectorielles est de la sur-ingénierie.
+Pour la classification et la régression (output scalaire), des modèles invariants simples (type EGNN avec des features scalaires) suffisent. L'équivariance complète avec des features vectorielles est de la sur-ingénierie.
 
 \textbf{2. Information géométrique :}
-Les organoïdes ont une géométrie moins contrainte que les molécules (pas d'angles de liaison fixes). Les distances et vecteurs directionnels suffisent, pas besoin d'angles explicites.
+Les organoïdes ont une géométrie moins contrainte que les molécules (pas d'angles de liaison fixes). Les distances et les vecteurs directionnels suffisent, pas besoin d'angles explicites.
 
 \textbf{3. Scalabilité :}
 Avec 50-5000 cellules, la complexité $\mathcal{O}(|E|)$ est critique. Il est préférable de favoriser des approches simples (EGNN, SchNet-like) plutôt que des tenseurs d'ordre élevé.
@@ -1686,7 +1688,7 @@ NequIP & Équivariant, tenseurs & 0.22 eV & 0.008 eV/Å \\
 \caption{Performances sur QM9 (adapté de Duval et al., 2024)}
 \end{table}
 
-Pour les organoïdes (classification, pas régression), les différences entre ces architectures sont moins critiques que pour prédiction d'énergies moléculaires précises.
+Pour les organoïdes, les différences entre ces architectures sont moins critiques que pour la prédiction d'énergies moléculaires précises.
 
 \subsection{Applications des GNNs géométriques}
 
@@ -1696,7 +1698,7 @@ Prédiction de propriétés moléculaires (énergie, forces, dipôles) à partir
 
 \subsubsection{Biologie structurale}
 
-\textbf{Prédiction de structure de protéines} : GNNs pour prédire angles dièdres, contacts, structure 3D (bien qu'AlphaFold2 utilise des Transformers)
+\textbf{Prédiction de structure de protéines} : GNNs pour prédire les angles dièdres, les contacts, la structure 3D (AlphaFold2)
 
 \textbf{Prédiction d'affinité ligand-protéine} : Graphes 3D pour le design de molécules
 
@@ -1708,7 +1710,7 @@ Prédiction de propriétés de cristaux, simulation de fluides, prédiction de f
 
 \subsubsection{Vision par ordinateur 3D}
 
-Segmentation et classification de nuages de points (LiDAR, scans 3D). Les architectures comme PointNet++, bien que non formellement équivariantes, capturent des structures géométriques.
+Segmentation et classification de nuages de points (LiDAR, scans 3D). Les architectures comme PointNet++, bien que non formellement équivariantes, permettent de capturer des structures géométriques.
 
 \subsection{Adaptation aux données biologiques cellulaires}
 
@@ -1755,8 +1757,6 @@ Enfin, la \textit{généralisation inter-cohortes} représente un défi récurre
 \textbf{Leçons pour notre travail sur organoïdes :}
 
 Cette analyse détaillée de l'état de l'art histopathologique apporte plusieurs enseignements directement exploitables pour notre recherche. D'abord, elle valide fondamentalement notre approche : les Cell Graphs, représentation exacte que nous utilisons, sont l'approche dominante et la plus efficace en pathologie computationnelle pour capturer l'organisation spatiale cellulaire. Ensuite, concernant les architectures, les GNN standards (GCN, GAT, GIN) ont démontré leur suffisance pour les tâches de classification tissulaire. Notre comparaison systématique d'architectures (GAT, DeepSets, EGNN) révèle des trade-offs intéressants : GAT offre les meilleures performances brutes grâce à son mécanisme d'attention, tandis qu'EGNN apporte une équivariance géométrique formelle justifiée par la nature 3D et l'orientation arbitraire des organoïdes en suspension — un avantage absent en histopathologie 2D.
-
-Le choix de nos features (morphologie cellulaire + intensités multicanal) s'aligne avec les standards établis en histopathologie, confortant notre pipeline d'extraction. Notre dataset comprend ~500 organoïdes bien différenciés sélectionnés parmi les 2272 extraits, garantissant la qualité des annotations tout en restant modeste comparé aux 10000-100000 slides typiques des études histopathologiques à large échelle ; cela souligne l'importance critique de la data augmentation et du transfert d'apprentissage depuis des données synthétiques.
 
 \subsubsection{Autres applications biologiques des GNNs}
 
