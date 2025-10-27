@@ -316,22 +316,22 @@ La tâche consiste à prédire le coefficient de clustering global du graphe $\b
 \textbf{Test set (15~000 organoïdes) :}
 
 \begin{center}
-\begin{tabular}{|l|c|c|c|}
+\begin{tabular}{|l|c|c|}
 \hline
-\textbf{Modèle} & \textbf{MSE} & \textbf{$R^2$} & \textbf{Params} \\
+\textbf{Modèle} & \textbf{MSE} & \textbf{Params} \\
 \hline
-GCN & 0.0198 ± 0.0021 & 0.872 ± 0.018 & 250K \\
-DeepSets & 0.0145 ± 0.0019 & 0.908 ± 0.015 & 280K \\
-EGNN & 0.0137 ± 0.0017 & 0.915 ± 0.013 & 800K \\
-GAT & \textbf{0.0118 ± 0.0014} & \textbf{0.928 ± 0.011} & 320K \\
+GCN & 0.0198 ± 0.0021 & 250K \\
+DeepSets & 0.0145 ± 0.0019 & 280K \\
+EGNN & 0.0137 ± 0.0017 & 800K \\
+GAT & \textbf{0.0118 ± 0.0014} & 320K \\
 \hline
 \end{tabular}
 \end{center}
 
 \textbf{Observations :}
 \begin{itemize}
-    \item GAT obtient les meilleures performances (MSE = 0.0118, $R^2 = 0.928$), démontrant l'efficacité du mécanisme d'attention
-    \item DeepSets atteint de bons résultats (MSE = 0.0145, $R^2 = 0.908$) malgré une architecture plus simple
+    \item GAT obtient les meilleures performances (MSE = 0.0118), démontrant l'efficacité du mécanisme d'attention
+    \item DeepSets atteint de bons résultats (MSE = 0.0145) malgré une architecture plus simple
     \item EGNN présente un trade-off intéressant : performances légèrement inférieures à GAT (MSE = 0.0137 vs 0.0118) mais garantit l'équivariance E(3), cruciale pour la robustesse aux rotations
     \item GCN baseline reste significativement moins performant, validant le besoin d'architectures plus sophistiquées
     \item Écarts-types faibles indiquent robustesse sur splits différents
@@ -364,15 +364,15 @@ Un scatter plot des coefficients prédits vs réels montre :
 Pour analyser les performances selon le degré de clustering, nous divisons le test set en 3 plages :
 
 \begin{center}
-\begin{tabular}{|l|c|c|c|}
+\begin{tabular}{|l|c|c|}
 \hline
-\textbf{Plage clustering} & \textbf{MSE} & \textbf{MAE} & \textbf{$R^2$} \\
+\textbf{Plage clustering} & \textbf{MSE} & \textbf{MAE} \\
 \hline
-Faible ($[0, 0.33]$) & 0.0082 & 0.063 & 0.951 \\
-Modéré ($[0.33, 0.67]$) & 0.0071 & 0.059 & 0.962 \\
-Fort ($[0.67, 1.0]$) & 0.0118 & 0.079 & 0.921 \\
+Faible ($[0, 0.33]$) & 0.0082 & 0.063 \\
+Modéré ($[0.33, 0.67]$) & 0.0071 & 0.059 \\
+Fort ($[0.67, 1.0]$) & 0.0118 & 0.079 \\
 \hline
-\textbf{Moyenne} & \textbf{0.0089} & \textbf{0.067} & \textbf{0.945} \\
+\textbf{Moyenne} & \textbf{0.0089} & \textbf{0.067} \\
 \hline
 \end{tabular}
 \end{center}
@@ -400,7 +400,7 @@ Les coefficients $\alpha_{ij}$ appris montrent que :
 
 \subsubsection{DeepSets : simplicité et efficacité}
 
-DeepSets obtient des performances intermédiaires (MSE = 0.0145, $R^2 = 0.908$) avec une architecture plus simple que GAT. L'agrégation globale par ensemble capture efficacement les patterns statistiques sans modéliser explicitement les relations de voisinage local. Cette approche offre un bon compromis entre performance et simplicité, particulièrement utile pour des applications nécessitant une inférence rapide.
+DeepSets obtient des performances intermédiaires (MSE = 0.0145) avec une architecture plus simple que GAT. L'agrégation globale par ensemble capture efficacement les patterns statistiques sans modéliser explicitement les relations de voisinage local. Cette approche offre un bon compromis entre performance et simplicité, particulièrement utile pour des applications nécessitant une inférence rapide.
 
 \subsubsection{EGNN : le trade-off équivariance-performance}
 
@@ -451,24 +451,24 @@ GAT atteint les meilleures performances avec une bonne généralisation. EGNN n�
 
 \textbf{Résultats :}
 \begin{center}
-\begin{tabular}{|l|c|c|}
+\begin{tabular}{|l|c|}
 \hline
-\textbf{Condition} & \textbf{MSE} & \textbf{$R^2$} \\
+\textbf{Condition} & \textbf{MSE} \\
 \hline
-Complet (3D + volume) & \textbf{0.0089} & \textbf{0.945} \\
-Sans positions 3D & 0.0356 & 0.772 (+×4 MSE) \\
-Sans volume & 0.0102 & 0.937 (+15\% MSE) \\
-Positions 2D seulement & 0.0178 & 0.887 (+×2 MSE) \\
+Complet (3D + volume) & \textbf{0.0089} \\
+Sans positions 3D & 0.0356 (+×4) \\
+Sans volume & 0.0102 (+15\%) \\
+Positions 2D seulement & 0.0178 (+×2) \\
 \hline
 \end{tabular}
-\end{center}
+\end{center>
 
 \textbf{Conclusions :}
 \begin{itemize}
     \item Les \textbf{positions 3D sont critiques} (MSE ×4 si supprimées)
     \item Le volume cellulaire (aire de Voronoï) a un impact modéré mais significatif (+15\% MSE sans)
     \item La 3D complète (vs projection 2D) apporte un gain substantiel (MSE ×2 si projection 2D)
-    \item Les positions seules atteignent $R^2=0.937$, confirmant que l'information spatiale domine
+    \item Les positions seules atteignent des performances très élevées (MSE = 0.0102), confirmant que l'information spatiale domine
 \end{itemize}
 
 \subsubsection{Influence de la stratégie de connectivité}
@@ -502,9 +502,9 @@ Delaunay & 0.0156 & 2.5 sec & Dense \\
 
 \textbf{Comparaison :}
 \begin{itemize}
-    \item EGNN complet (équivariant) : MSE = 0.0089 ($R^2 = 0.945$)
-    \item EGNN sans mise à jour coordonnées (messages invariants mais pas de propagation géométrique) : MSE = 0.0124 ($R^2 = 0.921$)
-    \item GNN utilisant coordonnées brutes comme features (non-équivariant) : MSE = 0.0245 ($R^2 = 0.846$)
+    \item EGNN complet (équivariant) : MSE = 0.0089
+    \item EGNN sans mise à jour coordonnées (messages invariants mais pas de propagation géométrique) : MSE = 0.0124
+    \item GNN utilisant coordonnées brutes comme features (non-équivariant) : MSE = 0.0245
 \end{itemize}
 
 \textbf{Conclusion :}
@@ -984,7 +984,7 @@ Ce chapitre a démontré empiriquement :
 \begin{enumerate}
     \item \textbf{Justification des GNN} : Étude comparative rigoureuse montrant que les GNN offrent une meilleure flexibilité géométrique (+17 points à ratio 5:1) que les statistiques spatiales, bien que ces dernières soient plus robustes au bruit (+10-15\% accuracy)
     
-    \item \textbf{Hiérarchie des architectures sur synthétiques} : GAT obtient les meilleures performances ($R^2 = 0.928$, MSE = 0.0118), suivi de DeepSets ($R^2 = 0.908$) et EGNN ($R^2 = 0.915$). EGNN présente un trade-off intéressant : légèrement moins performant mais garantit l'équivariance E(3) cruciale pour la robustesse aux rotations (dégradation ×3.6 pour GAT vs quasi-nulle pour EGNN)
+    \item \textbf{Hiérarchie des architectures sur synthétiques} : GAT obtient les meilleures performances (MSE = 0.0118), suivi de EGNN (MSE = 0.0137) et DeepSets (MSE = 0.0145). EGNN présente un trade-off intéressant : légèrement moins performant mais garantit l'équivariance E(3) cruciale pour la robustesse aux rotations (dégradation ×3.6 pour GAT vs quasi-nulle pour EGNN)
 
     \item \textbf{Performances sur réels (500 organoïdes sélectionnés)} : 89.3\% accuracy en classification binaire sur organoïdes bien différenciés
     
