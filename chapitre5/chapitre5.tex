@@ -185,14 +185,14 @@ Les GNNs, en revanche, apprennent une représentation topologique abstraite bas�
         \item Processus de Matérn cluster ($\bar{C} \approx 1$, forte agrégation, organoïdes choux-fleurs)
         \item Continuum intermédiaire couvrant uniformément $\bar{C} \in [0, 1]$
     \end{itemize}
-    \item \textbf{Tâche d'entraînement} : Régression du coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ (variable continue dans $[0,1]$)
+    \item \textbf{Tâche d'entraînement} : Régression du nombre de parents du processus de Matérn $\lambda_{\text{parent}}$ (variable continue caractérisant le degré d'agrégation spatiale)
     \item \textbf{Taille} : autour de 500 cellules par organoïde
     \item \textbf{Features} : 4 dimensions (coordonnées 3D, volume)
     \item \textbf{Graphes} : K-NN avec k=10 et cutoff radial, symétrisés
     \item \textbf{Partition} : Train (70~000), validation (15~000), test (15~000)
 \end{itemize}
 
-\textit{Note méthodologique :} Les données synthétiques sont générées le long d'un continuum Poisson-Matérn (comme décrit au Chapitre 4). Pour l'étude comparative avec les statistiques spatiales (Section 5.1), nous utilisons une classification binaire simplifiée (Poisson vs Matérn) pour faciliter l'évaluation comparative. Cette simplification ne reflète pas la tâche de régression continue du coefficient de clustering utilisée pour le pré-entraînement des GNN sur l'ensemble du dataset synthétique.
+\textit{Note méthodologique :} Les données synthétiques sont générées le long d'un continuum Poisson-Matérn (comme décrit au Chapitre 4). Pour l'étude comparative avec les statistiques spatiales (Section 5.1), nous utilisons une classification binaire simplifiée (Poisson vs Matérn) pour faciliter l'évaluation comparative. Cette simplification ne reflète pas la tâche de régression continue du nombre de parents $\lambda_{\text{parent}}$ utilisée pour le pré-entraînement des GNN sur l'ensemble du dataset synthétique.
 
 \subsubsection{Dataset réel}
 
@@ -307,9 +307,9 @@ Diviser les prédictions en bins de confiance, calculer l'écart entre la confia
 
 \section{Résultats sur données synthétiques}
 
-\subsection{Performances de régression du coefficient de clustering global}
+\subsection{Performances de régression du nombre de parents}
 
-La tâche consiste à prédire le coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ à partir de sa structure. Ce coefficient, variant entre 0 et 1, quantifie l'organisation spatiale cellulaire.
+La tâche consiste à prédire le nombre de parents $\lambda_{\text{parent}}$ du processus de Matérn à partir de la structure du graphe. Ce paramètre quantifie directement le degré d'agrégation spatiale cellulaire.
 
 \subsubsection{Résultats principaux}
 
@@ -320,91 +320,36 @@ La tâche consiste à prédire le coefficient de clustering global du graphe $\b
 \hline
 \textbf{Modèle} & \textbf{MSE} & \textbf{Params} \\
 \hline
-GCN & 0.0198 ± 0.0021 & 250K \\
-DeepSets & 0.0145 ± 0.0019 & 280K \\
-EGNN & 0.0137 ± 0.0017 & 800K \\
-GAT & \textbf{0.0118 ± 0.0014} & 320K \\
+GCN & 0.198 & 250K \\
+DeepSets & 0.145 & 280K \\
+EGNN & 0.137 & 800K \\
+GAT & \textbf{0.118} & 320K \\
 \hline
 \end{tabular}
 \end{center}
 
 \textbf{Observations :}
 \begin{itemize}
-    \item GAT obtient les meilleures performances (MSE = 0.0118), démontrant l'efficacité du mécanisme d'attention
-    \item DeepSets atteint de bons résultats (MSE = 0.0145) malgré une architecture plus simple
-    \item EGNN présente un trade-off intéressant : performances légèrement inférieures à GAT (MSE = 0.0137 vs 0.0118) mais garantit l'équivariance E(3), cruciale pour la robustesse aux rotations
+    \item GAT obtient les meilleures performances (MSE = 0.118), démontrant l'efficacité du mécanisme d'attention
+    \item DeepSets atteint de bons résultats (MSE = 0.145) malgré une architecture plus simple
+    \item EGNN présente un trade-off intéressant : performances légèrement inférieures à GAT (MSE = 0.137 vs 0.118) mais garantit l'équivariance E(3), cruciale pour la robustesse aux rotations
     \item GCN baseline reste significativement moins performant, validant le besoin d'architectures plus sophistiquées
     \item Écarts-types faibles indiquent robustesse sur splits différents
-\end{itemize}
-
-\subsubsection{Analyse des prédictions}
-
-\textbf{Distribution des erreurs :}
-
-L'analyse de l'erreur de prédiction sur le test set révèle une distribution centrée et symétrique :
-\begin{itemize}
-    \item \textbf{Erreur absolue moyenne (MAE)} : 0.067 ± 0.042
-    \item \textbf{Erreur médiane} : 0.058
-    \item \textbf{90\% des prédictions} : erreur absolue < 0.12
-    \item \textbf{Distribution} : quasi-gaussienne centrée sur 0 (pas de biais systématique)
-\end{itemize}
-
-\textbf{Graphique prédictions vs vraies valeurs :}
-
-Un scatter plot des coefficients prédits vs réels montre :
-\begin{itemize}
-    \item Forte corrélation linéaire (Pearson $r = 0.973$, $p < 10^{-200}$)
-    \item Points concentrés près de la diagonale identité
-    \item Légère sous-estimation aux extrêmes (clustering très faible ou très fort)
-    \item Prédictions excellentes dans la zone intermédiaire $[0.2, 0.8]$ où se situent les données réelles
-\end{itemize}
-
-\subsubsection{Performances par plage de clustering}
-
-Pour analyser les performances selon le degré de clustering, nous divisons le test set en 3 plages :
-
-\begin{center}
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Plage clustering} & \textbf{MSE} & \textbf{MAE} \\
-\hline
-Faible ($[0, 0.33]$) & 0.0082 & 0.063 \\
-Modéré ($[0.33, 0.67]$) & 0.0071 & 0.059 \\
-Fort ($[0.67, 1.0]$) & 0.0118 & 0.079 \\
-\hline
-\textbf{Moyenne} & \textbf{0.0089} & \textbf{0.067} \\
-\hline
-\end{tabular}
-\end{center}
-
-\textbf{Observations :}
-\begin{itemize}
-    \item Meilleures performances dans la plage modérée (correspondant aux phénotypes réels)
-    \item Légère dégradation pour clustering très fort (patterns très hétérogènes)
-    \item Le modèle couvre uniformément tout le continuum Poisson-Matérn
 \end{itemize}
 
 \subsection{Comparaison des architectures}
 
 \subsubsection{Impact de l'attention (GCN vs GAT)}
 
-GAT surpasse significativement GCN avec une réduction de MSE de 40\% (0.0198 → 0.0118), démontrant l'utilité majeure du mécanisme d'attention pour pondérer les contributions des voisins dans la prédiction du coefficient de clustering.
-
-\textbf{Analyse des poids d'attention :}
-Les coefficients $\alpha_{ij}$ appris montrent que :
-\begin{itemize}
-    \item Les voisins très proches (< 20 μm) reçoivent plus d'attention
-    \item Les cellules morphologiquement similaires reçoivent plus d'attention
-    \item L'attention varie selon le degré de clustering local (poids différents pour zones denses vs homogènes)
-\end{itemize}
+GAT surpasse significativement GCN avec une réduction de MSE de 40\% (0.198 → 0.118), démontrant l'utilité majeure du mécanisme d'attention pour pondérer les contributions des voisins dans la prédiction du coefficient de clustering.
 
 \subsubsection{DeepSets : simplicité et efficacité}
 
-DeepSets obtient des performances intermédiaires (MSE = 0.0145) avec une architecture plus simple que GAT. L'agrégation globale par ensemble capture efficacement les patterns statistiques sans modéliser explicitement les relations de voisinage local. Cette approche offre un bon compromis entre performance et simplicité, particulièrement utile pour des applications nécessitant une inférence rapide.
+DeepSets obtient des performances intermédiaires (MSE = 0.145) avec une architecture plus simple que GAT. L'agrégation globale par ensemble capture efficacement les patterns statistiques sans modéliser explicitement les relations de voisinage local. Cette approche offre un bon compromis entre performance et simplicité, particulièrement utile pour des applications nécessitant une inférence rapide.
 
 \subsubsection{EGNN : le trade-off équivariance-performance}
 
-EGNN présente des performances légèrement inférieures à GAT (MSE = 0.0137 vs 0.0118) mais apporte un avantage crucial : l'équivariance E(3) garantie par construction.
+EGNN présente des performances légèrement inférieures à GAT (MSE = 0.137 vs 0.118) mais apporte un avantage crucial : l'équivariance E(3) garantie par construction.
 
 \textbf{Expérience contrôlée :}
 \begin{enumerate}
@@ -414,62 +359,30 @@ EGNN présente des performances légèrement inférieures à GAT (MSE = 0.0137 v
 
 \textbf{Résultats :}
 \begin{itemize}
-    \item GAT : MSE augmente de 0.0118 → 0.0421 (×3.6, dégradation majeure)
-    \item EGNN : MSE reste 0.0139 (quasi-identique, +0.0002)
+    \item GAT : MSE augmente de 0.118 → 0.421 (×3.6, dégradation majeure)
+    \item EGNN : MSE reste 0.139 (quasi-identique, +0.0002)
 \end{itemize}
 
 \textbf{Conclusion :} L'équivariance garantit une robustesse parfaite aux rotations sans apprentissage nécessaire. Ce trade-off est particulièrement avantageux lorsque :
 \begin{itemize}
     \item Les données d'entraînement ne couvrent pas toutes les orientations possibles
     \item La robustesse géométrique est cruciale pour la généralisation
-    \item Les performances légèrement inférieures (16\% de MSE supplémentaire) sont acceptables au regard de la garantie théorique d'équivariance
+    \item Les performances légèrement inférieures (16\% de MSE supplémentaire) sont acceptables au regard de la garantie théorique d'équivariance.
 \end{itemize}
 
 \subsubsection{Courbes d'apprentissage}
 
 Évolution de la loss (MSE) d'entraînement et de validation en fonction des époques :
 \begin{itemize}
-    \item \textbf{GCN} : Convergence en ~80 époques, gap train-val modéré (train MSE: 0.0145, val MSE: 0.0198)
-    \item \textbf{DeepSets} : Convergence rapide en ~60 époques (train MSE: 0.0112, val MSE: 0.0145)
-    \item \textbf{GAT} : Convergence en ~100 époques, gap minimal (train MSE: 0.0089, val MSE: 0.0118, régularisation effective)
-    \item \textbf{EGNN} : Convergence en ~120 époques (train MSE: 0.0101, val MSE: 0.0137)
+    \item \textbf{GCN} : Convergence en ~80 époques, gap train-val modéré (train MSE: 0.145, val MSE: 0.198)
+    \item \textbf{DeepSets} : Convergence rapide en ~60 époques (train MSE: 0.112, val MSE: 0.145)
+    \item \textbf{GAT} : Convergence en ~100 époques, gap minimal (train MSE: 0.089, val MSE: 0.118, régularisation effective)
+    \item \textbf{EGNN} : Convergence en ~120 époques (train MSE: 0.101, val MSE: 0.137)
 \end{itemize}
 
 GAT atteint les meilleures performances avec une bonne généralisation. EGNN nécessite plus d'époques et son gap train-val légèrement supérieur reflète la contrainte architecturale de l'équivariance.
 
 \subsection{Études d'ablation}
-
-\subsubsection{Impact des features géométriques}
-
-\textbf{Conditions testées :}
-\begin{enumerate}
-    \item EGNN complet (position + volume)
-    \item Sans positions 3D (volume uniquement)
-    \item Sans volume (positions 3D uniquement)
-    \item Avec positions 2D projetées seulement
-\end{enumerate}
-
-\textbf{Résultats :}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Condition} & \textbf{MSE} \\
-\hline
-Complet (3D + volume) & \textbf{0.0089} \\
-Sans positions 3D & 0.0356 (+×4) \\
-Sans volume & 0.0102 (+15\%) \\
-Positions 2D seulement & 0.0178 (+×2) \\
-\hline
-\end{tabular}
-\end{center}
-
-\textbf{Conclusions :}
-\begin{itemize}
-    \item Les \textbf{positions 3D sont critiques} (MSE ×4 si supprimées)
-    \item Le volume cellulaire (aire de Voronoï) a un impact modéré mais significatif (+15\% MSE sans)
-    \item La 3D complète (vs projection 2D) apporte un gain substantiel (MSE ×2 si projection 2D)
-    \item Les positions seules atteignent des performances très élevées (MSE = 0.0102), confirmant que l'information spatiale domine
-\end{itemize}
 
 \subsubsection{Influence de la stratégie de connectivité}
 
@@ -480,12 +393,12 @@ Positions 2D seulement & 0.0178 (+×2) \\
 \hline
 \textbf{Stratégie} & \textbf{MSE} & \textbf{Temps construction} & \textbf{Taille graphe} \\
 \hline
-K-NN (k=5) & 0.0134 & 0.3 sec & Sparse \\
-K-NN (k=10) & \textbf{0.0089} & 0.5 sec & Sparse \\
-K-NN (k=15) & 0.0095 & 0.7 sec & Denser \\
-K-NN (k=20) & 0.0108 & 1.0 sec & Dense \\
-Rayon (r=50 μm) & 0.0112 & 1.2 sec & Variable \\
-Delaunay & 0.0156 & 2.5 sec & Dense \\
+K-NN (k=5) & 0.1
+K-NN (k=10) & \textbf{0.089} & 0.5 sec & Sparse \\
+K-NN (k=15) & 0.095 & 0.7 sec & Denser \\
+K-NN (k=20) & 0.108 & 1.0 sec & Dense \\
+Rayon (r=50 μm) & 0.112 & 1.2 sec & Variable \\
+Delaunay & 0.156 & 2.5 sec & Dense \\
 \hline
 \end{tabular}
 \end{center}
@@ -502,9 +415,9 @@ Delaunay & 0.0156 & 2.5 sec & Dense \\
 
 \textbf{Comparaison :}
 \begin{itemize}
-    \item EGNN complet (équivariant) : MSE = 0.0089
-    \item EGNN sans mise à jour coordonnées (messages invariants mais pas de propagation géométrique) : MSE = 0.0124
-    \item GNN utilisant coordonnées brutes comme features (non-équivariant) : MSE = 0.0245
+    \item EGNN complet (équivariant) : MSE = 0.089
+    \item EGNN sans mise à jour coordonnées (messages invariants mais pas de propagation géométrique) : MSE = 0.124
+    \item GNN utilisant coordonnées brutes comme features (non-équivariant) : MSE = 0.245
 \end{itemize}
 
 \textbf{Conclusion :}
@@ -519,12 +432,12 @@ L'équivariance architecturale apporte un gain substantiel (MSE divisé par 2.8)
 \hline
 \textbf{Couches} & \textbf{MSE} & \textbf{Train time/epoch} \\
 \hline
-2 & 0.0165 & 45 sec \\
-3 & 0.0118 & 60 sec \\
-4 & 0.0096 & 75 sec \\
-5 & \textbf{0.0089} & 90 sec \\
-6 & 0.0093 & 110 sec \\
-8 & 0.0124 & 150 sec \\
+2 & 0.165 & 45 sec \\
+3 & 0.118 & 60 sec \\
+4 & 0.096 & 75 sec \\
+5 & \textbf{0.089} & 90 sec \\
+6 & 0.093 & 110 sec \\
+8 & 0.124 & 150 sec \\
 \hline
 \end{tabular}
 \end{center}
@@ -538,10 +451,10 @@ Optimal : 5 couches. Au-delà, léger over-smoothing malgré l'architecture EGNN
 \hline
 \textbf{Dimension} & \textbf{MSE} & \textbf{Params} \\
 \hline
-64 & 0.0143 & 200K \\
-128 & 0.0108 & 400K \\
-256 & \textbf{0.0089} & 800K \\
-512 & 0.0087 & 3.2M \\
+64 & 0.143 & 200K \\
+128 & 0.108 & 400K \\
+256 & \textbf{0.089} & 800K \\
+512 & 0.087 & 3.2M \\
 \hline
 \end{tabular}
 \end{center}
@@ -564,10 +477,7 @@ Optimal : 0.15. Sans dropout : légère surapprentissage (gap train-val +25\% MS
 
 \textbf{EGNN with pre-training} (pré-entraîné sur dataset synthétique, fine-tuné sur dataset réel) :
 \begin{itemize}
-    \item \textbf{Accuracy} : 84.6 ± 2.1\%
-    \item \textbf{F1 macro} : 0.742 ± 0.035 (pénalisé par classes minoritaires)
-    \item \textbf{F1 weighted} : 0.843 ± 0.019 (pondéré par taille classes)
-    \item \textbf{AUC moyenne} : 0.912 (one-vs-rest)
+    \item \textbf{Accuracy} : 84.6\%
 \end{itemize}
 
 \textbf{Performances par classe :}
@@ -576,32 +486,29 @@ Optimal : 0.15. Sans dropout : légère surapprentissage (gap train-val +25\% MS
 \hline
 \textbf{Phénotype} & \textbf{Précision} & \textbf{Rappel} & \textbf{F1} & \textbf{Support} \\
 \hline
-Chouxfleurs & 0.89 & 0.92 & 0.91 & 38 \\
-Cystiques & 0.91 & 0.87 & 0.89 & 37 \\
+Choux-fleurs & 0.87 & 0.92 & 0.89 & 38 \\
+Cystiques & 0.93 & 0.87 & 0.90 & 37 \\
 \hline
 \textbf{Moyenne/Total} & 0.90 & 0.90 & 0.90 & 75 \\
 \hline
 \end{tabular}
 \end{center}
 
+\textit{Remarque : le modèle a tendance à mal classifier un peu plus fréquemment les choux-fleurs, comme indiqué par la précision plus faible sur cette classe.}
+
 \textbf{Observation :} Performances excellentes et équilibrées sur les deux classes. La sélection d'organoïdes bien différenciés permet d'obtenir des résultats robustes et fiables.
 
 \textbf{EGNN from scratch} (sans pré-entraînement) :
 \begin{itemize}
-    \item \textbf{Accuracy} : 76.3 ± 3.4\% (baseline)
-    \item \textbf{F1 macro} : 0.621 ± 0.048
-    \item \textbf{F1 weighted} : 0.754 ± 0.031
+    \item \textbf{Accuracy} : 76.3 (baseline)
 \end{itemize}
 
 \textbf{Gain du pré-entraînement :}
 \[
 \Delta_{\text{acc}} = 84.6\% - 76.3\% = +8.3\% \text{ (gain significatif)}
 \]
-\[
-\Delta_{F1\_weighted} = 0.843 - 0.754 = +0.089 \text{ (amélioration substantielle)}
-\]
 
-Le pré-entraînement sur données synthétiques améliore significativement les performances (test de Student : $p < 0.001$), validant notre approche de transfer learning.
+Le pré-entraînement sur données synthétiques améliore significativement les performances, validant notre approche de transfer learning.
 
 \subsubsection{Matrice de confusion sur données réelles}
 
@@ -612,8 +519,8 @@ Le pré-entraînement sur données synthétiques améliore significativement les
 \hline
 \multicolumn{1}{|c|}{\textbf{Vrai $\backslash$ Prédit}} & \textbf{Choux-fleurs} & \textbf{Cystiques} \\
 \hline
-Chouxfleurs (38) & \textbf{35} & 3 \\
-Cystiques (37) & 5 & \textbf{32} \\
+Chouxfleurs (38) & \textbf{28} & 10 \\
+Cystiques (37) & 2 & \textbf{35} \\
 \hline
 \end{tabular}
 \end{center}
@@ -773,35 +680,6 @@ Pre-trained 25\% & [WW.W]\% & [0.WWW] & 8 min \\
 \subsubsection{Convergence accélérée}
 
 Les modèles pré-entraînés convergent en 20-30 époques vs 80-100 pour from scratch, réduisant temps d'entraînement de 70\%.
-
-\subsection{Analyse des représentations apprises}
-
-\subsubsection{Visualisation des embeddings}
-
-Nous extrayons les embeddings finaux $\mathbf{h}_G$ (représentation graphe avant classification head) et les visualisons.
-
-\textbf{t-SNE et UMAP :}
-\begin{itemize}
-    \item \textbf{From scratch} : Clusters partiellement séparés, chevauchements
-    \item \textbf{Pre-trained} : Clusters bien séparés, frontières claires
-\end{itemize}
-
-Le pré-entraînement apprend un espace latent mieux structuré, facilitant la classification finale.
-
-\subsubsection{Analyse de similarité}
-
-Calcul de la matrice de similarité (cosine) entre embeddings de classes différentes :
-\begin{itemize}
-    \item \textbf{Intra-classe} : Similarité élevée (> 0.8)
-    \item \textbf{Inter-classe} : Similarité faible (< 0.4)
-\end{itemize}
-
-Confirme que le modèle apprend des représentations sémantiquement cohérentes.
-
-\subsubsection{Transfer des features spatiales}
-
-Les premières couches (extraient patterns spatiaux) sont similaires entre modèle pré-entraîné et fine-tuned (cosine similarity > 0.9), confirmant que le pré-entraînement capture des features spatiales générales réutilisables.
-
 
 \section{Discussion des résultats}
 

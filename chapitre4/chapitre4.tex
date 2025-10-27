@@ -117,8 +117,8 @@ Au-delà de la classification de phénotypes, notre pipeline adresse une seconde
 \textbf{Classification binaire (tâche principale) :}
 Distinction choux-fleurs vs cystiques sur les données réelles. Cette tâche de classification supervisée constitue l'objectif applicatif principal, avec des métriques d'évaluation incluant accuracy, F1-score, et matrices de confusion.
 
-\textbf{Régression du coefficient de clustering (tâche auxiliaire) :}
-Sur les données synthétiques, nous entraînons les modèles à prédire le coefficient de clustering global du graphe — une variable continue dans $[0, 1]$ caractérisant le degré d'agrégation spatiale. Ce coefficient, défini comme la moyenne des coefficients de clustering locaux $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ où $C_i$ mesure la densité de triangles autour du nœud $i$, quantifie la tendance des cellules voisines à former des triades fermées. Pour les organoïdes générés par processus de Poisson homogène, $\bar{C} \approx 0$ (répartition aléatoire), tandis que pour les processus de Matérn avec forte agrégation, $\bar{C} \rightarrow 1$ (clusters denses). Cette tâche de régression sert de pré-entraînement auto-supervisé : le modèle apprend à extraire des représentations géométriques fines des patterns spatiaux cellulaires, représentations qui se transfèrent ensuite efficacement à la classification de phénotypes réels. L'erreur quadratique moyenne (MSE) sert de métrique d'évaluation pour cette tâche.
+\textbf{Régression du nombre de parents (tâche auxiliaire) :}
+Sur les données synthétiques, nous entraînons les modèles à prédire le nombre de parents du processus de Matérn — une variable continue caractérisant le degré d'agrégation spatiale. Ce paramètre $\lambda_{\text{parent}}$ contrôle le nombre de centres de clusters générés lors de la simulation du processus ponctuel de Matérn. Pour les organoïdes générés par processus de Poisson homogène, on conserve le nombre de points, tandis que pour les processus de Matérn avec forte agrégation, $\lambda_{\text{parent}}$ est faible (nombre de centres de clusters faible). Cette tâche de régression sert de pré-entraînement auto-supervisé : le modèle apprend à extraire des représentations géométriques fines des patterns spatiaux cellulaires, représentations qui se transfèrent ensuite efficacement à la classification de phénotypes réels. L'erreur quadratique moyenne (MSE) sert de métrique d'évaluation pour cette tâche.
 
 \textbf{Régression de la déformation morphologique (données réelles) :}
 Pour les organoïdes réels, nous annotons également un score de déformation continue capturant le degré d'irrégularité morphologique — une mesure quantitative de l'écart par rapport à une sphère idéale. Cette métrique varie continûment entre les extrêmes cystiques (déformation faible, score ~0) et choux-fleurs (déformation forte, score ~1). La régression de ce score offre une granularité supérieure à la classification binaire, permettant de capturer les phénotypes intermédiaires et de quantifier finement les variations morphologiques intra-classe. Cette tâche utilise également la MSE comme loss et le $R^2$ comme métrique d'évaluation.
@@ -823,36 +823,29 @@ Pour les données synthétiques générées sur la sphère, l'aire de la cellule
 
 Cette cohérence dans l'extraction des features entre données synthétiques et réelles garantit la transférabilité des représentations apprises. Les mêmes métriques géométriques calculées sur les tessellations de Voronoï sphériques des données réelles et synthétiques permettent une comparaison directe et un apprentissage cohérent.
 
-\subsubsection{Calcul du coefficient de clustering pour la régression}
+\subsubsection{Calcul du nombre de parents pour la régression}
 
-Une fois le graphe construit par tessellation de Voronoï, nous calculons son coefficient de clustering global $\bar{C}$, qui sert de label pour la tâche de régression sur données synthétiques.
+Une fois le graphe construit par tessellation de Voronoï, nous utilisons le nombre de parents $\lambda_{\text{parent}}$ du processus de Matérn, qui sert de label pour la tâche de régression sur données synthétiques.
 
-\textbf{Définition mathématique :}
+\textbf{Définition et utilisation :}
 
-Pour chaque nœud $i$, le coefficient de clustering local mesure la proportion de triangles réalisés parmi ceux possibles dans son voisinage :
-\[
-C_i = \frac{2|\{(v_j, v_k) : v_j, v_k \in \mathcal{N}(i), (v_j, v_k) \in E\}|}{d_i(d_i-1)}
-\]
-où $\mathcal{N}(i)$ est l'ensemble des voisins du nœud $i$, $d_i$ son degré, et le numérateur compte le nombre d'arêtes reliant les voisins entre eux (formant des triangles avec $i$).
-
-Le coefficient de clustering global du graphe est la moyenne sur tous les nœuds :
-\[
-\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i
-\]
+Le paramètre $\lambda_{\text{parent}}$ du processus de Matérn contrôle directement le nombre de centres de clusters (points parents) générés sur la sphère. Ce paramètre est connu par construction lors de la génération synthétique et sert de label de régression.
 
 \textbf{Relation avec le continuum Poisson-Matérn :}
 
-Ce coefficient quantifie la tendance des cellules voisines à former des groupes densément connectés, capturant ainsi le degré d'agrégation spatiale :
+Le nombre de parents quantifie directement le degré d'agrégation spatiale lors de la génération :
 
 \begin{itemize}
-    \item \textbf{Poisson homogène} : Les cellules sont distribuées aléatoirement sur la sphère. Les voisins d'une cellule ont peu de chance d'être eux-mêmes voisins $\Rightarrow$ $\bar{C} \approx 0.1$-$0.2$ (faible clustering)
+    \item \textbf{Poisson homogène} : $\lambda_{\text{parent}} = 0$ (aucun centre de cluster, distribution aléatoire uniforme)
     
-    \item \textbf{Matérn cluster} : Les cellules forment des amas locaux. Les voisins d'une cellule appartiennent souvent au même cluster et sont donc connectés entre eux $\Rightarrow$ $\bar{C} \approx 0.7$-$0.9$ (fort clustering)
+    \item \textbf{Matérn faible clustering} : $\lambda_{\text{parent}}$ élevé (nombreux centres de clusters, chacun a peu de points)
     
-    \item \textbf{Continuum intermédiaire} : En variant les paramètres du processus de Matérn ($\lambda_{\text{parent}}$, $\lambda_{\text{cluster}}$, $r$), nous générons des patterns avec des degrés d'agrégation variables, produisant des valeurs de $\bar{C}$ couvrant uniformément l'intervalle $[0, 1]$
+    \item \textbf{Matérn fort clustering} : $\lambda_{\text{parent}}$ faible (peu de centres de clusters, chacun a beaucoup de points)
+    
+    \item \textbf{Continuum intermédiaire} : En variant $\lambda_{\text{parent}}$ continûment, nous générons des patterns avec des degrés d'agrégation variables, couvrant le spectre complet des architectures spatiales
 \end{itemize}
 
-\textbf{Propriété clé :} Le coefficient de clustering $\bar{C}$ est calculé \textit{a posteriori} sur le graphe généré, après application du processus ponctuel et construction de la tessellation. Il capture implicitement les corrélations spatiales induites par les paramètres du processus, offrant ainsi une métrique univoque et continue du degré d'organisation spatiale, idéale pour une tâche de régression supervisée.
+\textbf{Propriété clé :} Le nombre de parents $\lambda_{\text{parent}}$ est connu \textit{a priori} lors de la génération du processus ponctuel. Il contrôle directement les corrélations spatiales induites dans le graphe résultant, offrant ainsi une variable cible univoque et continue pour la tâche de régression supervisée, idéale pour apprendre des représentations des patterns spatiaux cellulaires.
 
 \subsection{Stratégies d'augmentation}
 
@@ -1194,12 +1187,12 @@ Ce chapitre a décrit en détail chaque composante de notre pipeline innovant po
 
 \textbf{Prétraitement et segmentation} : Le pipeline débute par un prétraitement robuste (normalisation d'intensité par percentiles, débruitage) suivi d'une segmentation state-of-the-art via Faster Cellpose
 
-\textbf{Données réelles et tâches} : Notre dataset collaboratif comprend 1311 échantillons imagés (2272 organoïdes extraits), dont nous avons sélectionné ~500 organoïdes bien différenciés (~250 par classe) pour l'apprentissage supervisé. Les phénotypes étudiés sont : choux-fleurs (agrégation spatiale forte) et cystiques (répartition homogène). Nous adressons trois tâches complémentaires : classification binaire choux-fleurs vs cystiques (tâche principale), régression du coefficient de clustering sur synthétiques (pré-entraînement), et régression de la déformation morphologique sur réels (quantification fine).
+\textbf{Données réelles et tâches} : Notre dataset collaboratif comprend 1311 échantillons imagés (2272 organoïdes extraits), dont nous avons sélectionné ~500 organoïdes bien différenciés (~250 par classe) pour l'apprentissage supervisé. Les phénotypes étudiés sont : choux-fleurs (agrégation spatiale forte) et cystiques (répartition homogène). Nous adressons trois tâches complémentaires : classification binaire choux-fleurs vs cystiques (tâche principale), régression du nombre de parents sur synthétiques (pré-entraînement), et régression de la déformation morphologique sur réels (quantification fine).
 
 \textbf{Génération synthétique} : Contribution majeure, nos ~100~000 organoïdes synthétiques sont générés via processus ponctuels (Poisson homogène et Matérn cluster) formant un continuum contrôlé de patterns spatiaux. La génération initiale sur la sphère permet la validation statistique rigoureuse (fonctions de Ripley, tests KS) ; le dataset GNN final subit ensuite une transformation spatiale étendant les coordonnées au-delà de la sphère proportionnellement à la densité locale, simulant les protubérances "chou-fleur" tout en préservant les aires cellulaires. Ces synthétiques servent au pré-entraînement et à l'apprentissage de représentations géométriques transférables.
 
 \textbf{Construction de graphes} : Extraction de 4 features par cellule (coordonnées 3D, volume), puis construction via stratégie K-NN hybride (k=10) équilibrant connectivité, signification biologique et efficacité computationnelle.
 
-\textbf{Architectures et entraînement} : Nous comparons plusieurs architectures GNN : GAT (Graph Attention Network), DeepSets, EGNN équivariant, et GCN comme baseline. Stratégie d'entraînement en deux phases : pré-entraînement sur synthétiques (régression clustering) puis fine-tuning sur réels (classification/régression), avec validation croisée 5-fold et recherche d'hyperparamètres systématique.
+\textbf{Architectures et entraînement} : Nous comparons plusieurs architectures GNN : GAT (Graph Attention Network), DeepSets, EGNN équivariant, et GCN comme baseline. Stratégie d'entraînement en deux phases : pré-entraînement sur synthétiques (régression du nombre de parents) puis fine-tuning sur réels (classification/régression), avec validation croisée 5-fold et recherche d'hyperparamètres systématique.
 
 Le Chapitre 5 présentera les résultats expérimentaux obtenus avec cette méthodologie, validant empiriquement les choix effectués et quantifiant les performances sur les tâches de classification et de régression.
