@@ -65,14 +65,14 @@ Pour chaque distribution, nous calculons ces trois fonctions sur 20 rayons équi
 
 Notre approche par GNN modélise la distribution cellulaire comme un graphe :
 
-\textbf{Construction du graphe} : Tessellation de Voronoï sphérique (\texttt{scipy.spatial.SphericalVoronoi}) — deux points sont connectés si leurs cellules de Voronoï sphériques partagent une arête (arc de grand cercle). Cette construction capture naturellement les relations de voisinage géométrique entre cellules sur la surface de la sphère, indépendamment de seuils de distance arbitraires.
+\textbf{Construction du graphe} : Tessellation de Voronoï sphérique (scipy.spatial.SphericalVoronoi) — deux points sont connectés si leurs cellules de Voronoï sphériques partagent une arête (arc de grand cercle). Cette construction capture naturellement les relations de voisinage géométrique entre cellules sur la surface de la sphère, indépendamment de seuils de distance arbitraires.
 
 \textbf{Features des nœuds} : Coordonnées 3D + volume (4 features par nœud, correspondant au vecteur du Chapitre 4).
 
 \textbf{Architecture} : Graph Attention Network (GAT)~\cite{Velickovic2018} avec :
 \begin{itemize}
     \item Couche d'entrée projetant les features dans un espace latent de dimension 64
-    \item $L$ couches GATConv, où $L \in \{2, 3, 4, 5, 6, 7, 8\}$ (profondeur variable pour analyse)
+    \item $L$ couches GATConv, où $L \in \{2, 3, 4, 5, 6, 7, 8\}$ (profondeur variable pour l'analyse)
     \item 4 têtes d'attention par couche (multi-head attention)
     \item Connexions résiduelles pondérées (facteur 0.2) entre chaque couche
     \item Normalisation par lots (batch normalization) après chaque convolution
@@ -108,12 +108,12 @@ La Figure~\ref{fig:noise_gaussian} présente l'évolution de l'accuracy en fonct
 
 \textbf{Profondeur optimale} : Il existe un optimum de profondeur GNN (L=5-6) qui offre le meilleur compromis. Au-delà, l'overfitting devient problématique sous bruit élevé. En deçà, la capacité d'apprentissage est insuffisante.
 
-\textbf{Conclusion bruit gaussien :} Les statistiques spatiales sont significativement plus robustes (+10-15 points d'accuracy) au bruit gaussien sur toute la plage testée. Cette supériorité s'explique par la nature analytique des fonctions K, F, G qui moyennent intrinsèquement le bruit sur de nombreuses paires de points, offrant une stabilité naturelle. Les GNN, bien que performants en conditions nominales, souffrent de la propagation du bruit à travers les couches de message passing.
+\textbf{Conclusion bruit gaussien :} Les statistiques spatiales sont significativement plus robustes au bruit gaussien sur toute la plage testée. Cette supériorité s'explique par la nature analytique des fonctions K, F, G qui moyennent intrinsèquement le bruit sur de nombreuses paires de points, offrant une stabilité naturelle. Les GNN, bien que performants en conditions nominales, souffrent de la propagation du bruit à travers les couches de message passing.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{../img/noise.png}
-    \caption{Robustesse au bruit gaussien : comparaison entre statistiques spatiales (courbe verte) et GNN de différentes profondeurs (courbes colorées). Les statistiques spatiales maintiennent une accuracy supérieure (+10-15 points) sur toute la plage de bruit, démontrant leur robustesse intrinsèque au bruit de localisation.}
+    \caption{Robustesse au bruit gaussien : comparaison entre statistiques spatiales (courbe bleue) et GNN de différentes profondeurs (courbes colorées).}
     \label{fig:noise_gaussian}
 \end{figure}
 
@@ -125,10 +125,10 @@ La Figure~\ref{fig:noise_pepper} présente l'évolution de l'accuracy face au br
 
 Les résultats sont qualitativement similaires au bruit gaussien, mais la dégradation est plus rapide :
 \begin{itemize}
-    \item Bruit structurel (ajout/suppression de points) plus perturbateur que bruit de position
-    \item Statistiques spatiales conservent leur avantage (> 0.90 jusqu'à $\sigma_{ps}=0.3$)
-    \item GNN chutent plus rapidement (< 0.80 pour $\sigma_{ps} > 0.25$)
-    \item Profondeur optimale reste L=5-6
+    \item Le bruit structurel (ajout/suppression de points) plus perturbateur que le bruit de position
+    \item Les statistiques spatiales conservent leur avantage (> 0.90 jusqu'à $\sigma_{ps}=0.3$)
+    \item Les GNNs chutent plus rapidement (< 0.80 pour $\sigma_{ps} > 0.25$)
+    \item La profondeur optimale reste L=5-6
 \end{itemize}
 
 \textbf{Interprétation :} Le bruit poivre et sel altère directement la topologie du graphe (suppression de nœuds, ajout de nœuds aberrants), perturbant fortement le message passing des GNN. Les statistiques spatiales, en moyennant sur l'ensemble des points, sont plus résilientes à ces modifications locales.
@@ -136,7 +136,7 @@ Les résultats sont qualitativement similaires au bruit gaussien, mais la dégra
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{../img/pepper.png}
-    \caption{Robustesse au bruit poivre et sel : évolution de l'accuracy en fonction du taux de bruit structurel. Le bruit d'ajout/suppression de points s'avère plus perturbateur que le bruit gaussien, mais les statistiques spatiales conservent leur avantage (> 0.90 jusqu'à $\sigma_{ps}=0.3$).}
+    \caption{Robustesse au bruit poivre et sel : évolution de l'accuracy en fonction du taux de bruit structurel.}
     \label{fig:noise_pepper}
 \end{figure}
 
@@ -157,78 +157,18 @@ La Figure~\ref{fig:ratio_aspect} présente l'accuracy en fonction du rapport d'a
 
 \textbf{Interprétation fondamentale :}
 
-Les statistiques spatiales (K, F, G) dépendent intrinsèquement de la géométrie sous-jacente du domaine. Les fonctions K de Ripley, par exemple, utilisent des facteurs de correction de bord $w_{ij}$ spécifiquement dérivés pour la géométrie sphérique. La distance géodésique sphérique est intégrée dans les calculs. En sortant de cette hypothèse géométrique (passage à ellipsoïde), ces corrections deviennent invalides, et les valeurs théoriques de référence (enveloppes de confiance) ne s'appliquent plus. Les statistiques perdent ainsi leur validité théorique et leur pouvoir discriminant s'effondre.
+Les statistiques spatiales (K, F, G) dépendent intrinsèquement de la géométrie sous-jacente du domaine. En sortant de cette hypothèse géométrique (passage à l'ellipsoïde), ces corrections deviennent invalides, et les valeurs théoriques de référence ne s'appliquent plus. Les statistiques perdent ainsi leur validité théorique et leur pouvoir discriminant s'effondre.
 
-Les GNN, en revanche, apprennent une représentation topologique abstraite basée sur la structure du graphe de voisinage. Cette représentation est intrinsèquement indépendante de la forme globale du domaine : un motif d'agrégation cellulaire locale (cluster de 5-10 cellules proches) possède une signature topologique identique qu'il se trouve sur une sphère, un ellipsoïde, ou toute autre surface. Les GNN capturent ces invariants topologiques locaux, conférant une flexibilité géométrique naturelle.
+Les GNNs, en revanche, apprennent une représentation topologique abstraite basée sur la structure du graphe de voisinage. Cette représentation est intrinsèquement indépendante de la forme globale du domaine : un motif d'agrégation cellulaire locale (cluster de 5-10 cellules proches) possède une signature topologique identique qu'il se trouve sur une sphère, un ellipsoïde, ou toute autre surface. Les GNN capturent ces invariants topologiques locaux, conférant une flexibilité géométrique naturelle.
 
 \textbf{Implication pratique :} Pour les organoïdes réels, dont les morphologies varient considérablement (cystiques quasi-sphériques, choux-fleurs irréguliers, formes intermédiaires), cette flexibilité topologique des GNN constitue un avantage décisif justifiant leur adoption.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{../img/accuracy_vs_ratio.png}
-    \caption{Généralisation géométrique : accuracy en fonction du rapport d'aspect ellipsoïdal. Les GNN (courbes bleues/rouges) montrent une dégradation gracieuse et conservent une bonne performance même sur des ellipsoïdes très allongés (ratio 5:1), tandis que les statistiques spatiales (courbe verte) s'effondrent rapidement en dehors de l'hypothèse sphérique. L'inversion des performances (GNN > stats spatiales) survient dès un ratio d'aspect > 2.5, démontrant la supériorité de la flexibilité topologique des GNN pour des morphologies variées.}
+    \caption{Généralisation géométrique : accuracy en fonction du rapport d'aspect ellipsoïdal}
     \label{fig:ratio_aspect}
 \end{figure}
-
-\subsection{Synthèse de l'étude comparative}
-
-\subsubsection{Quand privilégier les statistiques spatiales}
-
-Les statistiques spatiales (K, F, G de Ripley) se révèlent optimales dans les contextes suivants :
-
-\begin{itemize}
-    \item \textbf{Géométrie régulière et connue a priori} : Organoïdes parfaitement sphériques ou morphologies standardisées
-    \item \textbf{Données fortement bruitées} : Robustesse supérieure (+10-15\% accuracy) face aux bruits gaussien et poivre-et-sel
-    \item \textbf{Interprétabilité maximale} : Descripteurs mathématiques explicites avec fondements théoriques rigoureux
-    \item \textbf{Approche zero-shot} : Pas besoin de données annotées pour l'entraînement, applicable immédiatement
-    \item \textbf{Validation statistique formelle} : Tests d'hypothèses (enveloppes Monte Carlo, tests KS) pour valider le réalisme
-    \item \textbf{Ressources limitées} : Calcul rapide sur CPU, sans besoin de GPU
-\end{itemize}
-
-\subsubsection{Quand privilégier les GNN}
-
-Les Graph Neural Networks s'imposent dans les situations suivantes :
-
-\begin{itemize}
-    \item \textbf{Géométrie variable et complexe} : Formes irrégulières, non-sphériques, morphologies hétérogènes
-    \item \textbf{Flexibilité topologique} : Généralisation robuste (+17 points à ratio 5:1) à de nouvelles morphologies non vues
-    \item \textbf{Features riches et hétérogènes} : Exploitation simultanée de multiples attributs cellulaires (morphologie, intensités, marqueurs)
-    \item \textbf{Tâches complexes et multi-échelles} : Classification multi-classes, prédictions continues, analyse hiérarchique
-    \item \textbf{Apprentissage end-to-end} : Features extraites automatiquement, sans engineering manuel
-    \item \textbf{Scalabilité} : Inférence rapide par batching GPU pour criblage haut-débit
-\end{itemize}
-
-\subsubsection{Perspective : approche hybride}
-
-Une direction prometteuse consisterait à combiner les forces des deux approches :
-\begin{itemize}
-    \item Calculer descripteurs statistiques (K, F, G) comme features d'entrée additionnelles pour les nœuds du graphe
-    \item Exploiter la puissance de modélisation des GNN pour la décision finale
-    \item Bénéficier du meilleur des deux mondes : fondement statistique rigoureux + flexibilité topologique
-\end{itemize}
-
-Des expériences préliminaires suggèrent que cette hybridation améliore la robustesse au bruit (+3-5\% accuracy) tout en préservant la généralisation géométrique. Cette voie sera explorée dans les travaux futurs.
-
-\subsubsection{Application à notre contexte : organoïdes de prostate réels}
-
-Pour nos organoïdes réels, plusieurs facteurs justifient le choix des GNN :
-
-\textbf{Morphologies hétérogènes} : Les organoïdes cystiques sont quasi-sphériques, mais les choux-fleurs présentent des morphologies irrégulières avec excroissances, rendant l'hypothèse sphérique trop contraignante. Les GNN, par leur flexibilité géométrique, s'adaptent naturellement à cette diversité.
-
-\textbf{Features cellulaires riches} : Nous disposons de 4 features par cellule (position 3D, volume), que les GNN peuvent exploiter pleinement, tandis que les statistiques spatiales se limitent aux positions.
-
-\textbf{Classification multi-classes} : Notre dataset comprend 4 phénotypes (Cystiques, Choux-fleurs, Compact, Kératinisés), une tâche où les GNN excellent grâce à leur capacité d'apprentissage non-linéaire.
-
-\textbf{Pré-entraînement sur synthétiques} : L'approche GNN permet un transfer learning efficace depuis les données synthétiques, palliant la rareté des annotations expertes — un avantage absent pour les statistiques spatiales.
-
-Néanmoins, nous utilisons les statistiques spatiales comme outil de \textbf{validation complémentaire} :
-\begin{itemize}
-    \item Validation du réalisme des données synthétiques (Section 5.2)
-    \item Caractérisation quantitative des phénotypes réels
-    \item Interprétation des patterns spatiaux identifiés par les GNN
-\end{itemize}
-
-Cette étude comparative rigoureuse établit que, pour notre contexte d'organoïdes de prostate réels avec morphologies variables et features riches, les GNN constituent le choix optimal, offrant flexibilité, scalabilité et performances supérieures, tout en s'appuyant sur les statistiques spatiales pour la validation et l'interprétation.
 
 \section{Protocole expérimental}
 
@@ -241,41 +181,34 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
     \item \textbf{Total} : ~100~000 organoïdes synthétiques
     \item \textbf{Processus ponctuels} : Continuum Poisson-Matérn
     \begin{itemize}
-        \item Processus de Poisson homogène ($\bar{C} \approx 0.1$-$0.2$, faible agrégation, organoïdes cystiques)
-        \item Processus de Matérn cluster ($\bar{C} \approx 0.7$-$0.9$, forte agrégation, organoïdes choux-fleurs)
+        \item Processus de Poisson homogène ($\bar{C} \approx 0$, faible agrégation, organoïdes cystiques)
+        \item Processus de Matérn cluster ($\bar{C} \approx 1$, forte agrégation, organoïdes choux-fleurs)
         \item Continuum intermédiaire couvrant uniformément $\bar{C} \in [0, 1]$
     \end{itemize}
     \item \textbf{Tâche d'entraînement} : Régression du coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ (variable continue dans $[0,1]$)
-    \item \textbf{Taille} : 50-500 cellules par organoïde (moyenne : 250, médiane : 230)
+    \item \textbf{Taille} : autour de 500 cellules par organoïde
+    \item \textbf{Features} : 4 dimensions (coordonnées 3D, volume)
+    \item \textbf{Graphes} : K-NN avec k=10 et cutoff radial, symétrisés
     \item \textbf{Partition} : Train (70~000), validation (15~000), test (15~000)
 \end{itemize}
 
 \textit{Note méthodologique :} Les données synthétiques sont générées le long d'un continuum Poisson-Matérn (comme décrit au Chapitre 4). Pour l'étude comparative avec les statistiques spatiales (Section 5.1), nous utilisons une classification binaire simplifiée (Poisson vs Matérn) pour faciliter l'évaluation comparative. Cette simplification ne reflète pas la tâche de régression continue du coefficient de clustering utilisée pour le pré-entraînement des GNN sur l'ensemble du dataset synthétique.
 
-\textbf{Caractéristiques :}
-\begin{itemize}
-    \item Rayon sphère : 100-200 μm (distribution gaussienne)
-    \item Densité cellulaire : $\sim$0.01 cellules/μm² de surface
-    \item Features : 4 dimensions (coordonnées 3D, volume)
-    \item Graphes : K-NN avec k=10, symétrisés
-\end{itemize}
-
-\subsubsection{Dataset réel : OrganoProstate-2K}
+\subsubsection{Dataset réel}
 
 \textbf{Source biologique :}
 \begin{itemize}
     \item Type : Organoïdes de prostate humains
-    \item Lignée : Dérivés de biopsies patients et lignées cellulaires établies
-    \item Conditions : Culture en Matrigel, milieu supplémenté, analyse J7 (7ème jour post-passage)
+    \item Conditions : Culture en Matrigel, analyse à J7
     \item Collaboration : ANR Morpheus, IPMC Nice + Université Paris Cité
-    \item Période collecte : Mai 2023 - Février 2025 (22 mois)
+    \item Période de collecte : Mai 2023 - Février 2025 (22 mois)
 \end{itemize}
 
 \textbf{Acquisition :}
 \begin{itemize}
     \item Microscope : Microscopie confocale 8-bit, magnifications 20× et 40×
     \item Format : Images 8-bit TIFF 2048×2048 pixels (XY), 100-300 slices (Z)
-    \item Canaux : DAPI (noyaux) + marqueurs phénotype-spécifiques
+    \item Canaux : Noyaux
 \end{itemize}
 
 \textbf{Composition :}
@@ -285,39 +218,37 @@ Cette étude comparative rigoureuse établit que, pour notre contexte d'organoï
     \item \textbf{Classes} : 4 phénotypes observés, avec 2 classes principales
     \begin{enumerate}
         \item \textbf{Chouxfleurs} : 1,404 organoïdes (61.8\%) - morphologie en chou-fleur, surface irrégulière
-        \item \textbf{Cystiques} : 817 organoïdes (36.0\%) - formation kystes/cavités, épithélium polarisé
+        \item \textbf{Cystiques} : 817 organoïdes (36.0\%) - formation de cavités, surface sphérique
         \item \textbf{Compact} : 41 organoïdes (1.8\%) - structure dense, arrangement serré
         \item \textbf{Kératinisés} : 10 organoïdes (0.4\%) - différenciation kératinique spécialisée
     \end{enumerate}
     \item \textbf{Tâche principale} : Classification binaire Chouxfleurs vs Cystiques (97.8\% des données, Chapitre 4)
-    \item \textbf{Tâche étendue} : Classification 4-classes incluant phénotypes rares (évaluation complète)
     \item \textbf{Distribution} : Déséquilibre marqué, 97.8\% dans 2 classes dominantes (Chouxfleurs + Cystiques)
     \item \textbf{Annotations} : Labels fournis par le laboratoire partenaire
-    \item \textbf{Validation} : 100 organoïdes validés indépendamment (échantillon stratifié)
 \end{itemize}
 
 \textbf{Sélection des données pour l'étude :}
 
 Bien que le dataset complet contienne 2,272 organoïdes extraits, nous avons observé une importante variabilité intra-batch : certains organoïdes étiquetés "choux-fleurs" ne présentaient pas de différenciation morphologique claire. Pour garantir la qualité des annotations et la fiabilité de l'apprentissage supervisé, nous avons sélectionné un sous-ensemble de 500 organoïdes bien différenciés (250 par classe) présentant des phénotypes morphologiques clairs et non-ambigus.
 
-Les 1,772 organoïdes restants, bien que présentant une incohérence suspectée entre leur label batch et leur morphologie observée, constituent néanmoins une ressource précieuse pour des approches non supervisées futures (clustering, apprentissage de représentations, détection d'anomalies) permettant de découvrir la vraie structure morphologique indépendamment des labels batch potentiellement bruités.
+Les 1,772 organoïdes restants, bien que pouvant présenter une incohérence suspectée entre leur label batch et leur morphologie observée, constituent néanmoins une ressource précieuse pour des approches non supervisées futures (clustering, apprentissage de représentations, détection d'anomalies) permettant de découvrir la vraie structure morphologique indépendamment des labels batch potentiellement bruités.
 
 \textbf{Caractéristiques du dataset utilisé :}
 \begin{itemize}
     \item \textbf{Total utilisé (supervisé)} : 500 organoïdes bien différenciés (~250 Chouxfleurs, ~250 Cystiques)
     \item \textbf{Réserve (non supervisé)} : ~1,772 organoïdes avec incohérence label-morphologie
-    \item Taille organoïdes : 20-5,000 cellules (moyenne : 250, médiane : 180)
-    \item Distribution : Log-normale (queue lourde vers grandes tailles)
+    \item Taille des organoïdes : 20-5,000 cellules (moyenne : 250, médiane : 180)
+    \item Distribution : Log-normale (queue lourde vers les grandes tailles)
     \item Split : Stratifié par phénotype, 70\% train (~350 org), 15\% val (~75 org), 15\% test (~75 org)
     \item Équilibrage : Classes parfaitement équilibrées dans la sélection supervisée
 \end{itemize}
 
 \textbf{Pipeline de traitement :}
 \begin{itemize}
-    \item Segmentation : Faster Cellpose (notre optimisation, F1=0.95)
-    \item Extraction features : 4 dimensions par cellule (3D position + volume)
-    \item Construction graphes : K-NN (k=10) avec features géométriques
-    \item Clustering spatial : DBSCAN pour séparation organoïdes (eps=30 μm, min\_samples=20)
+    \item Segmentation : Faster Cellpose
+    \item Extraction des features : 4 dimensions par cellule (3D position + volume)
+    \item Construction de graphes : K-NN (k=10) + cutoff radial
+    \item Clustering spatial : DBSCAN pour séparation des organoïdes
 \end{itemize}
 
 \subsection{Métriques d'évaluation}
@@ -336,8 +267,8 @@ Les 1,772 organoïdes restants, bien que présentant une incohérence suspectée
 
 \textbf{Moyennes :}
 \begin{itemize}
-    \item \textbf{Macro-average} : Moyenne arithmétique sur classes (traite classes également)
-    \item \textbf{Weighted-average} : Moyenne pondérée par taille de classe (reflète distribution)
+    \item \textbf{Macro-average} : Moyenne arithmétique sur les classes (traite les classes également)
+    \item \textbf{Weighted-average} : Moyenne pondérée par la taille de la classe (reflète la distribution)
 \end{itemize}
 
 \textbf{Matrice de confusion :}
@@ -346,10 +277,10 @@ Tableau $C_{ij}$ où $C_{ij}$ = nombre d'échantillons de vraie classe $i$ préd
 \subsubsection{Métriques probabilistes}
 
 \textbf{Courbe ROC et AUC :}
-Pour classification multi-classes, ROC one-vs-rest pour chaque classe. AUC (aire sous courbe) mesure la capacité de discrimination ($\in [0,1]$, 0.5 = hasard, 1.0 = parfait).
+Pour la classification multi-classes, on utilise la méthode ROC one-vs-rest pour chaque classe. AUC (aire sous courbe) mesure la capacité de discrimination ($\in [0,1]$, 0.5 = hasard, 1.0 = parfait).
 
 \textbf{Courbes Précision-Rappel :}
-Particulièrement informatives pour classes déséquilibrées.
+Particulièrement informatives pour les classes déséquilibrées.
 
 \textbf{Log-loss (cross-entropy) :}
 \[
@@ -363,36 +294,22 @@ Pénalise les prédictions confiantes mais incorrectes.
 La calibration mesure si les probabilités prédites reflètent les probabilités réelles.
 
 \textbf{Expected Calibration Error (ECE) :}
-Diviser prédictions en bins de confiance, calculer l'écart entre confiance moyenne et accuracy réelle par bin.
+Diviser les prédictions en bins de confiance, calculer l'écart entre la confiance moyenne et l'accuracy réelle par bin.
 
 \subsection{Conditions expérimentales}
-
-\subsubsection{Hardware}
 
 \begin{itemize}
     \item GPU : NVIDIA RTX 3080 (10 Go VRAM)
     \item CPU : Intel Core i7-10700K (8 cores)
     \item RAM : 128 Go
-    \item Stockage : SSD NVMe 2 To
+    \item Stockage : SSD WD Elements 2 To
 \end{itemize}
-
-\subsubsection{Reproductibilité}
-
-Pour assurer la reproductibilité complète :
-\begin{itemize}
-    \item Seeds fixés : Python (42), NumPy (42), PyTorch (42)
-    \item torch.backends.cudnn.deterministic = True
-    \item torch.backends.cudnn.benchmark = False
-    \item Versions exactes de toutes bibliothèques documentées (requirements.txt)
-    \item Code versionné (git) avec tags pour chaque expérience
-\end{itemize}
-
 
 \section{Résultats sur données synthétiques}
 
 \subsection{Performances de régression du coefficient de clustering global}
 
-La tâche consiste à prédire le coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ à partir de sa structure. Ce coefficient, variant de 0 (Poisson homogène) à 1 (Matérn fortement agrégé), quantifie le degré d'organisation spatiale cellulaire.
+La tâche consiste à prédire le coefficient de clustering global du graphe $\bar{C} = \frac{1}{N}\sum_{i=1}^N C_i$ à partir de sa structure. Ce coefficient, variant entre 0 et 1, quantifie l'organisation spatiale cellulaire.
 
 \subsubsection{Résultats principaux}
 
@@ -403,10 +320,10 @@ La tâche consiste à prédire le coefficient de clustering global du graphe $\b
 \hline
 \textbf{Modèle} & \textbf{MSE} & \textbf{$R^2$} & \textbf{Params} \\
 \hline
-GCN baseline & 0.0198 ± 0.0021 & 0.872 ± 0.018 & 250K \\
+GCN & 0.0198 ± 0.0021 & 0.872 ± 0.018 & 250K \\
 DeepSets & 0.0145 ± 0.0019 & 0.908 ± 0.015 & 280K \\
-EGNN (équivariant) & 0.0137 ± 0.0017 & 0.915 ± 0.013 & 800K \\
-GAT (meilleur) & \textbf{0.0118 ± 0.0014} & \textbf{0.928 ± 0.011} & 320K \\
+EGNN & 0.0137 ± 0.0017 & 0.915 ± 0.013 & 800K \\
+GAT & \textbf{0.0118 ± 0.0014} & \textbf{0.928 ± 0.011} & 320K \\
 \hline
 \end{tabular}
 \end{center}
@@ -645,7 +562,7 @@ Optimal : 0.15. Sans dropout : légère surapprentissage (gap train-val +25\% MS
 
 \subsubsection{Résultats 5-fold cross-validation}
 
-\textbf{EGNN with pre-training} (pré-entraîné sur OrganoSynth-100K, fine-tuné sur OrganoProstate-2K) :
+\textbf{EGNN with pre-training} (pré-entraîné sur dataset synthétique, fine-tuné sur dataset réel) :
 \begin{itemize}
     \item \textbf{Accuracy} : 84.6 ± 2.1\%
     \item \textbf{F1 macro} : 0.742 ± 0.035 (pénalisé par classes minoritaires)
