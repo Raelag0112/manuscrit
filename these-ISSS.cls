@@ -369,7 +369,7 @@
 		\if@master
 			MÉMOIRE DE MASTER
 		\else
-			THÈSE DE DOCTORAT
+			%THÈSE DE DOCTORAT
 		\fi
 	\fi
 }
@@ -412,7 +412,7 @@
 		 		\put(25.75, 262){ 
 					\parbox[b][\paperheight]{\paperwidth}{ 
 						\vfill 
-						\includegraphics[width=\paperwidth]{visuel.jpg}
+						\includegraphics[width=\paperwidth]{visuel1.jpg}
 						\vfill 
 					}
 				}
