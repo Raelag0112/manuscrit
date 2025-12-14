@@ -1,0 +1,1514 @@
+% =============================================================================
+% Présentation de soutenance de thèse
+% Deep Learning for Organoid Analysis: Graph-Based Modeling of 3D Cellular Architectures
+% Alexandre Martin
+% =============================================================================
+
+\documentclass[aspectratio=169]{beamer}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{fontawesome5}
+
+% TikZ libraries
+\usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds,decorations.pathmorphing}
+
+% Theme configuration
+\usetheme{Madrid}
+\usecolortheme{whale}
+\usefonttheme{professionalfonts}
+
+% Custom colors
+\definecolor{inriaRed}{RGB}{227,0,38}
+\definecolor{inriaBlue}{RGB}{0,83,156}
+\definecolor{cysticGreen}{RGB}{76,175,80}
+\definecolor{cauliflowerOrange}{RGB}{255,152,0}
+\definecolor{darkblue}{RGB}{0,51,102}
+
+\setbeamercolor{structure}{fg=inriaBlue}
+\setbeamercolor{title}{fg=white,bg=inriaBlue}
+\setbeamercolor{frametitle}{fg=white,bg=inriaBlue}
+\setbeamercolor{block title}{fg=white,bg=inriaBlue}
+\setbeamercolor{block body}{bg=inriaBlue!10}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Add frame numbers
+\setbeamertemplate{footline}[frame number]
+
+% Title information
+\title[Deep Learning for Organoid Analysis]{Deep Learning for Organoid Analysis:\\Graph-Based Modeling of 3D Cellular Architectures}
+\author[Alexandre Martin]{Alexandre Martin}
+\institute[INRIA Sophia-Antipolis]{
+    INRIA Sophia-Antipolis -- Morpheme Team\\
+    In collaboration with IPMC Nice \& Paris Cité University\\[0.5em]
+    ANR Morpheus Project
+}
+\date{Thesis Defense}
+
+% Logo
+\titlegraphic{
+    \includegraphics[height=1cm]{img/visuel.jpg}
+}
+
+% =============================================================================
+\begin{document}
+
+% =============================================================================
+% PART 1: INTRODUCTION
+% =============================================================================
+
+% Slide 1: Title
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% Slide 2: Organoids Revolutionize Biology
+\begin{frame}{Organoids: Mini-Organs in a Dish}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{What are organoids?}
+            \begin{itemize}
+                \item 3D structures grown \textit{in vitro} from stem cells
+                \item Self-organize to mimic real organ architecture
+                \item Reproduce spatial complexity observed \textit{in vivo}
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Key features:}
+            \begin{itemize}
+                \item Form layers and internal cavities (lumens)
+                \item Exhibit cellular polarization
+                \item Bridge gap between 2D cultures and animal models
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Applications:}
+            \begin{itemize}
+                \item Personalized medicine
+                \item Drug screening
+                \item Disease modeling
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/3Dviz.png}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 3: Our Prostate Organoids
+\begin{frame}{Prostate Organoids: Two Phenotypes}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{block}{\textcolor{cysticGreen}{\faCheck} Cystic (Healthy)}
+                \begin{itemize}
+                    \item Spherical shape
+                    \item Central cavity
+                    \item Organized cellular structure
+                    \item Smooth surface
+                    \item \textbf{Uniform} cell distribution
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{block}{\textcolor{cauliflowerOrange}{\faExclamationTriangle} Cauliflower (Perturbed)}
+                \begin{itemize}
+                    \item Irregular surface
+                    \item Multiple buds
+                    \item Disorganized structure
+                    \item No central cavity
+                    \item \textbf{Clustered} cell distribution
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1em}
+    \begin{center}
+        \textbf{Dataset}: 2,272 organoids from 1,311 samples\\
+        Collected over 22 months (IPMC Nice \& Paris Cité)
+    \end{center}
+\end{frame}
+
+% Slide 4: Challenge 1 - Automatic Quantification
+\begin{frame}{Challenge \#1: Automatic Quantification}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Current situation: Manual analysis}
+            \begin{itemize}
+                \item 15--30 minutes per organoid
+                \item For 1000s of organoids $\rightarrow$ doesn't scale
+            \end{itemize}
+            
+            \vspace{1em}
+            \textbf{Problems with manual analysis:}
+            \begin{itemize}
+                \item \textcolor{red}{Subjective}: Different experts $\rightarrow$ different classifications
+                \item \textcolor{red}{Inconsistent}: Same expert, different times $\rightarrow$ different results
+                \item \textcolor{red}{Slow}: Bottleneck for drug screening
+            \end{itemize}
+            
+            \vspace{1em}
+            \textbf{Need:} \textcolor{inriaBlue}{Automated, objective, reproducible tools}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{tikzpicture}[scale=0.8]
+                \node[draw, rectangle, fill=red!20, minimum width=3cm, minimum height=1cm] at (0,2) {Manual: 30 min};
+                \node[draw, rectangle, fill=green!20, minimum width=3cm, minimum height=1cm] at (0,0) {Auto: 6 sec};
+                \draw[->, thick] (0,1.3) -- (0,0.7);
+                \node at (0.5,1) {\textbf{300×}};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 5: Challenge 2 - Rare Data
+\begin{frame}{Challenge \#2: Rare Annotated Data}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Computer Vision:}
+            \begin{itemize}
+                \item ImageNet: 14 million labeled images
+                \item Public, freely available
+            \end{itemize}
+            
+            \vspace{1em}
+            \textbf{Organoid Domain:}
+            \begin{itemize}
+                \item No public datasets
+                \item Expert annotation: $\sim$50€/hour
+                \item 1000s of annotations = impractical
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \begin{tikzpicture}
+                    \draw[fill=inriaBlue!30] (0,0) rectangle (3,3);
+                    \node at (1.5,1.5) {\Large ImageNet};
+                    \node at (1.5,0.5) {14M images};
+                    
+                    \draw[fill=red!30] (4,1) rectangle (5,2);
+                    \node at (4.5,1.5) {\tiny Organoids};
+                    \node at (4.5,0.5) {500 images};
+                \end{tikzpicture}
+            \end{center}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1em}
+    \begin{alertblock}{Data Scarcity}
+        Fundamental bottleneck for training deep learning models
+    \end{alertblock}
+\end{frame}
+
+% Slide 6: Challenge 3 - Geometric Robustness
+\begin{frame}{Challenge \#3: Geometric Robustness}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Organoids in 3D culture:}
+            \begin{itemize}
+                \item No preferred orientation
+                \item Random position and rotation
+            \end{itemize}
+            
+            \vspace{1em}
+            \textbf{Requirements:}
+            \begin{itemize}
+                \item \textbf{Invariance} to rotations
+                \item \textbf{Invariance} to translations
+                \item Robustness to acquisition variations
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.7]
+                    \draw[thick, fill=inriaBlue!20] (0,0) circle (1);
+                    \node at (0,-1.5) {Original};
+                    
+                    \draw[thick, fill=inriaBlue!20, rotate=45] (3,0) ellipse (1 and 0.7);
+                    \node at (3,-1.5) {Rotated};
+                    
+                    \draw[<->, thick, inriaBlue] (1.2,0) -- (1.8,0);
+                    \node[above] at (1.5,0.2) {\small Same class};
+                \end{tikzpicture}
+            \end{center}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5em}
+    \begin{block}{Key Insight}
+        Same organoid, different orientation $\Rightarrow$ same prediction
+    \end{block}
+\end{frame}
+
+% Slide 7: Research Questions
+\begin{frame}{Research Questions}
+    \begin{enumerate}
+        \item[\textbf{Q1}] \textbf{Are geometric graphs effective for organoid representation?}
+        \begin{itemize}
+            \item Can we capture biological information while compressing data?
+        \end{itemize}
+        
+        \vspace{0.8em}
+        \item[\textbf{Q2}] \textbf{Do equivariant GNNs outperform classical approaches?}
+        \begin{itemize}
+            \item Do they provide geometric robustness?
+        \end{itemize}
+        
+        \vspace{0.8em}
+        \item[\textbf{Q3}] \textbf{Is transfer learning from synthetic data effective?}
+        \begin{itemize}
+            \item Can synthetic organoids compensate for lack of annotations?
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+% Slide 8: Outline
+\begin{frame}{Presentation Outline}
+    \tableofcontents[hideallsubsections]
+\end{frame}
+
+% =============================================================================
+% PART 2: THEORETICAL FOUNDATIONS
+% =============================================================================
+\section{Theoretical Foundations}
+
+\begin{frame}
+    \begin{center}
+        {\Huge \textbf{Part I}}\\[1em]
+        {\LARGE Theoretical Foundations}\\[0.5em]
+        {\large Graphs and Graph Neural Networks}
+    \end{center}
+\end{frame}
+
+% Slide 10: Limitations of 3D CNNs
+\begin{frame}{Why Not 3D CNNs?}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Memory Constraints:}
+            \begin{itemize}
+                \item Single organoid: $\sim$2 GB
+                \item $2048 \times 2048 \times 200$ voxels
+                \item GPU memory: prohibitive
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Downsampling Issues:}
+            \begin{itemize}
+                \item Destroys cellular details
+                \item Individual cells unresolvable
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{No Native Invariance:}
+            \begin{itemize}
+                \item Not invariant to 3D rotations
+                \item Requires extensive augmentation
+                \item No guarantees
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Grid-Based Limitation:}
+            \begin{itemize}
+                \item Treats organoid as voxel grid
+                \item Doesn't model cells as entities
+                \item No relational structure
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5em}
+    \begin{alertblock}{Conclusion}
+        3D CNNs are not adapted to our constraints
+    \end{alertblock}
+\end{frame}
+
+% Slide 11: Graph Representation
+\begin{frame}{Graph Representation: A Natural Abstraction}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Key Insight:}\\
+            Cells form a network of spatial interactions
+            
+            \vspace{0.5em}
+            \textbf{Our Abstraction:}
+            \begin{itemize}
+                \item Each \textbf{cell} $\rightarrow$ \textbf{node}
+                \item Spatial proximity $\rightarrow$ \textbf{edges}
+                \item Node features: position, volume
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Compression:}
+            \begin{center}
+                \fbox{GB (images) $\rightarrow$ MB (graphs)}\\
+                \textbf{1000× compression}
+            \end{center}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/graph_comparison.png}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 12: Introduction to GNNs
+\begin{frame}{Graph Neural Networks: Message Passing}
+    \textbf{Challenge:} Graphs are non-Euclidean data
+    \begin{itemize}
+        \item Variable number of neighbors
+        \item No canonical ordering
+        \item No fixed structure
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Solution: Message Passing Paradigm}
+    \begin{equation*}
+        h_i^{(l+1)} = \text{UPDATE}\left(h_i^{(l)}, \text{AGGREGATE}\left(\{h_j^{(l)} : j \in \mathcal{N}(i)\}\right)\right)
+    \end{equation*}
+    
+    \begin{center}
+        \begin{tikzpicture}[scale=0.8, node distance=1.5cm]
+            \node[circle, draw, fill=inriaBlue!30] (A) at (0,0) {$i$};
+            \node[circle, draw, fill=gray!20] (B) at (-1.5,1) {$j_1$};
+            \node[circle, draw, fill=gray!20] (C) at (1.5,1) {$j_2$};
+            \node[circle, draw, fill=gray!20] (D) at (0,-1.5) {$j_3$};
+            
+            \draw[->, thick, inriaRed] (B) -- (A);
+            \draw[->, thick, inriaRed] (C) -- (A);
+            \draw[->, thick, inriaRed] (D) -- (A);
+            
+            \node[right] at (2,0) {\small Messages from neighbors};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+% Slide 13: Global Pooling
+\begin{frame}{Global Pooling and Classification}
+    \textbf{Goal:} Graph-level prediction (not node-level)
+    
+    \vspace{1em}
+    \textbf{Global Pooling:}
+    \begin{itemize}
+        \item \textbf{Mean pooling:} $h_G = \frac{1}{|V|}\sum_{i \in V} h_i$
+        \item \textbf{Max pooling:} $h_G = \max_{i \in V} h_i$
+        \item \textbf{Attention pooling:} learned importance weights
+    \end{itemize}
+    
+    \vspace{1em}
+    \textbf{Classification Head:}
+    \begin{equation*}
+        \text{Node features} \xrightarrow{\text{GNN layers}} \text{Node embeddings} \xrightarrow{\text{Pooling}} h_G \xrightarrow{\text{MLP}} \hat{y}
+    \end{equation*}
+\end{frame}
+
+% Slide 14: GCN Architecture
+\begin{frame}{GCN: Graph Convolutional Network (Baseline)}
+    \textbf{Kipf \& Welling, 2017}
+    
+    \vspace{0.5em}
+    \textbf{Update Rule:}
+    \begin{equation*}
+        h_i^{(l+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i) \cup \{i\}} \frac{1}{\sqrt{d_i d_j}} W^{(l)} h_j^{(l)}\right)
+    \end{equation*}
+    
+    \vspace{0.5em}
+    \textbf{Properties:}
+    \begin{itemize}
+        \item Normalized mean aggregation
+        \item Simple and effective
+        \item \textcolor{red}{Treats all neighbors equally}
+        \item \textcolor{red}{No distance/importance weighting}
+    \end{itemize}
+\end{frame}
+
+% Slide 15: GAT Architecture
+\begin{frame}{GAT: Graph Attention Network (Main Choice)}
+    \textbf{Veličković et al., 2018}
+    
+    \vspace{0.5em}
+    \textbf{Key Idea:} Learn attention coefficients to weight neighbors
+    
+    \begin{equation*}
+        \alpha_{ij} = \frac{\exp\left(\text{LeakyReLU}\left(\mathbf{a}^T[Wh_i \| Wh_j]\right)\right)}{\sum_{k \in \mathcal{N}(i)} \exp\left(\text{LeakyReLU}\left(\mathbf{a}^T[Wh_i \| Wh_k]\right)\right)}
+    \end{equation*}
+    
+    \begin{equation*}
+        h_i^{(l+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} W h_j^{(l)}\right)
+    \end{equation*}
+    
+    \vspace{0.5em}
+    \textbf{Multi-head Attention:} Multiple independent attention mechanisms
+    
+    \vspace{0.5em}
+    \textcolor{cysticGreen}{\faCheck} \textbf{Best performance} in our experiments
+\end{frame}
+
+% Slide 16: DeepSets
+\begin{frame}{DeepSets: Set-Based Baseline}
+    \textbf{Zaheer et al., 2017}
+    
+    \vspace{0.5em}
+    \textbf{Approach:} Treat organoid as unordered set of cells
+    
+    \begin{equation*}
+        f(X) = \rho\left(\sum_{x \in X} \phi(x)\right)
+    \end{equation*}
+    
+    \vspace{0.5em}
+    \textbf{Properties:}
+    \begin{itemize}
+        \item Permutation invariant
+        \item \textcolor{red}{Ignores local spatial structure}
+        \item Each cell processed independently before aggregation
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Observation:} Performs reasonably well\\
+    $\Rightarrow$ Global statistics are informative, but local structure helps
+\end{frame}
+
+% Slide 17: Geometric Equivariance
+\begin{frame}{Geometric Equivariance: Key Concept}
+    \textbf{Why important for organoids?}
+    \begin{itemize}
+        \item No preferred orientation in 3D culture
+        \item Biological phenotype $\neq$ function of orientation
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Invariance:}
+            \begin{equation*}
+                f(T(x)) = f(x)
+            \end{equation*}
+            Output identical regardless of transformation\\
+            \textit{For classification}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Equivariance:}
+            \begin{equation*}
+                f(T(x)) = T(f(x))
+            \end{equation*}
+            Output transforms coherently\\
+            \textit{For intermediate representations}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5em}
+    \begin{block}{Requirement}
+        Rotate the organoid $\Rightarrow$ same classification
+    \end{block}
+\end{frame}
+
+% Slide 18: E(3) Group
+\begin{frame}{The E(3) Group: 3D Euclidean Symmetries}
+    \textbf{E(3) = Euclidean group in 3 dimensions}
+    
+    \vspace{1em}
+    \begin{columns}
+        \begin{column}{0.33\textwidth}
+            \begin{center}
+                \textbf{Rotations}\\
+                Any 3D rotation\\around any axis
+            \end{center}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \begin{center}
+                \textbf{Translations}\\
+                Shifting the entire\\structure in space
+            \end{center}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \begin{center}
+                \textbf{Reflections}\\
+                Mirror\\symmetries
+            \end{center}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1em}
+    \begin{alertblock}{Key Insight}
+        We can build architectures that \textbf{guarantee} these invariances by construction — not learned through augmentation, but mathematically guaranteed.
+    \end{alertblock}
+\end{frame}
+
+% Slide 19: EGNN Architecture
+\begin{frame}{EGNN: Equivariant Graph Neural Network}
+    \textbf{Satorras et al., 2021}
+    
+    \vspace{0.5em}
+    \textbf{Key Principle:} Use only invariant quantities in messages
+    \begin{itemize}
+        \item Distances are invariant (don't change under rotation)
+        \item Direction vectors are equivariant
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Practical Advantages:}
+    \begin{itemize}
+        \item \textcolor{cysticGreen}{\faCheck} No data augmentation needed
+        \item \textcolor{cysticGreen}{\faCheck} Better generalization with less data
+        \item \textcolor{cysticGreen}{\faCheck} Robustness guaranteed by construction
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Trade-off:} Slightly lower raw performance, but guaranteed geometric robustness
+\end{frame}
+
+% Slide 20: EGNN Formulas
+\begin{frame}{EGNN: Key Formulas}
+    \textbf{Message computation} (invariant):
+    \begin{equation*}
+        m_{ij} = \phi_m\left(h_i, h_j, \|x_i - x_j\|^2\right)
+    \end{equation*}
+    
+    \textbf{Coordinate update} (equivariant):
+    \begin{equation*}
+        x_i^{(l+1)} = x_i^{(l)} + \sum_{j \neq i} (x_i - x_j) \cdot \phi_x(m_{ij})
+    \end{equation*}
+    
+    \textbf{Feature update}:
+    \begin{equation*}
+        h_i^{(l+1)} = \phi_h\left(h_i^{(l)}, \sum_{j \in \mathcal{N}(i)} m_{ij}\right)
+    \end{equation*}
+    
+    \vspace{0.5em}
+    \begin{block}{Best of Both Worlds}
+        Invariant messages + Equivariant coordinate updates
+    \end{block}
+\end{frame}
+
+% Slide 21: Architecture Comparison
+\begin{frame}{Architecture Comparison Summary}
+    \begin{table}
+        \centering
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Architecture} & \textbf{Aggregation} & \textbf{E(3)-Equiv.} & \textbf{Strength} \\
+            \midrule
+            GCN & Mean & \textcolor{red}{\faTimes} & Simple baseline \\
+            GAT & Attention & \textcolor{red}{\faTimes} & \textbf{Best accuracy} \\
+            DeepSets & Global sum & \textcolor{red}{\faTimes} & No local structure \\
+            EGNN & Distance-based & \textcolor{cysticGreen}{\faCheck} & \textbf{Guaranteed robustness} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{1em}
+    \textbf{Key Trade-off:}\\
+    GAT $\rightarrow$ Best raw performance\\
+    EGNN $\rightarrow$ Guaranteed geometric invariance
+\end{frame}
+
+% Slide 22: Part 2 Summary
+\begin{frame}{Theoretical Foundations: Summary}
+    \begin{enumerate}
+        \item \textbf{Graphs} capture relational structure with \textbf{1000× compression}
+        
+        \vspace{0.5em}
+        \item \textbf{GNNs} learn from non-Euclidean data via message passing
+        
+        \vspace{0.5em}
+        \item \textbf{GAT} achieves best performance through adaptive attention
+        
+        \vspace{0.5em}
+        \item \textbf{EGNN} provides guaranteed geometric robustness
+    \end{enumerate}
+\end{frame}
+
+% =============================================================================
+% PART 3: METHODOLOGY
+% =============================================================================
+\section{Methodology}
+
+\begin{frame}
+    \begin{center}
+        {\Huge \textbf{Part II}}\\[1em]
+        {\LARGE Methodology}\\[0.5em]
+        {\large From Raw Images to Predictions}
+    \end{center}
+\end{frame}
+
+% Slide 24: Pipeline Overview
+\begin{frame}{End-to-End Pipeline Overview}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=0.8cm,
+            block/.style={rectangle, draw, fill=inriaBlue!20, minimum width=2cm, minimum height=0.8cm, align=center, font=\small},
+            arrow/.style={->, thick}
+        ]
+            \node[block] (img) {3D Image\\(2 GB)};
+            \node[block, right=of img] (prep) {Preprocessing};
+            \node[block, right=of prep] (seg) {Faster\\Cellpose};
+            \node[block, right=of seg] (feat) {Feature\\Extraction};
+            \node[block, below=of feat] (clust) {DBSCAN\\Clustering};
+            \node[block, left=of clust] (graph) {Graph\\Construction};
+            \node[block, left=of graph] (gnn) {GNN\\Classification};
+            \node[block, left=of gnn, fill=cysticGreen!30] (pred) {Prediction};
+            
+            \draw[arrow] (img) -- (prep);
+            \draw[arrow] (prep) -- (seg);
+            \draw[arrow] (seg) -- (feat);
+            \draw[arrow] (feat) -- (clust);
+            \draw[arrow] (clust) -- (graph);
+            \draw[arrow] (graph) -- (gnn);
+            \draw[arrow] (gnn) -- (pred);
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{1em}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Processing time:} $\sim$20 min/organoid\\
+            (dominated by segmentation)
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Compression:} 2 GB $\rightarrow$ 10 MB\\
+            (\textbf{1000× reduction})
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 25: Dataset
+\begin{frame}{Collaborative Dataset}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{ANR Morpheus Project}
+            \begin{itemize}
+                \item 22 months of data collection
+                \item May 2023 -- February 2025
+                \item IPMC Nice + Paris Cité
+            \end{itemize}
+            
+            \vspace{1em}
+            \textbf{Dataset Statistics:}
+            \begin{itemize}
+                \item 1,311 imaged samples
+                \item 2,272 extracted organoids
+                \item \textbf{500 well-differentiated} selected
+                \item $\sim$250 per class
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/cumulative_organoids.png}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 26: Segmentation Optimization
+\begin{frame}{Faster Cellpose: Segmentation Optimization}
+    \textbf{Problem:} Cellpose is slow
+    \begin{itemize}
+        \item 30 sec/slice × 200 slices × 1000 organoids = \textbf{2,500 hours}
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Our Solution: Faster Cellpose}
+    \begin{enumerate}
+        \item \textbf{Knowledge Distillation:} Smaller student network (−50\% params)
+        \item \textbf{Weight Pruning:} Remove 30\% low-magnitude weights
+        \item \textbf{Inference Optimization:} Larger batches, mixed precision
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    \begin{block}{Result}
+        \textbf{5× speedup} while preserving F1 = 0.95\\
+        2,500 hours $\rightarrow$ 500 hours
+    \end{block}
+\end{frame}
+
+% Slide 27: Segmentation Comparison
+\begin{frame}{Segmentation Methods Comparison}
+    \begin{table}
+        \centering
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Method} & \textbf{F1 Score} & \textbf{Time/Slice} & \textbf{Speed-up} \\
+            \midrule
+            Geometric (ellipses) & 0.88 & 3 sec & 10× \\
+            \textbf{Faster Cellpose} & \textbf{0.95} & \textbf{6 sec} & \textbf{5×} \\
+            Original Cellpose & 0.98 & 30 sec & 1× \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{1em}
+    \textbf{Choice:} Faster Cellpose = optimal trade-off
+    \begin{itemize}
+        \item Segmentation quality $\rightarrow$ Graph quality $\rightarrow$ GNN performance
+    \end{itemize}
+\end{frame}
+
+% Slide 28: Graph Construction
+\begin{frame}{Geometric Graph Construction}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Node Features (4D):}
+            \begin{itemize}
+                \item 3D centroid: $(x, y, z)$
+                \item Cell volume
+                \item Normalized (centered, scaled)
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Edge Construction:}
+            \begin{itemize}
+                \item K-nearest neighbors ($K=10$)
+                \item Euclidean distance
+                \item Symmetrized graph
+                \item Radial cutoff for long edges
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/graph_comparison.png}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 29: Synthetic Generation
+\begin{frame}{Synthetic Generation via Point Processes}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Key Insight:} Cell distribution differs between phenotypes
+            
+            \vspace{0.5em}
+            \textbf{Cystic (Uniform):}
+            \begin{itemize}
+                \item Homogeneous Poisson process
+                \item Complete spatial randomness
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Cauliflower (Clustered):}
+            \begin{itemize}
+                \item Matérn cluster process
+                \item Parent points + clustered children
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Generated:} 100,000 synthetic organoids
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/synthetic.png}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 30: Transfer Learning
+\begin{frame}{Transfer Learning: Synthetic $\rightarrow$ Real}
+    \textbf{Phase 1: Pre-training} on 70,000 synthetic organoids
+    \begin{itemize}
+        \item Task: Regress Matérn parent number
+        \item Learn spatial organization patterns
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Phase 2: Fine-tuning} on 500 real organoids
+    \begin{itemize}
+        \item Reinitialize classification head
+        \item Reduced learning rate
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \begin{block}{Benefits}
+        \begin{itemize}
+            \item \textbf{4× data efficiency:} 125 pre-trained $\approx$ 500 from-scratch
+            \item \textbf{3× faster convergence}
+            \item \textbf{+8\% accuracy improvement}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% Slide 31: Final Architecture
+\begin{frame}{Final Architecture Configuration}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Encoder:}
+            \begin{itemize}
+                \item GAT with 5 layers
+                \item 256 hidden dimensions
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Pooling:}
+            \begin{itemize}
+                \item Mean + Max concatenation
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Classification Head:}
+            \begin{itemize}
+                \item MLP: 256 → 128 → 2
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Training:}
+            \begin{itemize}
+                \item Optimizer: AdamW
+                \item LR: $10^{-3}$ (pre-train) / $10^{-4}$ (fine-tune)
+                \item Dropout: 0.15
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Compute:}
+            \begin{itemize}
+                \item Pre-training: 200 epochs, 48h
+                \item Fine-tuning: 100 epochs, 30 min
+                \item Hardware: NVIDIA RTX 3080
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 32: Part 3 Summary
+\begin{frame}{Methodology: Summary}
+    \begin{enumerate}
+        \item \textbf{Complete automated pipeline} from raw images to predictions
+        
+        \vspace{0.5em}
+        \item \textbf{Faster Cellpose:} 5× speedup, F1 = 0.95
+        
+        \vspace{0.5em}
+        \item \textbf{Synthetic generation:} 100,000 organoids with perfect labels
+        
+        \vspace{0.5em}
+        \item \textbf{Transfer learning:} 4× reduction in annotation needs
+    \end{enumerate}
+\end{frame}
+
+% =============================================================================
+% PART 4: EXPERIMENTAL RESULTS
+% =============================================================================
+\section{Experimental Results}
+
+\begin{frame}
+    \begin{center}
+        {\Huge \textbf{Part III}}\\[1em]
+        {\LARGE Experimental Results}\\[0.5em]
+        {\large Validation of Our Approach}
+    \end{center}
+\end{frame}
+
+% Slide 34: GRETSI Study Protocol
+\begin{frame}{GRETSI 2025: GNNs vs Spatial Statistics}
+    \textbf{Research Question:}\\
+    When should we prefer GNNs over classical methods (Ripley's K)?
+    
+    \vspace{0.5em}
+    \textbf{Protocol:}
+    \begin{itemize}
+        \item Synthetic data with controlled ground truth
+        \item Spherical point distributions: Poisson vs Matérn
+        \item Two noise types: Gaussian (position) + Salt-and-pepper (points)
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Comparison:}
+    \begin{itemize}
+        \item GNN classifiers (various depths)
+        \item Random Forest on Ripley's K, F, G functions
+    \end{itemize}
+\end{frame}
+
+% Slide 35: Noise Robustness
+\begin{frame}{Result 1: Noise Robustness}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/noise.png}
+            \end{center}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Observation:}\\
+            Spatial statistics are \textbf{more robust to noise}
+            
+            \vspace{0.5em}
+            \textbf{Why?}
+            \begin{itemize}
+                \item Ripley's functions average over many point pairs
+                \item Natural smoothing of noise
+                \item GNNs propagate noise through layers
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Optimal GNN depth:} 5-6 layers
+            \begin{itemize}
+                \item Deeper $\rightarrow$ over-smoothing
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 36: Geometric Generalization
+\begin{frame}{Result 2: Geometric Generalization}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/accuracy_vs_ratio.png}
+            \end{center}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Training:} Spherical distributions\\
+            \textbf{Testing:} Ellipsoids (ratio 1:1 → 5:1)
+            
+            \vspace{0.5em}
+            \textbf{Results:}
+            \begin{itemize}
+                \item Spatial stats: 100\% → 65\% (\textcolor{red}{−35\%})
+                \item GNNs: 95\% → 82\% (\textcolor{cysticGreen}{−13\%})
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Why?}
+            \begin{itemize}
+                \item Ripley's K assumes isotropy
+                \item GNNs learn topological patterns
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5em}
+    \begin{alertblock}{Conclusion}
+        GNNs excel when morphologies vary — exactly our situation!
+    \end{alertblock}
+\end{frame}
+
+% Slide 37: Lesson
+\begin{frame}{Lesson from Comparative Study}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{GNNs Excel When:}
+            \begin{itemize}
+                \item Morphologies vary
+                \item Shapes are irregular
+                \item Geometry is non-spherical
+            \end{itemize}
+            
+            \vspace{1em}
+            $\Rightarrow$ \textbf{Real organoids}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Spatial Statistics Excel When:}
+            \begin{itemize}
+                \item Geometry is perfectly spherical
+                \item Consistent across samples
+                \item Low noise
+            \end{itemize}
+            
+            \vspace{1em}
+            $\Rightarrow$ \textbf{Idealized conditions}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1em}
+    \begin{block}{Foundation for Methodological Choices}
+        For cystic vs cauliflower with variable morphologies, GNNs are appropriate
+    \end{block}
+\end{frame}
+
+% Slide 38: Synthetic Performance
+\begin{frame}{Performance on Synthetic Data}
+    \textbf{Task:} Regression of Matérn parent number\\
+    \textbf{Test set:} 15,000 synthetic organoids
+    
+    \vspace{1em}
+    \begin{table}
+        \centering
+        \begin{tabular}{lcc}
+            \toprule
+            \textbf{Architecture} & \textbf{MSE} & \textbf{Improvement vs GCN} \\
+            \midrule
+            GCN (baseline) & 0.198 & — \\
+            DeepSets & 0.145 & +27\% \\
+            EGNN & 0.137 & +31\% \\
+            \textbf{GAT} & \textbf{0.118} & \textbf{+40\%} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.5em}
+    \textbf{GAT wins:} Attention enables adaptive neighbor weighting
+\end{frame}
+
+% Slide 39: Synthetic Analysis
+\begin{frame}{Synthetic Results Analysis}
+    \textbf{Why GAT wins:}
+    \begin{itemize}
+        \item Attention learns which neighbors matter most
+        \item Adaptive to clustering patterns
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{DeepSets' good performance:}
+    \begin{itemize}
+        \item Global statistics capture substantial information
+        \item But local structure still helps (GAT beats DeepSets)
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{EGNN trade-off:}
+    \begin{itemize}
+        \item Slightly behind GAT in raw numbers
+        \item But guaranteed equivariance
+        \item Equivariance divides MSE by \textbf{2.8×}
+    \end{itemize}
+\end{frame}
+
+% Slide 40: Real Performance
+\begin{frame}{Performance on Real Data}
+    \textbf{Dataset:} 500 well-differentiated organoids\\
+    \textbf{Evaluation:} 5-fold cross-validation
+    
+    \vspace{1em}
+    \begin{center}
+        {\Huge \textbf{84\% Accuracy}}\\
+        (GAT + pre-training)
+    \end{center}
+    
+    \vspace{1em}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Cauliflower:}
+            \begin{itemize}
+                \item Precision: 93\%
+                \item Recall: 74\%
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Cystic:}
+            \begin{itemize}
+                \item Precision: 78\%
+                \item Recall: 95\%
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 41: Confusion Matrix
+\begin{frame}{Confusion Matrix}
+    \begin{center}
+        \begin{tikzpicture}[scale=1.5]
+            % Matrix
+            \draw[thick] (0,0) rectangle (2,2);
+            \draw[thick] (1,0) -- (1,2);
+            \draw[thick] (0,1) -- (2,1);
+            
+            % Values
+            \node at (0.5,1.5) {\Large\textbf{28}};
+            \node at (1.5,1.5) {\Large 10};
+            \node at (0.5,0.5) {\Large 2};
+            \node at (1.5,0.5) {\Large\textbf{35}};
+            
+            % Labels
+            \node[rotate=90] at (-0.5,1.5) {Cauliflower};
+            \node[rotate=90] at (-0.5,0.5) {Cystic};
+            \node at (0.5,2.3) {Pred. Caul.};
+            \node at (1.5,2.3) {Pred. Cyst.};
+            
+            % Results
+            \node at (3.5,1.5) {\textbf{63/75 correct}};
+            \node at (3.5,1) {\textbf{= 84\% accuracy}};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{1em}
+    \textbf{Main confusion:} Cauliflower $\rightarrow$ Cystic
+    \begin{itemize}
+        \item Low-deformation cauliflowers appear quasi-spherical
+        \item Possible intermediate/transitional phenotypes
+    \end{itemize}
+\end{frame}
+
+% Slide 42: Transfer Learning Impact
+\begin{frame}{Transfer Learning Impact}
+    \begin{table}
+        \centering
+        \begin{tabular}{lc}
+            \toprule
+            \textbf{Training Strategy} & \textbf{Accuracy} \\
+            \midrule
+            GAT from scratch (100\% data) & 76\% \\
+            GAT pre-trained + fine-tuned & \textbf{84\%} \\
+            \midrule
+            \textit{Improvement} & \textbf{+8\%} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{1em}
+    \textbf{Data Efficiency:}
+    \begin{itemize}
+        \item Pre-trained with 25\% data (125 organoids): 78\%
+        \item From-scratch with 100\% data: 76\%
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \begin{alertblock}{4× Reduction in Annotation Requirements}
+        Transformative for practical applications
+    \end{alertblock}
+\end{frame}
+
+% Slide 43: Learning Curves
+\begin{frame}{Learning Curves: Transfer Learning Advantage}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/accuracy_vs_ratio.png}
+            \end{center}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Gains at different data fractions:}
+            \begin{itemize}
+                \item 10\% data: \textbf{+13\%}
+                \item 25\% data: +11\%
+                \item 50\% data: +10\%
+                \item 100\% data: +8\%
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Convergence:}
+            \begin{itemize}
+                \item Pre-trained: 20-30 epochs
+                \item From-scratch: 80-100 epochs
+                \item \textbf{3× faster}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 44: Computational Efficiency
+\begin{frame}{Computational Efficiency}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Inference:}
+            \begin{itemize}
+                \item \textbf{200+ organoids/minute} (GPU batch)
+                \item Enables high-throughput screening
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Memory:}
+            \begin{itemize}
+                \item $\sim$8 GB GPU memory
+                \item Compatible with standard hardware
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Reproducibility:}
+            \begin{itemize}
+                \item Identical outputs every time
+                \item No inter-observer variability
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Scalability:}
+            \begin{itemize}
+                \item 1000 organoids: $\sim$17 hours
+                \item 20 GPUs in parallel
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 45: Results Summary
+\begin{frame}{Experimental Results: Summary}
+    \begin{enumerate}
+        \item \textbf{GNNs > spatial statistics} for variable morphologies
+        
+        \vspace{0.5em}
+        \item \textbf{GAT achieves best performance:}
+        \begin{itemize}
+            \item MSE 0.118 (synthetic)
+            \item 84\% accuracy (real)
+        \end{itemize}
+        
+        \vspace{0.5em}
+        \item \textbf{Transfer learning:}
+        \begin{itemize}
+            \item 4× data efficiency
+            \item 3× faster convergence
+        \end{itemize}
+        
+        \vspace{0.5em}
+        \item \textbf{Practical pipeline:}
+        \begin{itemize}
+            \item 200+ organoids/minute
+            \item Fully automated, reproducible
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+% Slide 46: Limitations
+\begin{frame}{Identified Limitations}
+    \begin{itemize}
+        \item \textbf{Segmentation dependency:}
+        \begin{itemize}
+            \item Errors propagate through pipeline
+        \end{itemize}
+        
+        \vspace{0.5em}
+        \item \textbf{Validation scope:}
+        \begin{itemize}
+            \item Prostate organoids only
+            \item Generalization to brain, liver, etc. needs testing
+        \end{itemize}
+        
+        \vspace{0.5em}
+        \item \textbf{No inter-laboratory validation:}
+        \begin{itemize}
+            \item Different microscopes, protocols
+        \end{itemize}
+        
+        \vspace{0.5em}
+        \item \textbf{No interpretability analysis:}
+        \begin{itemize}
+            \item Which cells/regions drive predictions?
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% =============================================================================
+% PART 5: CONCLUSION
+% =============================================================================
+\section{Conclusion and Perspectives}
+
+\begin{frame}
+    \begin{center}
+        {\Huge \textbf{Part IV}}\\[1em]
+        {\LARGE Conclusion and Perspectives}
+    \end{center}
+\end{frame}
+
+% Slide 48: Contribution 1
+\begin{frame}{Contribution 1: Automated Pipeline}
+    \begin{block}{Complete End-to-End Pipeline}
+        From raw 3D images to phenotype predictions
+    \end{block}
+    
+    \vspace{1em}
+    \textbf{Features:}
+    \begin{itemize}
+        \item Full workflow: preprocessing → segmentation → classification
+        \item \textbf{1000× compression} while preserving biological information
+        \item \textbf{Open-source} codebase available to community
+    \end{itemize}
+\end{frame}
+
+% Slide 49: Contribution 2
+\begin{frame}{Contribution 2: Segmentation Optimization}
+    \begin{block}{Faster Cellpose}
+        \textbf{5× speedup} through knowledge distillation and pruning\\
+        Maintains F1 = 0.95
+    \end{block}
+    
+    \vspace{1em}
+    \textbf{Additional contribution:}
+    \begin{itemize}
+        \item Geometric method (ellipse detection): 15× speedup
+        \item Useful for ultra-rapid primary screening
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Impact:} Makes high-throughput analysis practical
+\end{frame}
+
+% Slide 50: Contribution 3
+\begin{frame}{Contribution 3: Geometric Graphs and GNNs}
+    \begin{block}{Graph-Based Representation}
+        Geometric graphs capture cellular relational structure
+    \end{block}
+    
+    \vspace{1em}
+    \textbf{Contributions:}
+    \begin{itemize}
+        \item Systematic comparison: GAT, DeepSets, EGNN, GCN
+        \item Demonstrated value of \textbf{E(3)-equivariant architectures}
+        \item \textbf{GAT:} best accuracy
+        \item \textbf{EGNN:} guaranteed geometric robustness
+    \end{itemize}
+\end{frame}
+
+% Slide 51: Contribution 4
+\begin{frame}{Contribution 4: Synthetic Data Generation}
+    \begin{block}{Point Process-Based Generation}
+        Poisson + Matérn processes for synthetic organoids
+    \end{block}
+    
+    \vspace{1em}
+    \textbf{Results:}
+    \begin{itemize}
+        \item \textbf{100,000 synthetic organoids} with perfect labels
+        \item \textbf{+8\% accuracy} improvement
+        \item \textbf{4× reduction} in annotation needs
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Generalizable:} Applicable to other spherical/ellipsoidal structures
+\end{frame}
+
+% Slide 52: Contribution 5
+\begin{frame}{Contribution 5: GRETSI Comparative Study}
+    \begin{block}{Published at GRETSI 2025}
+        Rigorous comparison: GNNs vs Spatial Statistics
+    \end{block}
+    
+    \vspace{1em}
+    \textbf{Findings:}
+    \begin{itemize}
+        \item GNNs: Better \textbf{geometric generalization}
+        \item Spatial statistics: Better \textbf{noise robustness}
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Impact:} Guides method selection based on data characteristics
+\end{frame}
+
+% Slide 53: Short-Term Perspectives
+\begin{frame}{Short-Term Perspectives}
+    \textbf{Methodological Extensions:}
+    \begin{itemize}
+        \item Multi-scale graphs (cell → region → organoid)
+        \item Graph Transformers for global attention
+        \item Alpha-shape morphological descriptors
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Multi-Modal Integration:}
+    \begin{itemize}
+        \item Spatial transcriptomics + imaging
+        \item Temporal data from time-lapse imaging
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Clinical Validation:}
+    \begin{itemize}
+        \item Prospective studies on patient cohorts
+        \item Therapeutic response prediction
+    \end{itemize}
+\end{frame}
+
+% Slide 54: Long-Term Perspectives
+\begin{frame}{Long-Term Vision}
+    \textbf{Therapeutic Response Prediction:}
+    \begin{itemize}
+        \item Patient-derived organoids
+        \item Test multiple treatments in silico
+        \item Predict best therapy for individual patients
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Generative Graph Models:}
+    \begin{itemize}
+        \item In silico organoid design
+        \item Optimize culture protocols computationally
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Societal Impact:}
+    \begin{itemize}
+        \item 3Rs principles: Replace, Reduce, Refine animal experimentation
+        \item Accelerate transition to organoid-based screening
+    \end{itemize}
+\end{frame}
+
+% Slide 55: Final Message
+\begin{frame}{Final Message}
+    \begin{center}
+        \textbf{\Large Geometric Graph Neural Networks}\\
+        are a powerful tool for 3D organoid analysis
+        
+        \vspace{1em}
+        \begin{tikzpicture}
+            \node[draw, circle, fill=inriaBlue!20, minimum size=2cm] (bio) at (0,0) {Biology};
+            \node[draw, circle, fill=cysticGreen!20, minimum size=2cm] (ai) at (4,0) {AI};
+            \draw[<->, thick, inriaRed] (bio) -- (ai);
+            \node[above] at (2,0.3) {Virtuous Synergy};
+        \end{tikzpicture}
+        
+        \vspace{1em}
+        \textbf{Open-source code} available for the community
+        
+        \vspace{1em}
+        {\Large Thank you for your attention.}\\
+        {\large I am happy to take your questions.}
+    \end{center}
+\end{frame}
+
+% =============================================================================
+% BACKUP SLIDES
+% =============================================================================
+\appendix
+
+\begin{frame}
+    \begin{center}
+        {\Huge Backup Slides}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Anticipated Questions}
+    \begin{enumerate}
+        \item \textbf{Why GAT over EGNN?}\\
+        Trade-off: GAT wins on accuracy; EGNN wins on theoretical guarantees
+        
+        \vspace{0.5em}
+        \item \textbf{Synthetic data validation?}\\
+        Empirical gains (+8\%) demonstrate practical utility
+        
+        \vspace{0.5em}
+        \item \textbf{Generalization to other organoids?}\\
+        Principles transferable; requires fine-tuning Cellpose
+        
+        \vspace{0.5em}
+        \item \textbf{Why only 500 organoids?}\\
+        Quality over quantity — ensuring label-morphology consistency
+        
+        \vspace{0.5em}
+        \item \textbf{Clinical deployment?}\\
+        Would require regulatory validation (IVDR/FDA), multi-site testing
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Timing Checkpoints}
+    \begin{table}
+        \centering
+        \begin{tabular}{lc}
+            \toprule
+            \textbf{Section} & \textbf{Target Time} \\
+            \midrule
+            After Introduction (Slide 8) & $\sim$7 min \\
+            After Foundations (Slide 22) & $\sim$20 min \\
+            After Methodology (Slide 32) & $\sim$29 min \\
+            After Results (Slide 46) & $\sim$40 min \\
+            End & $\sim$47 min \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{1em}
+    \textbf{If running long:} Abbreviate slides 38-39 (synthetic results)\\
+    \textbf{If running short:} Expand perspectives (slides 53-54)
+\end{frame}
+
+\end{document}
