@@ -112,65 +112,63 @@
 % Slide 3: Our Prostate Organoids
 \begin{frame}{Prostate Organoids: Two Phenotypes}
     \begin{columns}
-        \begin{column}{0.5\textwidth}
+        \begin{column}{0.48\textwidth}
             \begin{block}{\textcolor{cysticGreen}{\faCheck} Cystic (Healthy)}
                 \begin{itemize}
-                    \item Spherical shape
-                    \item Central cavity
-                    \item Organized cellular structure
-                    \item Smooth surface
+                    \item Spherical, central cavity
+                    \item Organized structure
                     \item \textbf{Uniform} cell distribution
                 \end{itemize}
             \end{block}
-        \end{column}
-        \begin{column}{0.5\textwidth}
+            \vspace{0.3em}
             \begin{block}{\textcolor{cauliflowerOrange}{\faExclamationTriangle} Cauliflower (Perturbed)}
                 \begin{itemize}
-                    \item Irregular surface
-                    \item Multiple buds
+                    \item Irregular, multiple buds
                     \item Disorganized structure
-                    \item No central cavity
                     \item \textbf{Clustered} cell distribution
                 \end{itemize}
             \end{block}
         \end{column}
+        \begin{column}{0.52\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{animations/real_organoid_clusters1.png}\\
+                {\footnotesize Real organoid examples with cell distributions}
+            \end{center}
+        \end{column}
     \end{columns}
     
-    \vspace{1em}
+    \vspace{0.5em}
     \begin{center}
-        \textbf{Dataset}: 2,272 organoids from 1,311 samples\\
-        Collected over 22 months (IPMC Nice \& Paris Cité)
+        \textbf{Dataset}: 2,272 organoids from 1,311 samples (22 months, IPMC Nice \& Paris Cité)
     \end{center}
 \end{frame}
 
 % Slide 4: Challenge 1 - Automatic Quantification
 \begin{frame}{Challenge \#1: Automatic Quantification}
     \begin{columns}
-        \begin{column}{0.6\textwidth}
-            \textbf{Current situation: Manual analysis}
+        \begin{column}{0.55\textwidth}
+            \textbf{Manual analysis problems:}
             \begin{itemize}
-                \item 15--30 minutes per organoid
-                \item For 1000s of organoids $\rightarrow$ doesn't scale
+                \item \textcolor{red}{\faTimes\ Subjective} — inter-expert variability
+                \item \textcolor{red}{\faTimes\ Inconsistent} — intra-expert variability
+                \item \textcolor{red}{\faTimes\ Slow} — 30 min/organoid
             \end{itemize}
             
             \vspace{1em}
-            \textbf{Problems with manual analysis:}
-            \begin{itemize}
-                \item \textcolor{red}{Subjective}: Different experts $\rightarrow$ different classifications
-                \item \textcolor{red}{Inconsistent}: Same expert, different times $\rightarrow$ different results
-                \item \textcolor{red}{Slow}: Bottleneck for drug screening
-            \end{itemize}
-            
-            \vspace{1em}
-            \textbf{Need:} \textcolor{inriaBlue}{Automated, objective, reproducible tools}
+            \textbf{Need:}\\
+            \textcolor{inriaBlue}{\faCheck\ Automated} — scalable\\
+            \textcolor{inriaBlue}{\faCheck\ Objective} — reproducible\\
+            \textcolor{inriaBlue}{\faCheck\ Fast} — high-throughput
         \end{column}
-        \begin{column}{0.4\textwidth}
-            \begin{tikzpicture}[scale=0.8]
-                \node[draw, rectangle, fill=red!20, minimum width=3cm, minimum height=1cm] at (0,2) {Manual: 30 min};
-                \node[draw, rectangle, fill=green!20, minimum width=3cm, minimum height=1cm] at (0,0) {Auto: 6 sec};
-                \draw[->, thick] (0,1.3) -- (0,0.7);
-                \node at (0.5,1) {\textbf{300×}};
-            \end{tikzpicture}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.9]
+                    \node[draw, rectangle, rounded corners, fill=red!25, minimum width=3.2cm, minimum height=1.2cm, font=\small, align=center] at (0,2.2) {Manual\\30 min/organoid};
+                    \node[draw, rectangle, rounded corners, fill=cysticGreen!40, minimum width=3.2cm, minimum height=1.2cm, font=\small, align=center] at (0,0) {Automated\\6 sec/organoid};
+                    \draw[->, very thick, inriaBlue] (0,1.4) -- (0,0.8);
+                    \node[font=\Large\bfseries, inriaRed] at (2.2,1.1) {300$\times$};
+                \end{tikzpicture}
+            \end{center}
         \end{column}
     \end{columns}
 \end{frame}
@@ -278,7 +276,39 @@
 
 % Slide 8: Outline
 \begin{frame}{Presentation Outline}
-    \tableofcontents[hideallsubsections]
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=0.6cm,
+            part/.style={rectangle, rounded corners, draw, minimum width=3.5cm, minimum height=1cm, align=center, font=\small\bfseries},
+            time/.style={font=\tiny, text=gray}
+        ]
+            \node[part, fill=inriaBlue!30] (p1) at (0,0) {I. Theoretical\\Foundations};
+            \node[part, fill=inriaBlue!40] (p2) at (4.5,0) {II. Methodology};
+            \node[part, fill=inriaBlue!50] (p3) at (9,0) {III. Results};
+            \node[part, fill=cysticGreen!40] (p4) at (4.5,-2) {IV. Conclusion};
+            
+            \draw[->, thick] (p1) -- (p2);
+            \draw[->, thick] (p2) -- (p3);
+            \draw[->, thick] (p3) -- (p4);
+            \draw[->, thick, dashed] (p1) -- (p4);
+            
+            \node[time, below=0.1cm of p1] {Graphs \& GNNs};
+            \node[time, below=0.1cm of p2] {Pipeline \& Synthetic};
+            \node[time, below=0.1cm of p3] {Validation};
+            \node[time, below=0.1cm of p4] {Contributions \& Perspectives};
+            
+            % Timeline
+            \node[time] at (0,-3.2) {$\sim$13 min};
+            \node[time] at (4.5,-3.2) {$\sim$9 min};
+            \node[time] at (9,-3.2) {$\sim$11 min};
+            \node[time] at (4.5,-2.8) {$\sim$7 min};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.5em}
+    \begin{center}
+        {\small Total: $\sim$40 minutes + questions}
+    \end{center}
 \end{frame}
 
 % =============================================================================
@@ -368,33 +398,44 @@
 
 % Slide 12: Introduction to GNNs
 \begin{frame}{Graph Neural Networks: Message Passing}
-    \textbf{Challenge:} Graphs are non-Euclidean data
-    \begin{itemize}
-        \item Variable number of neighbors
-        \item No canonical ordering
-        \item No fixed structure
-    \end{itemize}
-    
-    \vspace{0.5em}
-    \textbf{Solution: Message Passing Paradigm}
-    \begin{equation*}
-        h_i^{(l+1)} = \text{UPDATE}\left(h_i^{(l)}, \text{AGGREGATE}\left(\{h_j^{(l)} : j \in \mathcal{N}(i)\}\right)\right)
-    \end{equation*}
-    
-    \begin{center}
-        \begin{tikzpicture}[scale=0.8, node distance=1.5cm]
-            \node[circle, draw, fill=inriaBlue!30] (A) at (0,0) {$i$};
-            \node[circle, draw, fill=gray!20] (B) at (-1.5,1) {$j_1$};
-            \node[circle, draw, fill=gray!20] (C) at (1.5,1) {$j_2$};
-            \node[circle, draw, fill=gray!20] (D) at (0,-1.5) {$j_3$};
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Challenge:} Graphs are non-Euclidean
+            \begin{itemize}
+                \item Variable neighbors, no ordering
+            \end{itemize}
             
-            \draw[->, thick, inriaRed] (B) -- (A);
-            \draw[->, thick, inriaRed] (C) -- (A);
-            \draw[->, thick, inriaRed] (D) -- (A);
+            \vspace{0.5em}
+            \textbf{Solution: Message Passing}
+            \begin{equation*}
+                h_i^{(l+1)} = \text{UPD}\left(h_i^{(l)}, \text{AGG}\left(\{h_j^{(l)}\}_{j \in \mathcal{N}(i)}\right)\right)
+            \end{equation*}
             
-            \node[right] at (2,0) {\small Messages from neighbors};
-        \end{tikzpicture}
-    \end{center}
+            \vspace{0.5em}
+            \textbf{Iterative process:}
+            \begin{enumerate}
+                \item Each node sends message to neighbors
+                \item Aggregate incoming messages
+                \item Update node representation
+            \end{enumerate}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.75, node distance=1.5cm]
+                    \node[circle, draw, fill=inriaBlue!40, minimum size=1cm] (A) at (0,0) {$i$};
+                    \node[circle, draw, fill=gray!30, minimum size=0.8cm] (B) at (-1.5,1.2) {$j_1$};
+                    \node[circle, draw, fill=gray!30, minimum size=0.8cm] (C) at (1.5,1.2) {$j_2$};
+                    \node[circle, draw, fill=gray!30, minimum size=0.8cm] (D) at (0,-1.5) {$j_3$};
+                    
+                    \draw[->, thick, inriaRed, decorate, decoration={snake, amplitude=1pt}] (B) -- (A);
+                    \draw[->, thick, inriaRed, decorate, decoration={snake, amplitude=1pt}] (C) -- (A);
+                    \draw[->, thick, inriaRed, decorate, decoration={snake, amplitude=1pt}] (D) -- (A);
+                \end{tikzpicture}\\
+                {\footnotesize Messages flow to central node}\\[0.3em]
+                {\tiny \faPlayCircle\ Animation: \texttt{message\_passing.gif}}
+            \end{center}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % Slide 13: Global Pooling
@@ -441,21 +482,39 @@
     \textbf{Veličković et al., 2018}
     
     \vspace{0.5em}
-    \textbf{Key Idea:} Learn attention coefficients to weight neighbors
+    \textbf{Key Idea:} Learn attention coefficients to weight neighbors differently
     
-    \begin{equation*}
-        \alpha_{ij} = \frac{\exp\left(\text{LeakyReLU}\left(\mathbf{a}^T[Wh_i \| Wh_j]\right)\right)}{\sum_{k \in \mathcal{N}(i)} \exp\left(\text{LeakyReLU}\left(\mathbf{a}^T[Wh_i \| Wh_k]\right)\right)}
-    \end{equation*}
-    
-    \begin{equation*}
-        h_i^{(l+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} W h_j^{(l)}\right)
-    \end{equation*}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{1. Compute attention scores:}
+            \begin{equation*}
+                \alpha_{ij} = \text{softmax}_j\left(\text{score}(h_i, h_j)\right)
+            \end{equation*}
+            
+            \textbf{2. Weighted aggregation:}
+            \begin{equation*}
+                h_i^{\text{new}} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \textcolor{inriaRed}{\alpha_{ij}} \cdot W h_j\right)
+            \end{equation*}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.7]
+                    \node[circle, draw, fill=inriaBlue!40, minimum size=0.8cm] (A) at (0,0) {$i$};
+                    \node[circle, draw, fill=gray!30, minimum size=0.6cm] (B) at (-1.5,1.2) {$j_1$};
+                    \node[circle, draw, fill=gray!30, minimum size=0.6cm] (C) at (1.5,1.2) {$j_2$};
+                    \node[circle, draw, fill=gray!30, minimum size=0.6cm] (D) at (0,-1.5) {$j_3$};
+                    
+                    \draw[->, line width=2pt, inriaRed] (B) -- (A) node[midway, left] {\tiny 0.5};
+                    \draw[->, line width=1pt, inriaRed!50] (C) -- (A) node[midway, right] {\tiny 0.2};
+                    \draw[->, line width=1.5pt, inriaRed!75] (D) -- (A) node[midway, right] {\tiny 0.3};
+                \end{tikzpicture}\\
+                {\footnotesize Learned attention weights}
+            \end{center}
+        \end{column}
+    \end{columns}
     
     \vspace{0.5em}
-    \textbf{Multi-head Attention:} Multiple independent attention mechanisms
-    
-    \vspace{0.5em}
-    \textcolor{cysticGreen}{\faCheck} \textbf{Best performance} in our experiments
+    \textcolor{cysticGreen}{\faCheck} \textbf{Best performance} — Multi-head attention for robustness
 \end{frame}
 
 % Slide 16: DeepSets
@@ -484,36 +543,49 @@
 
 % Slide 17: Geometric Equivariance
 \begin{frame}{Geometric Equivariance: Key Concept}
-    \textbf{Why important for organoids?}
-    \begin{itemize}
-        \item No preferred orientation in 3D culture
-        \item Biological phenotype $\neq$ function of orientation
-    \end{itemize}
-    
-    \vspace{0.5em}
     \begin{columns}
         \begin{column}{0.5\textwidth}
-            \textbf{Invariance:}
-            \begin{equation*}
-                f(T(x)) = f(x)
-            \end{equation*}
-            Output identical regardless of transformation\\
-            \textit{For classification}
+            \textbf{Why for organoids?}\\
+            No preferred orientation in 3D culture
+            
+            \vspace{0.8em}
+            \begin{block}{Invariance (classification)}
+                $f(T(x)) = f(x)$\\
+                {\small Same output after rotation}
+            \end{block}
+            
+            \vspace{0.3em}
+            \begin{block}{Equivariance (features)}
+                $f(T(x)) = T(f(x))$\\
+                {\small Features rotate coherently}
+            \end{block}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \textbf{Equivariance:}
-            \begin{equation*}
-                f(T(x)) = T(f(x))
-            \end{equation*}
-            Output transforms coherently\\
-            \textit{For intermediate representations}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.65]
+                    % Original
+                    \draw[thick, fill=inriaBlue!20] (0,1.5) circle (0.8);
+                    \fill[cauliflowerOrange] (0.3,1.8) circle (0.15);
+                    \fill[cauliflowerOrange] (-0.2,1.2) circle (0.12);
+                    \node[below] at (0,0.5) {\small Original};
+                    
+                    % Rotated
+                    \draw[thick, fill=inriaBlue!20] (3.5,1.5) circle (0.8);
+                    \fill[cauliflowerOrange] (3.2,1.2) circle (0.15);
+                    \fill[cauliflowerOrange] (3.8,1.9) circle (0.12);
+                    \node[below] at (3.5,0.5) {\small Rotated};
+                    
+                    % Arrow
+                    \draw[->, thick, decorate, decoration={snake, amplitude=2pt}] (1,1.5) -- (2.3,1.5);
+                    \node[above] at (1.65,1.7) {\tiny rotate};
+                    
+                    % Same class
+                    \node[draw, rounded corners, fill=cysticGreen!30, font=\small\bfseries] at (1.75,-0.3) {Same class!};
+                \end{tikzpicture}\\
+                {\footnotesize \faPlayCircle\ \texttt{rotation\_invariance.gif}}
+            \end{center}
         \end{column}
     \end{columns}
-    
-    \vspace{0.5em}
-    \begin{block}{Requirement}
-        Rotate the organoid $\Rightarrow$ same classification
-    \end{block}
 \end{frame}
 
 % Slide 18: E(3) Group
@@ -723,7 +795,7 @@
     \vspace{0.5em}
     \textbf{Our Solution: Faster Cellpose}
     \begin{enumerate}
-        \item \textbf{Knowledge Distillation:} Smaller student network (−50\% params)
+        \item \textbf{Knowledge Distillation:} Smaller student network ($-$50\% params)
         \item \textbf{Weight Pruning:} Remove 30\% low-magnitude weights
         \item \textbf{Inference Optimization:} Larger batches, mixed precision
     \end{enumerate}
@@ -760,7 +832,7 @@
 % Slide 28: Graph Construction
 \begin{frame}{Geometric Graph Construction}
     \begin{columns}
-        \begin{column}{0.55\textwidth}
+        \begin{column}{0.5\textwidth}
             \textbf{Node Features (4D):}
             \begin{itemize}
                 \item 3D centroid: $(x, y, z)$
@@ -773,13 +845,16 @@
             \begin{itemize}
                 \item K-nearest neighbors ($K=10$)
                 \item Euclidean distance
-                \item Symmetrized graph
-                \item Radial cutoff for long edges
+                \item Symmetrized + radial cutoff
             \end{itemize}
+            
+            \vspace{0.3em}
+            {\footnotesize \faPlayCircle\ Animation: \texttt{graph\_construction.gif}}
         \end{column}
-        \begin{column}{0.45\textwidth}
+        \begin{column}{0.5\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{img/graph_comparison.png}
+                \includegraphics[width=\textwidth]{animations/graph_construction_pipeline1.png}\\
+                {\footnotesize From segmentation to graph}
             \end{center}
         \end{column}
     \end{columns}
@@ -788,29 +863,30 @@
 % Slide 29: Synthetic Generation
 \begin{frame}{Synthetic Generation via Point Processes}
     \begin{columns}
-        \begin{column}{0.55\textwidth}
-            \textbf{Key Insight:} Cell distribution differs between phenotypes
+        \begin{column}{0.5\textwidth}
+            \textbf{Key Insight:} Cell distribution differs
             
             \vspace{0.5em}
-            \textbf{Cystic (Uniform):}
-            \begin{itemize}
-                \item Homogeneous Poisson process
-                \item Complete spatial randomness
-            \end{itemize}
+            \begin{block}{\textcolor{cysticGreen}{Cystic} — Poisson}
+                Homogeneous, spatially random
+            \end{block}
+            
+            \vspace{0.3em}
+            \begin{block}{\textcolor{cauliflowerOrange}{Cauliflower} — Matérn}
+                Parent points + clustered children
+            \end{block}
             
             \vspace{0.5em}
-            \textbf{Cauliflower (Clustered):}
-            \begin{itemize}
-                \item Matérn cluster process
-                \item Parent points + clustered children
-            \end{itemize}
+            \textbf{Generated:} \textbf{100,000} synthetic organoids\\
+            {\footnotesize Perfect labels, infinite supply}
             
-            \vspace{0.5em}
-            \textbf{Generated:} 100,000 synthetic organoids
+            \vspace{0.3em}
+            {\footnotesize \faPlayCircle\ \texttt{point\_processes.gif}}
         \end{column}
-        \begin{column}{0.45\textwidth}
+        \begin{column}{0.5\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{img/synthetic.png}
+                \includegraphics[width=\textwidth]{animations/synthetic_generation_steps.png}\\
+                {\footnotesize Generation pipeline steps}
             \end{center}
         \end{column}
     \end{columns}
@@ -843,41 +919,59 @@
 
 % Slide 31: Final Architecture
 \begin{frame}{Final Architecture Configuration}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=0.5cm,
+            block/.style={rectangle, rounded corners, draw, minimum height=0.7cm, align=center, font=\footnotesize},
+            arrow/.style={->, thick}
+        ]
+            % Architecture flow
+            \node[block, fill=gray!20, minimum width=1.2cm] (input) {Input\\$4D$};
+            \node[block, fill=inriaBlue!30, minimum width=1.8cm, right=of input] (gat) {GAT\\5 layers};
+            \node[block, fill=inriaBlue!20, minimum width=1.5cm, right=of gat] (pool) {Pool\\mean+max};
+            \node[block, fill=cauliflowerOrange!30, minimum width=1.5cm, right=of pool] (mlp) {MLP\\256→128};
+            \node[block, fill=cysticGreen!40, minimum width=1.2cm, right=of mlp] (out) {Output\\2 classes};
+            
+            \draw[arrow] (input) -- (gat);
+            \draw[arrow] (gat) -- (pool);
+            \draw[arrow] (pool) -- (mlp);
+            \draw[arrow] (mlp) -- (out);
+            
+            % Specs below
+            \node[font=\tiny, text=gray] at (2.7,-0.8) {256 hidden dim};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.5em}
     \begin{columns}
         \begin{column}{0.5\textwidth}
-            \textbf{Encoder:}
-            \begin{itemize}
-                \item GAT with 5 layers
-                \item 256 hidden dimensions
-            \end{itemize}
-            
-            \vspace{0.5em}
-            \textbf{Pooling:}
-            \begin{itemize}
-                \item Mean + Max concatenation
-            \end{itemize}
-            
-            \vspace{0.5em}
-            \textbf{Classification Head:}
-            \begin{itemize}
-                \item MLP: 256 → 128 → 2
-            \end{itemize}
+            \begin{table}
+                \footnotesize
+                \begin{tabular}{ll}
+                    \toprule
+                    \multicolumn{2}{c}{\textbf{Training}} \\
+                    \midrule
+                    Optimizer & AdamW \\
+                    LR (pre-train) & $10^{-3}$ \\
+                    LR (fine-tune) & $10^{-4}$ \\
+                    Dropout & 0.15 \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \textbf{Training:}
-            \begin{itemize}
-                \item Optimizer: AdamW
-                \item LR: $10^{-3}$ (pre-train) / $10^{-4}$ (fine-tune)
-                \item Dropout: 0.15
-            \end{itemize}
-            
-            \vspace{0.5em}
-            \textbf{Compute:}
-            \begin{itemize}
-                \item Pre-training: 200 epochs, 48h
-                \item Fine-tuning: 100 epochs, 30 min
-                \item Hardware: NVIDIA RTX 3080
-            \end{itemize}
+            \begin{table}
+                \footnotesize
+                \begin{tabular}{ll}
+                    \toprule
+                    \multicolumn{2}{c}{\textbf{Compute}} \\
+                    \midrule
+                    Pre-training & 200 ep, 48h \\
+                    Fine-tuning & 100 ep, 30 min \\
+                    Hardware & RTX 3080 \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
         \end{column}
     \end{columns}
 \end{frame}
@@ -976,8 +1070,8 @@
             \vspace{0.5em}
             \textbf{Results:}
             \begin{itemize}
-                \item Spatial stats: 100\% → 65\% (\textcolor{red}{−35\%})
-                \item GNNs: 95\% → 82\% (\textcolor{cysticGreen}{−13\%})
+                \item Spatial stats: 100\% → 65\% (\textcolor{red}{$-$35\%})
+                \item GNNs: 95\% → 82\% (\textcolor{cysticGreen}{$-$13\%})
             \end{itemize}
             
             \vspace{0.5em}
@@ -1175,24 +1269,32 @@
     \begin{columns}
         \begin{column}{0.5\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{img/accuracy_vs_ratio.png}
+                \includegraphics[width=\textwidth]{code/learning_curves.png}\\
+                {\footnotesize Training convergence comparison}
             \end{center}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \textbf{Gains at different data fractions:}
-            \begin{itemize}
-                \item 10\% data: \textbf{+13\%}
-                \item 25\% data: +11\%
-                \item 50\% data: +10\%
-                \item 100\% data: +8\%
-            \end{itemize}
+            \textbf{Data efficiency gains:}
+            \begin{table}
+                \footnotesize
+                \begin{tabular}{lc}
+                    \toprule
+                    \textbf{Data} & \textbf{Gain} \\
+                    \midrule
+                    10\% & \textbf{+13\%} \\
+                    25\% & +11\% \\
+                    50\% & +10\% \\
+                    100\% & +8\% \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
             
-            \vspace{0.5em}
-            \textbf{Convergence:}
+            \vspace{0.3em}
+            \textbf{Convergence speed:}
             \begin{itemize}
                 \item Pre-trained: 20-30 epochs
                 \item From-scratch: 80-100 epochs
-                \item \textbf{3× faster}
+                \item[$\Rightarrow$] \textbf{3× faster}
             \end{itemize}
         \end{column}
     \end{columns}

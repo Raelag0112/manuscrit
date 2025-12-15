@@ -269,7 +269,7 @@ def animate_synthetic_generation():
     
     if SAVE_GIF:
         print("Saving synthetic_generation.gif...")
-        anim.save('synthetic_generation.gif', writer='pillow', fps=20, dpi=DPI)
+        anim.save('animations/synthetic_generation.gif', writer='pillow', fps=20, dpi=DPI)
         print("Saved!")
     
     plt.close(fig)
@@ -376,7 +376,7 @@ def create_generation_process_figure():
                  color='white', fontsize=14, fontweight='bold', y=0.98)
     
     plt.tight_layout(rect=[0.05, 0, 1, 0.95])
-    plt.savefig('synthetic_generation_steps.png', dpi=DPI, 
+    plt.savefig('animations/synthetic_generation_steps.png', dpi=DPI, 
                 facecolor='#1a1a2e', bbox_inches='tight')
     print("Saved synthetic_generation_steps.png")
     plt.close(fig)
