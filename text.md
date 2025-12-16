@@ -6,11 +6,11 @@
 
 ---
 
-## PART 1: INTRODUCTION (6-7 min)
+## INTRODUCTION (5-6 min)
 
 ### Slide 1: Title (30 sec)
 
-Good morning everyone, and thank you for being here today.
+Good afternoon everyone, and thank you for being here today.
 
 I am Alexandre Martin, and I am honored to present my doctoral thesis entitled "Deep Learning for Organoid Analysis: Graph-Based Modeling of 3D Cellular Architectures."
 
@@ -18,746 +18,714 @@ This work was conducted at INRIA Sophia-Antipolis within the Morpheme team, in c
 
 ---
 
-### Slide 2: Hook — Organoids Revolutionize Biology (1 min)
+### Slide 2: Organoids Introduction (1 min)
 
 Let me start by introducing organoids. Organoids are often called "mini-organs in a dish." They are three-dimensional structures grown in vitro from stem cells that self-organize to mimic the architecture and function of real organs.
 
-Unlike traditional two-dimensional cell cultures, where cells grow on flat surfaces and lose their natural organization, organoids reproduce the spatial complexity we observe in vivo: they form layers, develop internal cavities called lumens, and exhibit cellular polarization.
+Unlike traditional two-dimensional cell cultures, organoids reproduce the spatial complexity we observe in vivo. They bridge the gap between oversimplified 2D cultures and expensive, ethically problematic animal models.
 
-Since their first description for intestinal tissue in 2009 by Hans Clevers' team, organoids have been developed for many organs: brain, kidney, liver, lung, pancreas, and many others. They bridge the gap between oversimplified 2D cultures and expensive, ethically problematic animal models.
-
-Their applications are transformative: personalized medicine, drug screening, disease modeling, and potentially regenerative medicine.
+Their applications are transformative: personalized medicine, drug screening, and disease modeling.
 
 ---
 
-### Slide 3: Our Prostate Organoids (1 min)
+### Slide 3: The Challenge (1 min)
 
 In this thesis, we focus on prostate organoids. We observe two main phenotypes that are our classification targets.
 
-The first is the **cystic phenotype**, which represents healthy organoids. These have a spherical shape with a central cavity, organized cellular structure, and smooth surface. At the cellular level, cells are distributed relatively uniformly.
+The **cystic phenotype** represents healthy organoids: spherical shape, central cavity, organized structure, and uniform cell distribution.
 
-The second is the **cauliflower phenotype**, which represents a perturbed state. These organoids have an irregular surface with multiple buds, disorganized structure, and at the cellular level, cells form local clusters with high spatial aggregation.
+The **cauliflower phenotype** represents a perturbed state: irregular surface, multiple buds, and clustered cell distribution.
 
-Our dataset, collected over 22 months through collaboration with IPMC Nice and Paris Cité, contains 2,272 individual organoids extracted from 1,311 imaged samples. This represents a substantial resource for our domain.
-
----
-
-### Slide 4: Scientific Challenge #1 — Automatic Quantification (45 sec)
-
-Why do we need automated analysis? Let me explain the first major challenge.
-
-Currently, expert biologists analyze organoids manually. This takes 15 to 30 minutes per organoid. For a study involving thousands of organoids — which is typical for drug screening — this simply doesn't scale.
-
-Moreover, manual analysis is subjective. Different experts may classify the same organoid differently. Even the same expert may give different assessments at different times. This variability undermines reproducibility.
-
-We need automated, objective, reproducible analysis tools.
+Our goal is to automatically classify these phenotypes from 3D microscopy images.
 
 ---
 
-### Slide 5: Scientific Challenge #2 — Rare Annotated Data (45 sec)
+### Slide 4: Starting Point — No Data (1 min)
 
-The second challenge is the scarcity of annotated data.
+Here is a crucial point that shaped this entire thesis: **at the beginning, we had no annotated data**.
 
-Unlike computer vision where we have ImageNet with 14 million labeled images, the organoid domain has no public datasets. Expert annotation is expensive — a biologist's time costs around 50 euros per hour. Getting thousands of annotations is simply not practical.
+Unlike computer vision where ImageNet provides 14 million labeled images, the organoid domain had no public datasets. Expert annotation is expensive — a biologist's time costs around 50 euros per hour. Getting thousands of annotations is simply not practical.
 
-This data scarcity is a fundamental bottleneck for training deep learning models, which typically require large amounts of labeled examples.
+This posed a fundamental question: **how to develop and validate methods without real data?**
 
----
-
-### Slide 6: Scientific Challenge #3 — Geometric Robustness (45 sec)
-
-The third challenge is geometric robustness.
-
-Organoids cultured in 3D suspension have no preferred orientation. Their position and rotation in the culture dish are essentially random. This means our predictions must be invariant to rotations and translations — the same organoid oriented differently should receive the same classification.
-
-Additionally, acquisition conditions vary between laboratories — different microscopes, different protocols, different imaging parameters. Our methods must be robust to these variations.
+Our answer was to bootstrap the research using **synthetic data** combined with **graph modeling**. This is the story I will tell you today.
 
 ---
 
-### Slide 7: Research Questions (1 min)
+### Slide 5: Three Key Challenges (1 min)
 
-These challenges lead us to three core research questions that structure this thesis.
+Let me crystallize these into three key challenges.
 
-**Question 1**: Are geometric graphs an effective representation for organoids in machine learning? Can we capture the essential biological information while dramatically compressing the data?
+**Challenge 1 — Manual Analysis**: Currently, biologists analyze organoids manually. This takes 30 minutes per organoid, is subjective, and not reproducible. For drug screening with thousands of organoids, this simply doesn't scale.
 
-**Question 2**: Do equivariant Graph Neural Networks outperform classical approaches? Do they provide the geometric robustness we need?
+**Challenge 2 — Data Scarcity**: Unlike ImageNet with 14 million images, we have no public organoid datasets. Expert annotation is expensive — 50 euros per hour. Getting thousands of annotations is impractical.
 
-**Question 3**: Is transfer learning from synthetic data effective? Can we generate realistic synthetic organoids to compensate for the lack of real annotations?
+**Challenge 3 — 3D Geometry**: Organoids float freely in 3D culture with no preferred orientation. Each organoid is about 2 gigabytes of data. We need methods that are rotation-invariant and memory-efficient.
 
----
-
-### Slide 8: Presentation Outline (30 sec)
-
-Here is the outline of my presentation.
-
-First, I will present the **theoretical foundations**: the theory of graphs and Graph Neural Networks, explaining why this representation is natural for organoids.
-
-Second, I will describe our **methodology**: the complete pipeline from raw images to predictions, including our contributions to segmentation and synthetic data generation.
-
-Third, I will present our **experimental results** on both synthetic and real data, demonstrating the effectiveness of our approach.
-
-Finally, I will conclude with the **contributions and perspectives** for future work.
+We need automated, data-efficient, and geometrically robust methods.
 
 ---
 
-## PART 2: THEORETICAL FOUNDATIONS (12-14 min)
+### Slide 6: Research Questions (45 sec)
 
-### Slide 9: Part 2 Title (10 sec)
+These constraints lead us to three core research questions.
 
-Let me now turn to the theoretical foundations of our approach: graphs and Graph Neural Networks.
+**Question 1**: Can we model organoids as geometric graphs? Can we capture the essential biological information while compressing the data?
 
----
+**Question 2**: Do GNNs outperform classical spatial statistics? We needed to justify the deep learning approach rigorously.
 
-### Slide 10: Limitations of 3D CNNs (1.5 min)
-
-A natural question is: why not use 3D Convolutional Neural Networks, which have been successful for medical image analysis?
-
-The answer lies in practical constraints. A single organoid imaged at high resolution generates about 2 gigabytes of data — 2048 by 2048 pixels, times 200 slices in Z. Loading this into GPU memory for a 3D CNN is prohibitive.
-
-The standard solution is downsampling — reducing resolution to fit in memory. But this destroys the fine cellular details we need. Individual cells become unresolvable.
-
-Furthermore, 3D CNNs don't have native geometric invariance. They're not naturally invariant to 3D rotations. Achieving this requires extensive data augmentation, which is computationally expensive and doesn't provide guarantees.
-
-Finally, CNNs treat the organoid as a grid of voxels. They don't explicitly model cells as individual entities or capture the relational structure — which cell is next to which.
+**Question 3**: Can synthetic data enable transfer learning? Can we compensate for the lack of real annotations?
 
 ---
 
-### Slide 11: Graph Representation — A Natural Abstraction (1.5 min)
+### Slide 7: Presentation Outline (30 sec)
 
-This leads us to our key insight: graphs provide a natural abstraction for organoids.
+Here is my presentation outline, which reflects the actual research journey.
 
-Think about it: cells within an organoid form a network of spatial interactions. They contact each other, communicate through signaling, coordinate their behaviors. This relational organization — who is next to whom — largely determines the organoid's phenotype.
+**Part I**: I'll start with graph modeling and justify why we chose GNNs — this was our work when we had no real data.
 
-Our abstraction is simple: each cell becomes a node in a graph. Spatial proximity defines edges — neighboring cells are connected. Node features capture cellular properties: 3D position, volume, morphology.
+**Part II**: Then I'll present the theoretical foundations of Graph Neural Networks.
 
-This representation offers spectacular compression. We go from gigabytes of raw image data to megabytes of graph data — a factor of 1000. Yet we preserve the biologically relevant structural information.
+**Part III**: When real data finally arrived, we built a processing pipeline — I'll describe this next.
 
-On this slide you can see the transformation: raw 3D image, to point cloud of cell centroids, to geometric graph with edges encoding neighborhood relationships.
+**Part IV**: Finally, I'll show the transfer learning results combining synthetic and real data.
 
----
-
-### Slide 12: Introduction to Graph Neural Networks (2 min)
-
-Given this graph representation, how do we learn from it? This is where Graph Neural Networks come in.
-
-The key challenge is that graphs are non-Euclidean data. Unlike images where pixels lie on a regular grid, nodes in a graph have variable numbers of neighbors, no canonical ordering, no fixed structure.
-
-GNNs solve this through the **message passing paradigm**. The idea is elegant: each node iteratively aggregates information from its neighbors to update its representation.
-
-Let me explain with this animation. At layer zero, each node has its initial features. At layer one, each node collects messages from its neighbors and updates. At layer two, information has propagated further. After L layers, each node's representation captures information from its L-hop neighborhood.
-
-Mathematically, the update rule is: the new representation of node i equals an UPDATE function applied to its current representation and an AGGREGATE of its neighbors' representations.
-
-This is analogous to convolution on images, but generalized to arbitrary graph structures.
+The narrative follows our research path: no data → synthetic + theory → real data arrives → transfer learning.
 
 ---
 
-### Slide 13: Global Pooling and Classification (1 min)
+## PART I: GRAPH MODELING & JUSTIFICATION (12 min)
 
-For organoid classification, we need a graph-level prediction, not node-level.
+### Slide 8: Part I Title (10 sec)
 
-This requires **global pooling**: aggregating all node representations into a single graph representation. The simplest approaches are mean pooling — averaging all node features — or max pooling — taking the element-wise maximum.
-
-More sophisticated approaches include attention-weighted pooling, where we learn which nodes are most important for the prediction.
-
-Once we have this graph-level representation, we apply a classification head — typically a multi-layer perceptron — to produce class probabilities.
+Let me now explain why we chose to model organoids as graphs and why we chose GNNs over classical methods.
 
 ---
 
-### Slide 14: GCN Architecture — Baseline (1 min)
+### Slide 9: Why Model Organoids as Graphs? (1.5 min)
 
-Let me now describe the specific architectures we evaluated, starting with our baseline.
+The key biological insight is that **cell spatial organization** differs between phenotypes. Cystic organoids have uniformly distributed cells; cauliflower organoids have clustered cells.
 
-The **Graph Convolutional Network**, or GCN, was introduced by Kipf and Welling in 2017. It performs normalized mean aggregation: each node's update is a weighted average of its neighbors' features, normalized by the degrees.
+This leads naturally to a graph abstraction: each **cell becomes a node**, spatial **proximity defines edges**, and node features capture position and volume.
 
-The formula shows this: we sum over neighbors, divide by the square root of degrees for normalization, and apply a learnable weight matrix.
+This representation offers spectacular advantages:
+- **1000× compression**: from gigabytes of images to megabytes of graphs
+- It captures the relational structure — which cells are neighbors
+- It's natural for point cloud data
 
-GCN is simple and effective, but it treats all neighbors equally. It doesn't distinguish whether a neighbor is close or far, important or unimportant.
-
----
-
-### Slide 15: GAT Architecture — Our Main Choice (1.5 min)
-
-The **Graph Attention Network**, or GAT, addresses this limitation through attention.
-
-The key idea is to learn attention coefficients that weight the importance of each neighbor. Not all neighbors contribute equally to the prediction — some are more informative than others.
-
-The attention mechanism works as follows: for each pair of connected nodes, we compute an attention score using a learned attention vector. We apply a LeakyReLU nonlinearity and softmax to get normalized weights. Then we aggregate neighbor features weighted by these learned coefficients.
-
-GAT also uses **multi-head attention** — multiple independent attention mechanisms whose outputs are concatenated. This allows capturing different types of relationships simultaneously.
-
-As we'll see in the results, GAT achieves the best performance among the architectures we tested, precisely because of this adaptive weighting mechanism.
+On this slide, you can see the transformation from 3D image to point cloud to geometric graph.
 
 ---
 
-### Slide 16: DeepSets Architecture — Comparison Baseline (1 min)
+### Slide 9: Synthetic Organoid Generation — Motivation (1 min)
 
-As an alternative baseline, we also evaluated **DeepSets**, a set-based approach.
+With no real data at the start of this thesis, we needed to create synthetic organoids.
 
-DeepSets treats the organoid as an unordered set of cells, without explicit neighborhood structure. Each cell is encoded independently by a neural network phi, then all encodings are aggregated globally — typically by summation or averaging — and finally processed by another network rho.
+The key biological insight is that **cell distribution differs between phenotypes**: cystic organoids have uniformly distributed cells, while cauliflower organoids have clustered cells.
 
-This approach is invariant to permutations: the order in which we process cells doesn't matter. But it completely ignores local spatial structure. Each cell is treated in isolation before the global aggregation.
-
-Surprisingly, DeepSets performs reasonably well — this tells us that global statistics about cellular properties are quite informative. But as we'll see, architectures that explicitly model local structure perform better.
+Our solution uses **spatial point processes** — mathematical models for generating point patterns with controllable properties. This gives us perfect ground truth labels and unlimited training data.
 
 ---
 
-### Slide 17: Geometric Equivariance — Key Concept (1.5 min)
+### Slide 10: Point Processes — Mathematical Foundation (1.5 min)
 
-Now let me introduce a concept that is crucial for organoid analysis: geometric equivariance.
+Let me explain the mathematical foundation.
 
-**Why is this important for organoids?** As I mentioned earlier, organoids in 3D culture have no preferred orientation. They float randomly. The biological phenotype doesn't depend on how we happen to orient the organoid when imaging.
+For **cystic organoids**, we use a **homogeneous Poisson process**. Points are distributed with complete spatial randomness — no clustering, no regularity. The intensity parameter λ controls the expected number of points per unit volume.
 
-This means our model's prediction should be **invariant** to rotations and translations: rotate the organoid, get the same prediction.
+For **cauliflower organoids**, we use a **Matérn cluster process**. First, we generate parent points uniformly. Then, around each parent, we scatter children points. The parameters control parent intensity κ, children per parent μ, and cluster radius r.
 
-Let me clarify the distinction between invariance and equivariance, which are related but different concepts.
-
-**Invariance** means the output is identical regardless of transformation: f of T of x equals f of x. For classification, we want invariance — the class doesn't change if we rotate.
-
-**Equivariance** means the output transforms coherently: f of T of x equals T of f of x. For intermediate representations — like node embeddings — equivariance is appropriate. The representation should rotate along with the input.
+By varying these parameters, we generate a continuum from uniform to highly clustered distributions.
 
 ---
 
-### Slide 18: The E(3) Group (1 min)
+### Slide 11: Synthetic Dataset Statistics (1 min)
 
-The relevant symmetry group for 3D biological structures is **E(3)** — the Euclidean group in 3 dimensions.
+Our synthetic dataset is substantial.
 
-E(3) encompasses three types of transformations:
-- **Rotations**: any 3D rotation around any axis
-- **Translations**: shifting the entire structure in space  
-- **Reflections**: mirror symmetries
+For generation parameters, each organoid contains 100 to 500 cells, distributed on a normalized unit sphere. Cell volumes follow a log-normal distribution matching real biology.
 
-For organoid analysis, all these transformations should leave our predictions unchanged. An organoid and its mirror image, rotated and translated, should receive the same classification.
+We generated **100,000 synthetic organoids** total: 70,000 for training, 15,000 for validation, and 15,000 for testing.
 
-The key insight is that we can build architectures that **guarantee** these invariances by construction — not learned through data augmentation, but mathematically guaranteed.
+The key advantages are **perfect ground truth** — we know exactly how clustered each organoid is — **unlimited supply** — we can generate more anytime — and **controllable difficulty** — we can create easy or hard cases.
 
 ---
 
-### Slide 19: EGNN Architecture — Guaranteed Equivariance (1.5 min)
+### Slide 13: GRETSI Study — GNNs vs Spatial Statistics (1 min)
 
-The **Equivariant Graph Neural Network**, or EGNN, achieves this guarantee through careful architectural design.
+Before committing to GNNs, we asked: **when should we prefer GNNs over classical methods?**
 
-The key principle is: use only invariant quantities in the message computation. Distances between nodes are invariant — they don't change if we rotate or translate. So EGNN builds messages from distances, not raw coordinates.
+This rigorous comparison, published at GRETSI 2025, compares:
+- **Classical approach**: Ripley's K, F, G functions with Random Forest
+- **Deep learning approach**: Graph Neural Networks
 
-But EGNN also updates node coordinates in an equivariant way. The coordinate update uses direction vectors — which are equivariant — scaled by learned weights. This allows the model to reason about geometry while maintaining mathematical guarantees.
-
-The practical advantages are significant:
-- No data augmentation needed for rotations — we get invariance for free
-- Better generalization with less data — we don't waste capacity learning obvious symmetries
-- Robustness is guaranteed by construction, not hopefully learned
+Our protocol uses synthetic data where we control ground truth. We test noise robustness and geometric generalization.
 
 ---
 
-### Slide 20: EGNN — Key Formulas (1 min)
+### Slide 14: Result 1 — Noise Robustness (1.5 min)
 
-Let me show the key formulas for EGNN.
+This figure shows accuracy versus noise level.
 
-For **message computation**: the message from node j to node i depends on their features and the squared distance between them. Note that the distance is invariant — it doesn't change under rotation.
+The key observation: **spatial statistics are more robust to noise**. Even at high noise levels, Ripley's functions maintain good accuracy.
 
-For **coordinate update**: each node's position is updated by a weighted sum of direction vectors to its neighbors. The weights are learned and depend on the message. Crucially, direction vectors are equivariant, so the update preserves equivariance.
+Why? Ripley's functions average over many point pairs, naturally smoothing noise. GNNs can propagate noise through message passing layers.
 
-For **feature update**: node features are updated based on the aggregated messages, using a standard neural network.
-
-This combination — invariant messages, equivariant coordinate updates — gives us the best of both worlds.
+We also observe an optimal GNN depth around 5-6 layers — deeper networks suffer from over-smoothing.
 
 ---
 
-### Slide 21: Architecture Comparison (1 min)
-
-Let me summarize the architectures we evaluated.
-
-**GCN** is our simple baseline with normalized mean aggregation. It's effective but treats all neighbors equally.
-
-**GAT** introduces attention to weight neighbor contributions adaptively. As we'll see, it achieves the best raw performance.
-
-**DeepSets** uses global aggregation without explicit local structure. It's a useful comparison to assess the value of local structure.
-
-**EGNN** guarantees E(3)-equivariance through its architecture. It offers a trade-off: slightly lower raw performance but guaranteed geometric robustness.
-
----
-
-### Slide 22: Part 2 Summary (30 sec)
-
-To summarize this theoretical section:
-
-Graphs capture the relational structure of organoids with 1000× compression compared to raw images.
-
-Graph Neural Networks learn from this non-Euclidean data through message passing.
-
-GAT achieves the best performance through adaptive attention.
-
-EGNN provides guaranteed geometric robustness through equivariant design.
-
----
-
-## PART 3: METHODOLOGY (8-10 min)
-
-### Slide 23: Part 3 Title (10 sec)
-
-Let me now present our methodology: the complete pipeline from raw images to phenotype predictions.
-
----
-
-### Slide 24: Pipeline Overview (1.5 min)
-
-Here is an overview of our end-to-end pipeline.
-
-We start with a 3D confocal image — about 2 gigabytes of data, 2048 by 2048 pixels times 200 slices.
-
-The first step is **preprocessing**: intensity normalization and denoising to handle acquisition variations.
-
-Next comes **cell segmentation** using Faster Cellpose — our optimized version of the state-of-the-art segmentation method. This produces masks labeling each individual cell.
-
-We then extract **cell features**: centroid coordinates and volume, giving us 4 features per cell.
-
-**DBSCAN clustering** separates individual organoids when multiple are present in the same field of view.
-
-**Graph construction** via K-nearest-neighbors creates the geometric graph representation.
-
-Finally, **GNN classification** predicts the phenotype.
-
-The total processing time is about 20 minutes per organoid, dominated by segmentation. The output graph is only about 10 megabytes — a 1000× compression from the original image.
-
----
-
-### Slide 25: Collaborative Dataset (1 min)
-
-Our work relies on a substantial collaborative dataset collected through the ANR Morpheus project.
-
-The data was acquired over 22 months, from May 2023 to February 2025, in collaboration with IPMC Nice and Paris Cité University.
-
-This plot shows the cumulative growth of our dataset over time.
-
-In total, we imaged 1,311 samples from which we extracted 2,272 individual organoids.
-
-For this study, we selected 500 well-differentiated organoids — approximately 250 per class — where the phenotype label clearly matched the observed morphology. This ensures high-quality supervision for training.
-
----
-
-### Slide 26: Segmentation Optimization (1.5 min)
-
-Cell segmentation is a critical bottleneck. Let me explain our contribution here.
-
-Cellpose is the current state-of-the-art for cell segmentation, achieving F1 scores of 0.98. But it's slow — 30 seconds per image slice.
-
-For our dataset, this means: 30 seconds times 200 slices times 1000 organoids equals 2,500 hours of computation — over 100 days! This is prohibitive.
-
-We developed **Faster Cellpose** through several optimizations.
-
-First, **knowledge distillation**: we train a smaller "student" network to mimic the larger "teacher" Cellpose model, reducing parameters by 50%.
-
-Second, **weight pruning**: we remove 30% of low-magnitude weights with minimal accuracy loss.
-
-Third, **inference optimizations**: larger batch sizes, mixed precision computation, reduced iterations.
-
-The result: 5× speedup while preserving F1 = 0.95. This reduces 2,500 hours to 500 hours — making our pipeline practical.
-
----
-
-### Slide 27: Segmentation Methods Comparison (1 min)
-
-This table compares our segmentation approaches.
-
-Our geometric method based on ellipse detection is extremely fast — 3 seconds per slice — but achieves only 0.88 F1, which is too imprecise for our needs.
-
-**Faster Cellpose**, our contribution, achieves 0.95 F1 at 6 seconds per slice — the optimal trade-off.
-
-Original Cellpose achieves 0.98 F1 but at 30 seconds per slice — too slow for thousands of organoids.
-
-We chose Faster Cellpose for our pipeline because segmentation quality directly impacts graph quality and downstream GNN performance.
-
----
-
-### Slide 28: Geometric Graph Construction (1.5 min)
-
-Once cells are segmented, we construct the geometric graph.
-
-Each cell becomes a node with a **4-dimensional feature vector**: the 3D centroid coordinates (x, y, z) and the cell volume. Coordinates are normalized by centering and scaling.
-
-For **edge construction**, we use K-nearest neighbors with K=10. Each node is connected to its 10 closest neighbors based on Euclidean distance between centroids.
-
-We then **symmetrize** the graph: if i is a neighbor of j, then j is also a neighbor of i. We also apply a radial cutoff to remove excessively long edges.
-
-This hybrid strategy balances connectivity, biological meaning, and computational efficiency.
-
-The image on this slide shows graphs constructed from our data, clearly visualizing the cellular neighborhood structure.
-
----
-
-### Slide 29: Synthetic Generation via Point Processes (1.5 min)
-
-To address the scarcity of annotated data, we developed synthetic organoid generation based on spatial point processes.
-
-The key insight is that the spatial distribution of cells differs between phenotypes.
-
-For **cystic organoids**, cells are distributed relatively uniformly — we model this with a **homogeneous Poisson process**. This is complete spatial randomness: cells are positioned independently.
-
-For **cauliflower organoids**, cells aggregate into clusters — we model this with a **Matérn cluster process**. Parent points are distributed uniformly, then child points cluster around each parent.
-
-By controlling the process parameters, we generate a continuum from purely random to highly clustered distributions.
-
-On this slide, you can see the visual difference: Poisson on the left with uniform distribution, Matérn on the right with clear clustering.
-
-We generated **100,000 synthetic organoids** with perfectly known ground truth labels.
-
----
-
-### Slide 30: From Synthetic to Real — Transfer Learning (1 min)
-
-Our strategy is transfer learning from synthetic to real data.
-
-**Phase 1: Pre-training** on 70,000 synthetic organoids. We train the GNN to regress the number of parent points in the Matérn process — a continuous measure of clustering degree. This teaches the network to recognize spatial organization patterns.
-
-**Phase 2: Fine-tuning** on 500 real organoids. We reinitialize the classification head and fine-tune with a reduced learning rate.
-
-The benefits are substantial:
-- 4× data efficiency: 125 pre-trained organoids achieve what 500 from-scratch require
-- 3× faster convergence
-- 8% accuracy improvement
-
----
-
-### Slide 31: Final Architecture (1 min)
-
-Our final architecture uses GAT as the encoder — 5 layers with 256 hidden dimensions.
-
-For global pooling, we concatenate mean and max pooling to capture both average and extreme features.
-
-The classification head is a two-layer MLP: 256 to 128 to 2 outputs.
-
-Training uses AdamW optimizer with learning rate 10⁻³ and dropout 0.15 for regularization.
-
-For pre-training on synthetic data, we train for 200 epochs — about 48 hours on an NVIDIA RTX 3080.
-
-For fine-tuning on real data, we use a reduced learning rate of 10⁻⁴ and train for 100 epochs — about 30 minutes.
-
----
-
-### Slide 32: Part 3 Summary (30 sec)
-
-To summarize our methodology:
-
-We developed a complete automated pipeline from raw images to predictions.
-
-Faster Cellpose provides 5× speedup while preserving segmentation quality.
-
-Synthetic generation via point processes creates 100,000 training examples with perfect labels.
-
-Transfer learning from synthetic to real reduces annotation needs by 4×.
-
----
-
-## PART 4: EXPERIMENTAL RESULTS (10-12 min)
-
-### Slide 33: Part 4 Title (10 sec)
-
-Let me now present our experimental results, validating the choices I've described.
-
----
-
-### Slide 34: GRETSI 2025 Comparative Study — Protocol (1 min)
-
-Before showing results on real organoids, I want to present a fundamental study comparing GNNs to classical spatial statistics.
-
-This work, published at GRETSI 2025, asks: when should we prefer GNNs over traditional methods like Ripley's K function?
-
-Our protocol uses synthetic data where we control ground truth perfectly. We generate spherical point distributions — either Poisson (cystic) or Matérn (cauliflower) — and classify them.
-
-We apply two types of noise to test robustness: Gaussian noise displacing point positions, and salt-and-pepper noise adding and removing points.
-
-We compare GNN classifiers of varying depths to a Random Forest trained on Ripley's K, F, and G functions.
-
----
-
-### Slide 35: Result 1 — Noise Robustness (1.5 min)
-
-This figure shows accuracy versus Gaussian noise level.
-
-The green curve is spatial statistics — Ripley's functions with Random Forest. The colored curves are GNNs of different depths.
-
-The key observation: **spatial statistics are more robust to noise**. Even at high noise levels, they maintain over 85% accuracy. GNNs degrade more rapidly.
-
-This makes sense: Ripley's functions average over many point pairs, naturally smoothing noise. GNNs propagate noise through message passing layers.
-
-We also observe an optimal GNN depth around 5-6 layers. Deeper networks suffer from over-smoothing and overfit to noise.
-
----
-
-### Slide 36: Result 2 — Geometric Generalization (1.5 min)
+### Slide 15: Result 2 — Geometric Generalization (1.5 min)
 
 But here's the crucial finding that justifies our approach.
 
-We trained both methods on perfectly spherical distributions. Then we tested on **ellipsoids** with increasing aspect ratios — from 1:1 (sphere) to 5:1 (elongated ellipsoid).
+We trained both methods on perfect spheres. Then we tested on **ellipsoids** with increasing aspect ratios.
 
-Look at this graph. Spatial statistics — the blue curve — collapse dramatically. From 100% accuracy on spheres to only 65% on ellipsoids. A 35% drop!
+Look at this graph:
+- **Spatial statistics** collapse from 100% to 65% — a 35% drop!
+- **GNNs** degrade gracefully from 95% to 82% — only 13% drop.
 
-GNNs — the orange curve — degrade much more gracefully. From 95% to 82%. Only a 13% drop.
+Why? Ripley's K assumes spherical geometry. When shapes deviate, the theory breaks.
 
-Why? Spatial statistics like Ripley's K depend explicitly on spherical geometry. Their theoretical values assume isotropic distances. When geometry deviates from spherical, the theory breaks down.
-
-GNNs learn **topological patterns** that are more abstract: local clustering, cell arrangement, neighborhood structure. These patterns persist even when the overall shape changes.
+GNNs learn **topological patterns** — local clustering, neighborhood structure — that persist even when overall shape changes.
 
 For real organoids with variable morphologies, this geometric flexibility is decisive.
 
 ---
 
-### Slide 37: Lesson from Comparative Study (1 min)
+### Slide 16: Justification — Why GNNs for Organoids (1 min)
 
 So what's the lesson?
 
-**GNNs excel** when morphologies vary — exactly our situation with cystic versus cauliflower organoids having very different shapes.
+**GNNs excel** when morphologies vary, shapes are irregular, geometry is non-spherical — exactly our situation with real organoids.
 
-**Spatial statistics excel** when geometry is perfectly spherical and consistent.
+**Spatial statistics excel** when geometry is perfectly spherical and consistent — idealized conditions only.
 
-For real organoid analysis, where shapes range from smooth spheres to irregular cauliflowers, GNNs are the appropriate choice.
-
-This rigorous comparison provides the foundation for our methodological choices.
+This rigorous comparison provides the foundation for choosing GNNs.
 
 ---
 
-### Slide 38: Performance on Synthetic Data (1.5 min)
+### Slide 17: Part I Summary (30 sec)
 
-Now let me show architecture comparison results on synthetic data.
+To summarize Part I:
 
-The task is regression of the Matérn parent number — a continuous measure of clustering degree. We test on 15,000 synthetic organoids.
+Graphs naturally capture cellular spatial organization with 1000× compression.
 
-Here are the results in terms of Mean Squared Error.
+Synthetic data enabled method development without annotations.
 
-GCN, our baseline, achieves 0.198.
+The GRETSI study demonstrates GNNs outperform spatial statistics for variable morphologies — justifying our deep learning approach.
 
-DeepSets, without explicit local structure, achieves 0.145 — 27% better than GCN.
-
-EGNN, with equivariance guarantees, achieves 0.137 — 31% better than GCN.
-
-And GAT, with attention, achieves 0.118 — **40% better than GCN**.
-
-GAT's attention mechanism allows it to adaptively weight which neighbors matter most for predicting clustering degree.
+Now that we've justified GNNs, let's understand how they work.
 
 ---
 
-### Slide 39: Synthetic Results Analysis (1 min)
+## PART II: GNN THEORY (12 min)
 
-Let me interpret these results.
+### Slide 18: Part II Title (10 sec)
 
-**GAT wins** because attention enables adaptive weighting. For detecting clustering patterns, not all neighbors are equally informative — attention learns this.
-
-**DeepSets' good performance** is interesting. It means global statistics about cells — even without local structure — capture substantial information. But local structure still matters: GAT beats DeepSets significantly.
-
-**EGNN's performance** represents a trade-off. It's slightly behind GAT in raw numbers, but it provides guaranteed equivariance — robustness to arbitrary rotations without data augmentation.
-
-Our ablation studies show that equivariance divides the MSE by 2.8× compared to using raw coordinates naively. This is a major benefit.
+Let me now present the theoretical foundations of Graph Neural Networks.
 
 ---
 
-### Slide 40: Performance on Real Data (1.5 min)
+### Slide 19: Why Not 3D CNNs? (1 min)
 
-Now for the most important results: real organoid classification.
+A natural question: why not use 3D CNNs?
 
-We evaluated on 500 well-differentiated organoids — approximately 250 cystic and 250 cauliflower — using 5-fold cross-validation.
+**Memory constraints**: A single organoid is about 2 GB — 2048×2048×200 voxels. GPU memory is prohibitive.
 
-Our main result: **84% accuracy** with GAT pre-trained on synthetic data.
+**Downsampling destroys details**: Reducing resolution loses individual cells.
 
-Looking at per-class performance:
-- **Cauliflower**: 93% precision, 74% recall. When we predict cauliflower, we're almost always right. But we miss some cauliflowers.
-- **Cystic**: 78% precision, 95% recall. We catch almost all cystic organoids, with some false positives.
+**No native invariance**: 3D CNNs aren't invariant to rotations. Augmentation is expensive and doesn't provide guarantees.
 
-This asymmetry is interpretable: some cauliflower organoids have low deformation and appear quasi-spherical, leading to confusion with cystic.
+**Grid limitation**: CNNs treat organoids as voxel grids, not as cell networks.
 
----
-
-### Slide 41: Confusion Matrix (1 min)
-
-The confusion matrix shows the details.
-
-On 75 test organoids:
-- 28 cauliflower correctly classified
-- 35 cystic correctly classified  
-- 10 cauliflower misclassified as cystic
-- 2 cystic misclassified as cauliflower
-
-Total: 63 correct out of 75 — 84% accuracy.
-
-The main confusion direction is cauliflower → cystic. These are often low-deformation cauliflower organoids with relatively smooth surfaces. Biologically, they may represent intermediate or transitional phenotypes.
+Graphs and GNNs overcome all these limitations.
 
 ---
 
-### Slide 42: Transfer Learning Impact (1.5 min)
+### Slide 20: Message Passing Paradigm (1.5 min)
 
-This table shows the crucial impact of transfer learning.
+GNNs solve the challenge of learning from graphs through **message passing**.
 
-GAT trained from scratch on real data: 76% accuracy.
+The idea is elegant: each node iteratively aggregates information from its neighbors.
 
-GAT pre-trained on synthetic, then fine-tuned on real: **84% accuracy**.
+The update rule: node i's new representation equals an UPDATE function applied to its current representation and an AGGREGATE of neighbors' representations.
 
-That's an **8 percentage point improvement** — substantial and consistent across cross-validation folds.
+After L layers, each node captures information from its L-hop neighborhood.
 
-But even more importantly, look at **data efficiency**.
-
-With only 25% of the real data — 125 organoids — the pre-trained model achieves 78% accuracy. That **matches** what the from-scratch model achieves with 100% of the data!
-
-This means a **4× reduction in annotation requirements**. For practical applications where expert annotation is the bottleneck, this is transformative.
+This is analogous to convolution on images, generalized to arbitrary graph structures.
 
 ---
 
-### Slide 43: Detailed Learning Curves (1 min)
+### Slide 18: Global Pooling (1 min)
 
-These detailed learning curves show the pattern more clearly.
+For classification, we need to go from **node-level** representations to a **graph-level** representation.
 
-At 10% data — just 50 organoids — the pre-trained model gains 13 percentage points over from-scratch.
+We have several pooling options: **Mean pooling** averages all node features, **Max pooling** takes element-wise maximum, **Sum pooling** adds all features, and **Attention pooling** uses learned weights.
 
-As we add more data, the gap narrows but remains: +11% at 25%, +10% at 50%, +8% at 100%.
+Our choice is **Mean + Max concatenation** — combining both gives complementary information: mean captures overall statistics, max captures most salient features.
 
-The pre-trained model also converges 3× faster — 20-30 epochs versus 80-100 epochs.
-
-This validates our synthetic generation strategy. Even though synthetic organoids differ from real ones, they teach useful representations of spatial organization that transfer effectively.
+The full pipeline is: nodes pass through the GNN to get embeddings, then we pool to get a single graph vector, then an MLP produces the class prediction.
 
 ---
 
-### Slide 44: Computational Efficiency (1 min)
+### Slide 22: GCN — Baseline (1 min)
 
-Our pipeline is not only accurate but efficient.
+The **Graph Convolutional Network** is our baseline, introduced by Kipf and Welling in 2017.
 
-For inference, we achieve throughput of over 200 organoids per minute in GPU batch mode. This enables high-throughput screening applications.
+It performs normalized mean aggregation: each node's update is a weighted average of neighbors' features.
 
-Memory footprint is modest — about 8 GB GPU memory — compatible with standard hardware.
-
-Predictions are perfectly reproducible. Unlike human annotators with inter-observer variability, our model gives identical outputs every time.
-
-For scalability: processing 1000 organoids takes about 17 hours with 20 GPUs running in parallel. Complete datasets can be analyzed in reasonable timeframes.
+GCN is simple and effective, but it treats all neighbors equally — no distance or importance weighting.
 
 ---
 
-### Slide 45: Results Summary (1 min)
+### Slide 23: GAT — Our Main Choice (1.5 min)
 
-Let me summarize our experimental findings.
+The **Graph Attention Network** addresses this through learned attention.
 
-First, GNNs offer better geometric flexibility than spatial statistics — essential for variable organoid morphologies.
+The key idea: learn attention coefficients that weight neighbor importance. Not all neighbors contribute equally — some are more informative.
 
-Second, GAT achieves the best performance: MSE of 0.118 on synthetic data, 84% accuracy on real data.
+We compute attention scores for each neighbor pair, apply softmax normalization, then aggregate weighted features.
 
-Third, transfer learning provides 4× data efficiency and 3× faster convergence.
+GAT also uses **multi-head attention** — multiple independent mechanisms capturing different relationship types.
 
-Fourth, the pipeline is practical: 200+ organoids per minute, fully automated, perfectly reproducible.
+As we'll see, **GAT achieves the best performance** precisely because of this adaptive weighting.
 
 ---
 
-### Slide 46: Identified Limitations (1 min)
+### Slide 24: DeepSets — Comparison (1 min)
+
+As a baseline, we also evaluated **DeepSets** — a set-based approach.
+
+DeepSets treats the organoid as an unordered set of cells, ignoring neighborhood structure. Each cell is encoded independently, then globally aggregated.
+
+Surprisingly, it performs reasonably well — global statistics are informative. But architectures with explicit local structure perform better.
+
+---
+
+### Slide 25: Geometric Equivariance (1 min)
+
+Now a crucial concept: **geometric equivariance**.
+
+Organoids in 3D culture have no preferred orientation. The biological phenotype doesn't depend on how we orient the sample.
+
+**Invariance** means the prediction is identical regardless of rotation: f(Rx) = f(x).
+
+**Equivariance** means intermediate representations rotate coherently: f(Rx) = R·f(x).
+
+We can build architectures that **guarantee** these properties mathematically.
+
+---
+
+### Slide 26: The E(3) Group (1 min)
+
+Before diving into EGNN, let me explain the E(3) group — the Euclidean group in 3 dimensions.
+
+E(3) includes three types of transformations: **Rotations** — any 3D rotation around any axis, **Translations** — shifting the entire structure in space, and **Reflections** — mirror symmetries.
+
+The key insight is that we can build architectures that **guarantee** these invariances by construction — not learned through augmentation, but **mathematically proven**. This is much stronger than hoping data augmentation will teach the network rotation invariance.
+
+---
+
+### Slide 27: EGNN — Guaranteed Equivariance (1.5 min)
+
+The **Equivariant Graph Neural Network** achieves this guarantee.
+
+The key principle: use only **invariant quantities** in messages. Distances don't change under rotation — so EGNN builds messages from distances, not raw coordinates.
+
+Coordinate updates use direction vectors — equivariant quantities — scaled by learned weights.
+
+Practical advantages:
+- No data augmentation needed
+- Better generalization with less data
+- Robustness guaranteed by construction
+
+The trade-off: slightly lower raw accuracy than GAT.
+
+---
+
+### Slide 28: Architecture Comparison (1 min)
+
+Let me summarize:
+
+**GCN**: Simple baseline, treats neighbors equally.
+
+**GAT**: Attention-weighted aggregation, **best accuracy**.
+
+**DeepSets**: Global aggregation, no local structure.
+
+**EGNN**: Distance-based, **guaranteed E(3)-equivariance**.
+
+The key trade-off: GAT for best raw performance, EGNN for guaranteed geometric robustness.
+
+---
+
+### Slide 29: Part II Summary (30 sec)
+
+To summarize Part II:
+
+Message passing enables learning on graphs.
+
+GAT with attention achieves best accuracy.
+
+EGNN provides guaranteed E(3)-equivariance.
+
+All architectures outperform spatial statistics on variable morphologies.
+
+Next: real data finally arrives — how to build the processing pipeline?
+
+---
+
+## PART III: REAL DATA PIPELINE (10 min)
+
+### Slide 30: Part III Title (10 sec)
+
+Let me now describe how we transform real 3D images into graphs.
+
+---
+
+### Slide 31: The Real Dataset Arrives (1.5 min)
+
+Through the ANR Morpheus collaboration, real data finally arrived.
+
+Over 22 months — May 2023 to February 2025 — IPMC Nice and Paris Cité collected 1,311 samples, from which we extracted 2,272 organoids.
+
+For this study, we selected **500 well-differentiated organoids** — approximately 250 per class — where labels clearly match morphology.
+
+The challenge: how to transform 2 GB 3D images into graphs for GNN processing?
+
+---
+
+### Slide 27: End-to-End Pipeline (1.5 min)
+
+Here is our complete pipeline.
+
+We start with a 3D confocal image — 2 GB of data.
+
+**Preprocessing** handles intensity normalization and denoising.
+
+**Faster Cellpose** — our optimized segmentation — identifies individual cells.
+
+**Feature extraction** computes centroids and volumes.
+
+**DBSCAN clustering** separates organoids in multi-organoid fields.
+
+**Graph construction** via K-nearest-neighbors creates the geometric graph.
+
+**GNN classification** predicts the phenotype.
+
+Total time: ~20 minutes per organoid. Compression: 2 GB → 10 MB — **1000× reduction**.
+
+---
+
+### Slide 28: Faster Cellpose (1.5 min)
+
+Cell segmentation is the bottleneck. Cellpose is state-of-the-art but slow — 30 seconds per slice.
+
+For our dataset: 30 sec × 200 slices × 1000 organoids = **2,500 hours**. Prohibitive!
+
+We developed **Faster Cellpose** through:
+- **Knowledge distillation**: smaller student network, −50% parameters
+- **Weight pruning**: remove 30% low-magnitude weights
+- **Mixed precision**: FP16 inference
+
+Result: **5× speedup** while maintaining F1 = 0.95. This makes the pipeline practical.
+
+---
+
+### Slide 29: Graph Construction (1 min)
+
+From segmented cells, we construct graphs.
+
+**Node features** (4D): 3D centroid coordinates plus cell volume, normalized.
+
+**Edges**: K-nearest neighbors with K=10, Euclidean distance, symmetrized with radial cutoff.
+
+This captures the cellular neighborhood structure essential for phenotype classification.
+
+---
+
+### Slide 30: Part III Summary (30 sec)
+
+To summarize Part III:
+
+Real dataset: 500 well-differentiated organoids collected over 22 months.
+
+Faster Cellpose: 5× speedup maintaining quality.
+
+Graph construction: 1000× compression preserving structure.
+
+Complete pipeline: 3D image → graph → prediction.
+
+Next: can transfer learning from synthetic data improve real-world performance?
+
+---
+
+## PART IV: RESULTS & TRANSFER LEARNING (10 min)
+
+### Slide 31: Part IV Title (10 sec)
+
+Let me now present the transfer learning results.
+
+---
+
+### Slide 32: Transfer Learning Strategy (1.5 min)
+
+Our strategy bridges synthetic and real data.
+
+**Phase 1: Pre-training** on 70,000 synthetic organoids. We train the GNN to regress the Matérn parent number — a continuous clustering measure. This teaches spatial organization patterns.
+
+**Phase 2: Fine-tuning** on 500 real organoids. We reinitialize the classification head and fine-tune with reduced learning rate.
+
+The question: does synthetic pre-training help with real classification?
+
+---
+
+### Slide 33: Performance on Synthetic Data (1.5 min)
+
+First, architecture comparison on synthetic data.
+
+Task: regression of Matérn parent number. Test set: 15,000 organoids.
+
+Results (Mean Squared Error):
+- GCN (baseline): 0.198
+- DeepSets: 0.145 (+27%)
+- EGNN: 0.137 (+31%)
+- **GAT: 0.118 (+40%)**
+
+GAT wins because attention learns which neighbors matter for detecting clustering patterns.
+
+EGNN's equivariance divides MSE by **2.8×** compared to naive coordinate use.
+
+---
+
+### Slide 34: Synthetic Results Analysis (1 min)
+
+Let me analyze these synthetic results more deeply.
+
+**Why does GAT win?** Attention learns **which neighbors matter** — it's adaptive to clustering patterns, and multi-head attention captures different relationship types simultaneously.
+
+**Why does DeepSets perform well?** Global statistics are informative for distinguishing clustering patterns. But local structure still helps, which is why GAT beats DeepSets.
+
+The **EGNN trade-off** is interesting: it's slightly behind GAT in raw MSE, but it provides guaranteed equivariance. Without equivariance, MSE was 0.38. With EGNN, it's 0.137 — a **2.8× improvement** from the geometric guarantee alone.
+
+---
+
+### Slide 35: Performance on Real Data (1.5 min)
+
+Now the crucial result: real organoid classification.
+
+500 organoids, 5-fold cross-validation.
+
+**84% accuracy** with GAT pre-trained on synthetic data.
+
+Per-class performance:
+- **Cauliflower**: 93% precision, 74% recall
+- **Cystic**: 78% precision, 95% recall
+
+The main confusion: low-deformation cauliflowers appear quasi-spherical, resembling cystic organoids.
+
+---
+
+### Slide 36: Confusion Matrix Analysis (1 min)
+
+Let me show the confusion matrix in detail.
+
+We have 28 true positive cauliflowers, 35 true positive cystics, and 63 out of 75 correct predictions — that's our 84%.
+
+The **main error pattern** is cauliflower misclassified as cystic — 10 cases. Only 2 cystics were misclassified as cauliflower.
+
+The **interpretation**: low-deformation cauliflowers have quasi-spherical appearance. They may represent transitional phenotypes — biologically intermediate states. This is actually informative about the biology!
+
+---
+
+### Slide 37: Transfer Learning Impact (1.5 min)
+
+This slide shows why transfer learning matters.
+
+GAT from scratch: 76% accuracy.
+GAT pre-trained: **84% accuracy**.
+**+8 percentage points improvement**.
+
+But even more important — **data efficiency**:
+- Pre-trained with 25% data (125 organoids): 78%
+- From-scratch with 100% data: 76%
+
+The pre-trained model with 25% of data **matches** the from-scratch model with 100%!
+
+This means **4× reduction in annotation requirements** — transformative for practical applications.
+
+Convergence is also **3× faster**.
+
+---
+
+### Slide 36: Final Architecture (1 min)
+
+Our final architecture:
+
+**Encoder**: GAT, 5 layers, 256 hidden dimensions.
+
+**Pooling**: Mean + Max concatenation.
+
+**Head**: MLP 256 → 128 → 2 classes.
+
+**Training**: AdamW optimizer, 10⁻³ pre-train / 10⁻⁴ fine-tune.
+
+**Inference**: 200+ organoids/minute, ~8 GB GPU memory.
+
+---
+
+### Slide 39: Learning Curves — Detailed Analysis (1 min)
+
+Let me show the learning curves in detail.
+
+The data efficiency gains are striking. With 10% data — just 50 organoids — from-scratch gets 58%, but pre-trained gets 71% — that's **+13%**. At 25% data, pre-trained reaches 78%, which matches from-scratch at 100%. At full data, we see the +8% improvement.
+
+The **key observation**: largest gains happen in the **low data regime**. This is exactly where we need help most!
+
+For convergence, pre-trained models converge in 20-30 epochs, while from-scratch needs 80-100 epochs — **3× faster**.
+
+The practical impact is transformative: 125 real organoids with pre-training performs equivalently to 500 organoids from scratch.
+
+---
+
+### Slide 40: Computational Efficiency (1 min)
+
+Let me discuss computational efficiency, crucial for practical deployment.
+
+**Inference performance**: We achieve **200+ organoids per minute** using GPU batch processing. This enables high-throughput screening applications.
+
+**Memory footprint**: About 8 GB GPU memory, compatible with standard hardware like RTX 3080 or A100.
+
+**Reproducibility**: Results are **100% deterministic**. No inter-observer variability. Identical results every run — essential for scientific validity.
+
+**Scalability**: 100 organoids in 30 seconds, 1000 in 5 minutes, 10,000 in 50 minutes.
+
+Compare to manual analysis: 30 minutes per organoid times 1000 equals 500 hours. Our automated system: 5 minutes total. That's **6000× faster**.
+
+---
+
+### Slide 41: Limitations (1 min)
 
 I want to be transparent about limitations.
 
-Our approach depends critically on segmentation quality. If segmentation fails, errors propagate through the entire pipeline.
+**Segmentation dependency**: Errors propagate through the pipeline.
 
-We validated on prostate organoids only. Generalization to brain, liver, or other organoid types requires adaptation and validation.
+**Validation scope**: Prostate organoids only; generalization needs testing.
 
-We did not perform inter-laboratory validation. Robustness to different microscopes and protocols needs testing.
+**No inter-laboratory validation**: Different microscopes and protocols.
 
-We did not include interpretability analysis — identifying which cells or regions drive predictions. This is important for biological understanding and acceptance.
-
----
-
-## PART 5: CONCLUSION AND PERSPECTIVES (6-8 min)
-
-### Slide 47: Part 5 Title (10 sec)
-
-Let me now conclude with our contributions and perspectives for future work.
+**No interpretability**: Which cells drive predictions?
 
 ---
 
-### Slide 48: Contribution 1 — Automated Pipeline (1 min)
+### Slide 42: Part IV Summary (30 sec)
 
-Our first major contribution is a **complete automated pipeline** from raw images to predictions.
+To summarize results:
 
-This pipeline handles the full workflow: preprocessing, segmentation, feature extraction, graph construction, and classification.
+GAT achieves 84% accuracy on real data.
 
-It achieves 1000× compression — from gigabytes of images to megabytes of graphs — while preserving biologically relevant information.
+Transfer learning provides +8% improvement, 4× data efficiency, 3× faster convergence.
 
-The entire codebase is open-source and available to the community.
-
----
-
-### Slide 49: Contribution 2 — Segmentation Optimization (1 min)
-
-Our second contribution addresses the segmentation bottleneck.
-
-**Faster Cellpose** achieves 5× speedup through knowledge distillation and pruning, while maintaining F1 = 0.95.
-
-We also developed a geometric method based on ellipse detection achieving 15× speedup, useful for ultra-rapid primary screening.
-
-These optimizations make high-throughput analysis practical — thousands of organoids instead of hundreds.
+Practical system: 200+ organoids/minute, fully automated.
 
 ---
 
-### Slide 50: Contribution 3 — Geometric Graphs and GNNs (1 min)
+## CONCLUSION (5 min)
 
-Our third contribution is the graph-based representation and GNN analysis framework.
+### Slide 39: Conclusion Title (10 sec)
 
-We showed that geometric graphs explicitly capture cellular relational structure — which cells are neighbors, how they're organized spatially.
-
-We systematically compared four architectures: GAT, DeepSets, EGNN, and GCN.
-
-We demonstrated the value of E(3)-equivariant architectures for guaranteed geometric robustness.
+Let me conclude with our contributions and perspectives.
 
 ---
 
-### Slide 51: Contribution 4 — Synthetic Generation (1 min)
+### Slide 44: Contribution 1 — Graph-Based Representation (1 min)
 
-Our fourth contribution is synthetic data generation via spatial point processes.
+My first contribution is the **graph-based representation** for organoid modeling.
 
-Using Poisson and Matérn processes, we generated 100,000 synthetic organoids with perfectly known labels.
+The key innovation is the cell-to-node abstraction: each cell becomes a node, spatial proximity defines edges, and we use 4D features capturing position and volume.
 
-This enabled pre-training that improves real-data performance by 8% and reduces annotation needs by 4×.
-
-The methodology is generalizable to other spherical or ellipsoidal biological structures.
+The impact is spectacular: **1000× compression** — from 2 GB images to 2 MB graphs — while preserving the biological structure that matters for classification. This enables GNN analysis that would be impossible on raw images.
 
 ---
 
-### Slide 52: Contribution 5 — GRETSI Comparative Study (45 sec)
+### Slide 45: Contribution 2 — GRETSI Comparative Study (1 min)
 
-Finally, our rigorous comparative study, published at GRETSI 2025, provides foundational understanding.
+My second contribution is the **GRETSI comparative study**, published at GRETSI 2025.
 
-We showed that GNNs offer better geometric generalization — essential for variable morphologies.
+We rigorously compared GNNs versus spatial statistics. The key findings: GNNs provide better **geometric generalization** to varying shapes, while spatial statistics offer better **noise robustness**.
 
-Spatial statistics offer better noise robustness — valuable when geometry is consistent.
-
-This guides method selection based on data characteristics.
+The recommendation: use GNNs for variable morphologies like real organoids, statistics only for idealized spherical conditions. This justifies our entire deep learning approach and provides guidelines for the community.
 
 ---
 
-### Slide 53: Short-Term Perspectives (1.5 min)
+### Slide 46: Contribution 3 — Synthetic Data Generation (1 min)
 
-Looking ahead, several extensions are immediately feasible.
+My third contribution is the **synthetic data generation** system using point processes.
 
-For **methodological extensions**, we plan to develop multi-scale graphs capturing cell, region, and organoid levels simultaneously. Graph Transformer architectures could provide global attention. Alpha-shape morphological descriptors could complement local cellular analysis.
+We use Poisson processes for uniform distributions (cystic) and Matérn cluster processes for clustered distributions (cauliflower). We generated **100,000 synthetic organoids** with perfect ground truth labels.
 
-For **multi-modal integration**, spatial transcriptomics data could be combined with imaging — each cell gets both spatial and molecular features. Temporal data from time-lapse imaging could capture developmental dynamics.
-
-For **clinical validation**, prospective studies on patient cohorts would test therapeutic response prediction.
+This enabled research when we had no real data, provided the foundation for transfer learning, and delivered +8% accuracy improvement on real data. The approach is generalizable to other spherical or ellipsoidal biological structures.
 
 ---
 
-### Slide 54: Long-Term Perspectives (1 min)
+### Slide 47: Contribution 4 — Transfer Learning Strategy (1 min)
 
-The long-term vision is transformative.
+My fourth contribution is the **transfer learning strategy** from synthetic to real data.
 
-**Therapeutic response prediction**: Patient-derived organoids could be tested against multiple treatments to predict which therapy will work best for that individual patient.
+The results speak for themselves: **+8%** accuracy improvement, **4×** data efficiency, and **3×** faster convergence.
 
-**Generative graph models**: In silico organoid design could optimize culture protocols computationally before wet-lab experiments.
-
-**Societal impact**: Organoid-based screening follows the 3Rs principles — Replace, Reduce, Refine animal experimentation. Our automated analysis tools accelerate this transition.
+The practical impact is transformative: 125 organoids with pre-training equals 500 organoids from scratch. We fundamentally changed the annotation requirements for organoid analysis.
 
 ---
 
-### Slide 55: Final Message (1 min)
+### Slide 48: Contribution 5 — Complete Automated Pipeline (1 min)
+
+My fifth contribution is the **complete automated pipeline** — end-to-end from raw 3D images to phenotype predictions.
+
+Components include preprocessing, Faster Cellpose with 5× speedup, graph construction, and GNN classification. The system is **fully automated**, runs at **200+ organoids per minute**, and is completely **open-source**.
+
+The code is available at github.com/morpheme-inria/organoid-gnn for the community to use and build upon.
+
+---
+
+### Slide 49: Short-Term Perspectives (1 min)
+
+Looking at short-term perspectives.
+
+**Methodological extensions** include multi-scale graphs — from cell to region to organoid levels — Graph Transformers with global attention, and interpretability analysis to understand which cells drive predictions.
+
+**Multi-modal integration** would combine spatial transcriptomics with imaging, temporal data from time-lapse microscopy, and metabolomic features.
+
+**Clinical validation** requires testing on prospective patient cohorts and multi-site validation.
+
+---
+
+### Slide 50: Long-Term Vision (1 min)
+
+For the long-term vision.
+
+**Therapeutic response prediction** using patient-derived organoids: test treatments in silico and enable personalized therapy selection.
+
+**Generative graph models** for in silico organoid design, optimizing culture protocols through computational biology.
+
+**Multi-organ extension** to brain organoids, liver, kidney, lung, and tumor organoids.
+
+The **societal impact** supports the 3Rs principles — Replace, Reduce, Refine animal experimentation — while accelerating drug discovery.
+
+---
+
+### Slide 52: Final Message (1 min)
 
 Let me conclude with a final message.
 
-**Geometric Graph Neural Networks** are a powerful tool for 3D organoid analysis. They capture relational structure, provide geometric robustness, and achieve high performance.
+**Geometric Graph Neural Networks** are a powerful tool for 3D organoid analysis.
 
-There is a **virtuous synergy between biology and AI**: better data enables better models, which generate better understanding, which informs better experiments.
+Our research journey: starting with no data → developing synthetic approaches → justifying GNNs → building pipelines when real data arrived → demonstrating transfer learning success.
 
-Our **open-source code** is available for the community to use, adapt, and extend.
+Our **open-source code** is available for the community.
 
-I believe this work contributes to an exciting future where AI-powered organoid analysis accelerates biomedical discovery and improves human health.
+I believe this work contributes to an exciting future where AI-powered organoid analysis accelerates biomedical discovery.
 
 Thank you for your attention. I am happy to take your questions.
 
@@ -765,38 +733,44 @@ Thank you for your attention. I am happy to take your questions.
 
 ## NOTES FOR DELIVERY
 
-### General Tips
-- Speak clearly and at moderate pace (~130 words/min)
-- Make eye contact with jury members
-- Use the laser pointer sparingly and purposefully
-- Pause briefly between sections
-- Stay calm if asked difficult questions
-
 ### Key Points to Emphasize
-- The 1000× compression while preserving biological information
+- The narrative: no data → synthetic + theory → real data → transfer learning
+- 1000× compression while preserving biological information
+- GRETSI justification for GNNs over spatial statistics
 - GAT as best performer, EGNN for guaranteed robustness
 - 4× data efficiency from transfer learning
 - 84% accuracy on real organoids
 - Practical applicability: 200+ organoids/minute
+- 6000× faster than manual analysis
 
 ### Anticipated Questions
-1. **Why GAT over EGNN?** Trade-off between raw performance and guaranteed robustness. GAT wins on accuracy; EGNN wins on theoretical guarantees.
+1. **Why GAT over EGNN?** Trade-off: GAT wins on accuracy; EGNN wins on theoretical guarantees.
 
-2. **Synthetic data validation?** Acknowledged limitation — no formal statistical validation. But empirical gains (8%) demonstrate practical utility.
+2. **Synthetic data validation?** Empirical gains (+8%) demonstrate practical utility despite domain gap.
 
-3. **Generalization to other organoids?** Principles are transferable; fine-tuning Cellpose and adapting features would be needed.
+3. **Generalization to other organoids?** Principles transferable; requires fine-tuning Cellpose and adapting features.
 
-4. **Why only 500 organoids selected?** Quality over quantity — ensuring label-morphology consistency for reliable supervised learning.
+4. **Why only 500 organoids?** Quality over quantity — ensuring label-morphology consistency.
 
-5. **Clinical deployment?** Would require regulatory validation (IVDR/FDA), multi-site testing, user interface development.
+5. **Clinical deployment?** Would require regulatory validation (IVDR/FDA), multi-site testing.
+
+6. **Why point processes specifically?** They naturally model the biological phenomena: Poisson for random cell distribution, Matérn for clustering.
 
 ### Timing Checkpoints
-- After Introduction (Slide 8): ~7 min
-- After Foundations (Slide 22): ~20 min
-- After Methodology (Slide 32): ~29 min
-- After Results (Slide 46): ~40 min
-- End: ~47 min
+- After Introduction (Slide 7): ~6 min
+- After Part I - Justification (Slide 17): ~16 min
+- After Part II - GNN Theory (Slide 28): ~26 min
+- After Part III - Pipeline (Slide 35): ~33 min
+- After Part IV - Results (Slide 43): ~43 min
+- Conclusion (Slide 52): ~45 min
 
-If running long: abbreviate slides 38-39 (synthetic results details)
-If running short: expand on perspectives (slides 53-54)
+If running long: abbreviate E(3) group details (Slide 22) or Contribution slides (44-48)
+If running short: expand on perspectives and limitations
 
+### General Tips
+- Emphasize the research narrative: how constraints shaped the approach
+- Speak clearly and at moderate pace (~130 words/min)
+- Make eye contact with jury members
+- Pause briefly between sections
+- Stay calm if asked difficult questions
+- Use the confusion matrix to discuss biological insights
