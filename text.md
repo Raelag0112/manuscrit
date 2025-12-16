@@ -396,7 +396,7 @@ The challenge: how to transform 2 GB 3D images into graphs for GNN processing?
 
 ---
 
-### Slide 27: End-to-End Pipeline (1.5 min)
+### Slide 32: End-to-End Pipeline (1.5 min)
 
 Here is our complete pipeline.
 
@@ -418,7 +418,7 @@ Total time: ~20 minutes per organoid. Compression: 2 GB → 10 MB — **1000× r
 
 ---
 
-### Slide 28: Faster Cellpose (1.5 min)
+### Slide 33: Faster Cellpose (1.5 min)
 
 Cell segmentation is the bottleneck. Cellpose is state-of-the-art but slow — 30 seconds per slice.
 
@@ -433,7 +433,7 @@ Result: **5× speedup** while maintaining F1 = 0.95. This makes the pipeline pra
 
 ---
 
-### Slide 29: Graph Construction (1 min)
+### Slide 34: Graph Construction (1 min)
 
 From segmented cells, we construct graphs.
 
@@ -445,7 +445,7 @@ This captures the cellular neighborhood structure essential for phenotype classi
 
 ---
 
-### Slide 30: Part III Summary (30 sec)
+### Slide 35: Part III Summary (30 sec)
 
 To summarize Part III:
 
@@ -461,15 +461,15 @@ Next: can transfer learning from synthetic data improve real-world performance?
 
 ---
 
-## PART IV: RESULTS & TRANSFER LEARNING (10 min)
+## PART IV: RESULTS & TRANSFER LEARNING (12 min)
 
-### Slide 31: Part IV Title (10 sec)
+### Slide 36: Part IV Title (10 sec)
 
 Let me now present the transfer learning results.
 
 ---
 
-### Slide 32: Transfer Learning Strategy (1.5 min)
+### Slide 37: Transfer Learning Strategy (1.5 min)
 
 Our strategy bridges synthetic and real data.
 
@@ -481,7 +481,7 @@ The question: does synthetic pre-training help with real classification?
 
 ---
 
-### Slide 33: Performance on Synthetic Data (1.5 min)
+### Slide 38: Performance on Synthetic Data (1.5 min)
 
 First, architecture comparison on synthetic data.
 
@@ -499,7 +499,7 @@ EGNN's equivariance divides MSE by **2.8×** compared to naive coordinate use.
 
 ---
 
-### Slide 34: Synthetic Results Analysis (1 min)
+### Slide 39: Synthetic Results Analysis (1 min)
 
 Let me analyze these synthetic results more deeply.
 
@@ -539,7 +539,7 @@ The **interpretation**: low-deformation cauliflowers have quasi-spherical appear
 
 ---
 
-### Slide 37: Transfer Learning Impact (1.5 min)
+### Slide 40: Transfer Learning Impact (1.5 min)
 
 This slide shows why transfer learning matters.
 
@@ -559,7 +559,7 @@ Convergence is also **3× faster**.
 
 ---
 
-### Slide 36: Final Architecture (1 min)
+### Slide 41: Final Architecture (1 min)
 
 Our final architecture:
 
@@ -575,7 +575,7 @@ Our final architecture:
 
 ---
 
-### Slide 39: Learning Curves — Detailed Analysis (1 min)
+### Slide 42: Learning Curves — Detailed Analysis (1 min)
 
 Let me show the learning curves in detail.
 
@@ -619,7 +619,7 @@ I want to be transparent about limitations.
 
 ---
 
-### Slide 42: Part IV Summary (30 sec)
+### Slide 45: Part IV Summary (30 sec)
 
 To summarize results:
 
@@ -631,15 +631,15 @@ Practical system: 200+ organoids/minute, fully automated.
 
 ---
 
-## CONCLUSION (5 min)
+## CONCLUSION (7 min)
 
-### Slide 39: Conclusion Title (10 sec)
+### Slide 46: Conclusion Title (10 sec)
 
 Let me conclude with our contributions and perspectives.
 
 ---
 
-### Slide 44: Contribution 1 — Graph-Based Representation (1 min)
+### Slide 47: Contribution 1 — Graph-Based Representation (1 min)
 
 My first contribution is the **graph-based representation** for organoid modeling.
 
@@ -649,7 +649,7 @@ The impact is spectacular: **1000× compression** — from 2 GB images to 2 MB g
 
 ---
 
-### Slide 45: Contribution 2 — GRETSI Comparative Study (1 min)
+### Slide 48: Contribution 2 — GRETSI Comparative Study (1 min)
 
 My second contribution is the **GRETSI comparative study**, published at GRETSI 2025.
 
@@ -659,7 +659,7 @@ The recommendation: use GNNs for variable morphologies like real organoids, stat
 
 ---
 
-### Slide 46: Contribution 3 — Synthetic Data Generation (1 min)
+### Slide 49: Contribution 3 — Synthetic Data Generation (1 min)
 
 My third contribution is the **synthetic data generation** system using point processes.
 
@@ -669,7 +669,7 @@ This enabled research when we had no real data, provided the foundation for tran
 
 ---
 
-### Slide 47: Contribution 4 — Transfer Learning Strategy (1 min)
+### Slide 50: Contribution 4 — Transfer Learning Strategy (1 min)
 
 My fourth contribution is the **transfer learning strategy** from synthetic to real data.
 
@@ -679,7 +679,7 @@ The practical impact is transformative: 125 organoids with pre-training equals 5
 
 ---
 
-### Slide 48: Contribution 5 — Complete Automated Pipeline (1 min)
+### Slide 51: Contribution 5 — Complete Automated Pipeline (1 min)
 
 My fifth contribution is the **complete automated pipeline** — end-to-end from raw 3D images to phenotype predictions.
 
@@ -689,7 +689,7 @@ The code is available at github.com/morpheme-inria/organoid-gnn for the communit
 
 ---
 
-### Slide 49: Short-Term Perspectives (1 min)
+### Slide 52: Short-Term Perspectives (1 min)
 
 Looking at short-term perspectives.
 
@@ -701,7 +701,7 @@ Looking at short-term perspectives.
 
 ---
 
-### Slide 50: Long-Term Vision (1 min)
+### Slide 53: Long-Term Vision (1 min)
 
 For the long-term vision.
 
@@ -715,7 +715,7 @@ The **societal impact** supports the 3Rs principles — Replace, Reduce, Refine 
 
 ---
 
-### Slide 52: Final Message (1 min)
+### Slide 54: Final Message (1 min)
 
 Let me conclude with a final message.
 
@@ -758,13 +758,13 @@ Thank you for your attention. I am happy to take your questions.
 
 ### Timing Checkpoints
 - After Introduction (Slide 7): ~6 min
-- After Part I - Justification (Slide 17): ~16 min
-- After Part II - GNN Theory (Slide 28): ~26 min
-- After Part III - Pipeline (Slide 35): ~33 min
-- After Part IV - Results (Slide 43): ~43 min
-- Conclusion (Slide 52): ~45 min
+- After Part I - Justification (Slide 17): ~17 min
+- After Part II - GNN Theory (Slide 29): ~27 min
+- After Part III - Pipeline (Slide 35): ~34 min
+- After Part IV - Results (Slide 45): ~44 min
+- Conclusion (Slide 54): ~45 min
 
-If running long: abbreviate E(3) group details (Slide 22) or Contribution slides (44-48)
+If running long: abbreviate E(3) group details (Slide 26) or Contribution slides (47-51)
 If running short: expand on perspectives and limitations
 
 ### General Tips
