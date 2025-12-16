@@ -57,10 +57,6 @@
 }
 \date{Thesis Defense}
 
-% Logo
-\titlegraphic{
-    \includegraphics[height=1cm]{img/visuel.jpg}
-}
 
 % =============================================================================
 \begin{document}
@@ -123,7 +119,7 @@
         \end{column}
         \begin{column}{0.52\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{animations/real_organoid_clusters1.png}\\
+                \includegraphics[width=\textwidth]{img/3Dviz.png}\\
                 {\footnotesize Cell distribution differs between phenotypes}
             \end{center}
         \end{column}
@@ -171,72 +167,6 @@
     \end{columns}
 \end{frame}
 
-% Slide 5: Three Challenges
-\begin{frame}{Three Key Challenges}
-    \begin{columns}
-        \begin{column}{0.33\textwidth}
-            \begin{center}
-                \textbf{\faUserClock\ Challenge 1}\\[0.3em]
-                \textcolor{inriaRed}{Manual Analysis}
-            \end{center}
-            \begin{itemize}
-                \item 30 min/organoid
-                \item Subjective
-                \item Not reproducible
-            \end{itemize}
-        \end{column}
-        \begin{column}{0.33\textwidth}
-            \begin{center}
-                \textbf{\faDatabase\ Challenge 2}\\[0.3em]
-                \textcolor{inriaRed}{Data Scarcity}
-            \end{center}
-            \begin{itemize}
-                \item No public datasets
-                \item Expensive annotation
-                \item Domain-specific
-            \end{itemize}
-        \end{column}
-        \begin{column}{0.33\textwidth}
-            \begin{center}
-                \textbf{\faCube\ Challenge 3}\\[0.3em]
-                \textcolor{inriaRed}{3D Geometry}
-            \end{center}
-            \begin{itemize}
-                \item No preferred orientation
-                \item 2 GB per organoid
-                \item Rotation invariance
-            \end{itemize}
-        \end{column}
-    \end{columns}
-    
-    \vspace{1em}
-    \begin{alertblock}{Need}
-        Automated, data-efficient, geometrically robust methods
-    \end{alertblock}
-\end{frame}
-
-% Slide 6: Research Questions
-\begin{frame}{Research Questions}
-    \begin{enumerate}
-        \item[\textbf{Q1}] \textbf{Can we model organoids as geometric graphs?}
-            \begin{itemize}
-            \item Capture biological information while compressing data
-            \end{itemize}
-            
-        \vspace{0.8em}
-        \item[\textbf{Q2}] \textbf{Do GNNs outperform classical spatial statistics?}
-            \begin{itemize}
-            \item Justify the deep learning approach
-            \end{itemize}
-            
-        \vspace{0.8em}
-        \item[\textbf{Q3}] \textbf{Can synthetic data enable transfer learning?}
-        \begin{itemize}
-            \item Compensate for lack of real annotations
-        \end{itemize}
-    \end{enumerate}
-\end{frame}
-
 % Slide 6: Outline
 \begin{frame}{Presentation Outline}
     \begin{center}
@@ -259,11 +189,6 @@
             \node[time, below=0.05cm of p3] {\footnotesize Dataset + Segmentation};
             \node[time, below=0.05cm of p4] {\footnotesize Validation};
             
-            % Timeline
-            \node[time] at (0,-1.3) {$\sim$10 min};
-            \node[time] at (4.5,-1.3) {$\sim$10 min};
-            \node[time] at (9,-1.3) {$\sim$10 min};
-            \node[time] at (4.5,-3.0) {$\sim$10 min};
             \end{tikzpicture}
     \end{center}
     
@@ -311,7 +236,7 @@
         \end{column}
         \begin{column}{0.45\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{img/graph_comparison.png}
+                \includegraphics[width=0.7\textwidth]{img/org.png}
             \end{center}
         \end{column}
     \end{columns}
@@ -341,122 +266,75 @@
         \end{column}
         \begin{column}{0.5\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{img/synthetic.png}\\
+                \includegraphics[width=0.65\textwidth]{img/distribs.png}\\
                 {\footnotesize Uniform vs clustered distributions}
             \end{center}
         \end{column}
     \end{columns}
 \end{frame}
 
-% Slide 10: Point Processes Detail
-\begin{frame}{Point Processes: Mathematical Foundation}
+% Slide 10: Simple Point Processes Explanation
+\begin{frame}{How We Simulate the Patterns}
     \begin{columns}
         \begin{column}{0.5\textwidth}
-            \begin{block}{\textcolor{cysticGreen}{Poisson Process} (Cystic)}
-                \textbf{Intensity:} $\lambda$ (points per unit volume)
-                \begin{equation*}
-                    P(N(B) = k) = \frac{(\lambda|B|)^k e^{-\lambda|B|}}{k!}
-                \end{equation*}
-                {\small Complete spatial randomness}
-            \end{block}
-            
-            \vspace{0.3em}
-            \begin{block}{\textcolor{cauliflowerOrange}{Matérn Cluster} (Cauliflower)}
-                \textbf{Parameters:}
-                \begin{itemize}
-                    \item $\kappa$: parent intensity
-                    \item $\mu$: children per parent
-                    \item $r$: cluster radius
-                \end{itemize}
-            \end{block}
+            \textbf{Cystic:} 
+            \begin{itemize}
+                \item Randomly scatter cells in the shape
+                \item No clumps, just even spread
+            \end{itemize}
+            \vspace{1em}
+            \textbf{Cauliflower:} 
+            \begin{itemize}
+                \item Place cell groups (clusters) randomly
+                \item Each group contains a few cells close together
+            \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
             \begin{center}
-                \begin{tikzpicture}[scale=0.6]
-                    % Poisson
-                    \draw[thick] (0,0) circle (2);
-                    \foreach \i in {1,...,20} {
-                        \pgfmathsetmacro{\x}{rand*1.8}
-                        \pgfmathsetmacro{\y}{rand*1.8}
-                        \fill[cysticGreen] (\x,\y) circle (0.08);
-                    }
-                    \node[below] at (0,-2.3) {\small Poisson (uniform)};
-                    
-                    % Matern
-                    \begin{scope}[xshift=5.5cm]
-                        \draw[thick] (0,0) circle (2);
-                        % Cluster 1
-                        \foreach \i in {1,...,5} {
-                            \pgfmathsetmacro{\x}{-0.8+rand*0.4}
-                            \pgfmathsetmacro{\y}{0.5+rand*0.4}
-                            \fill[cauliflowerOrange] (\x,\y) circle (0.08);
-                        }
-                        % Cluster 2
-                        \foreach \i in {1,...,6} {
-                            \pgfmathsetmacro{\x}{0.7+rand*0.4}
-                            \pgfmathsetmacro{\y}{-0.6+rand*0.4}
-                            \fill[cauliflowerOrange] (\x,\y) circle (0.08);
-                        }
-                        % Cluster 3
-                        \foreach \i in {1,...,4} {
-                            \pgfmathsetmacro{\x}{0.2+rand*0.3}
-                            \pgfmathsetmacro{\y}{1.2+rand*0.3}
-                            \fill[cauliflowerOrange] (\x,\y) circle (0.08);
-                        }
-                        \node[below] at (0,-2.3) {\small Matérn (clustered)};
-                    \end{scope}
-                \end{tikzpicture}
+                \includegraphics[width=0.65\textwidth]{img/distribs.png}\\
+                {\footnotesize Uniform vs clustered distributions}
             \end{center}
-            
-            \vspace{0.3em}
-            {\footnotesize \faPlayCircle\ \texttt{point\_processes.gif}}
         \end{column}
     \end{columns}
 \end{frame}
 
-% Slide 11: Synthetic Dataset Statistics
-\begin{frame}{Synthetic Dataset: Statistics}
+
+\begin{frame}{Spherical Voronoi: Volumes \& Cell Graphs}
     \begin{columns}
         \begin{column}{0.5\textwidth}
-            \textbf{Generation Parameters:}
+            \textbf{Synthetic Volume \& Graph Generation:}
             \begin{itemize}
-                \item Cell count: 100--500 per organoid
-                \item Sphere radius: normalized to 1
-                \item Volume features: log-normal distribution
+                \item \textbf{Goal:} Assign realistic 3D cell volumes and build a cell interaction graph
+                \item \textbf{Method:}
+                \begin{itemize}
+                    \item Scatter cell centers randomly on the sphere surface
+                    \item Compute the \textbf{spherical Voronoi tessellation} (each region = one cell)
+                    \item \textbf{Volume:} Use the volume of each region as the cell's feature
+                    \item \textbf{Graph:} Connect an edge where Voronoi regions touch
+                \end{itemize}
+                \item Automatically encodes realistic spatial constraints:
+                \begin{itemize}
+                    \item Volume is driven by packing geometry
+                    \item Graph edges naturally reflect cell–cell contacts
+                \end{itemize}
             \end{itemize}
-            
-            \vspace{0.5em}
-            \textbf{Dataset Splits:}
-            \begin{table}
-                \footnotesize
-                \begin{tabular}{lc}
-                    \toprule
-                    \textbf{Split} & \textbf{Count} \\
-                    \midrule
-                    Training & 70,000 \\
-                    Validation & 15,000 \\
-                    Test & 15,000 \\
-                    \midrule
-                    \textbf{Total} & \textbf{100,000} \\
-                    \bottomrule
-                \end{tabular}
-            \end{table}
         \end{column}
         \begin{column}{0.5\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{animations/synthetic_generation_steps.png}\\
-                {\footnotesize Generation pipeline steps}
+                \includegraphics[width=0.85\textwidth]{img/Voronoi.png}\\
+                {\footnotesize Spherical Voronoi:\quad
+                Colors = cells, edges = touching regions}
             \end{center}
-            
-            \vspace{0.3em}
-            \textbf{Advantages:}
-            \begin{itemize}
-                \item Perfect ground truth
-                \item Unlimited supply
-                \item Controllable difficulty
-            \end{itemize}
         \end{column}
     \end{columns}
+\end{frame}
+
+
+% Slide 11: Synthetic Dataset Statistics
+\begin{frame}{Synthetic Dataset}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/synthetic_generation_steps.png}
+    \end{center}
 \end{frame}
 
 % Slide 10: GRETSI Study Introduction
@@ -491,6 +369,31 @@
         \item Test noise robustness and geometric generalization
     \end{itemize}
 \end{frame}
+
+% Slide: Ripley's Functions Explained
+\begin{frame}{What are Ripley's Functions?}
+    \textbf{Ripley's K, F, and G Functions}\\
+    \vspace{1em}
+    \begin{itemize}
+        \item \textbf{Purpose:} Quantify spatial patterns of point data---are points \textit{clustered}, \textit{random}, or \textit{regularly spaced}?
+        \item \textbf{How:} Measure how many points are within a distance $r$ of each other, compared to randomness.
+    \end{itemize}
+    \vspace{1em}
+    \textbf{Key Functions:}
+    \begin{itemize}
+        \item $\mathbf{K}(r)$: Average number of other points within distance $r$ of a typical point.
+        \item $\mathbf{F}(r)$: Probability the nearest point from a random location is within $r$.
+        \item $\mathbf{G}(r)$: Probability the nearest neighbor of a point is within $r$.
+    \end{itemize}
+    \vspace{1em}
+    \textbf{Interpretation:}\\
+    Compare to random (Poisson) pattern:
+    \begin{itemize}
+        \item Above random $\rightarrow$ clustering
+        \item Below random $\rightarrow$ regularity/repulsion
+    \end{itemize}
+\end{frame}
+
 
 % Slide 11: Noise Robustness
 \begin{frame}{Result 1: Noise Robustness}
@@ -623,6 +526,66 @@
     \end{center}
 \end{frame}
 
+\begin{frame}{Deep Learning: The Big Picture}
+    \begin{itemize}
+        \item \textbf{What is deep learning?}
+        \begin{itemize}
+            \item Family of machine learning methods using \textbf{artificial neural networks} with many layers 
+            \item Learns features from raw data, no need for handcrafted rules
+        \end{itemize}
+        \vspace{0.7em}
+        \item \textbf{Major successes:}
+        \begin{itemize}
+            \item Computer vision (images), text understanding, speech, scientific data
+        \end{itemize}
+        \vspace{0.7em}
+        \item \textbf{Why is it powerful?}
+        \begin{itemize}
+            \item \textbf{End-to-end learning:} from input to output, automatically
+            \item Learns complex nonlinear patterns
+            \item Improves with more data and scale
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+
+% Slide: CNN Inspiration: The Visual Cortex
+\begin{frame}{Where Did CNNs Come From?}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Biological Inspiration:}\\
+            \begin{itemize}
+                \item \textbf{Visual cortex} (Hubel \& Wiesel, 1960s)
+                \item Simple cells: detect \textbf{edges, orientations} in small receptive fields
+                \item Complex cells: combine simple cells' outputs, sensitive to \textbf{patterns}
+            \end{itemize}
+
+            \vspace{0.5em}
+            \textbf{Key idea:} \\
+            \textit{Hierarchical feature extraction from local to global}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/cnn.png}\\
+                {\footnotesize CNN: edge and feature detectors}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide: CNNs Ignite the Deep Learning Revolution
+\begin{frame}{CNNs Enable AI's Computer Vision Boom}
+    \begin{itemize}
+        \item \textbf{2012:} AlexNet wins ImageNet challenge --- breakthrough in image classification
+        \item \textbf{Impact:} Superhuman performance in vision tasks (object detection, segmentation, etc.)
+        \item \textbf{Applications:} From self-driving cars to medical imaging
+        \item \textbf{Standard tool} for 2D natural image analysis
+    \end{itemize}
+\end{frame}
+
+
+
 % Slide 16: Why Not 3D CNNs
 \begin{frame}{Why Not 3D CNNs?}
     \begin{columns}
@@ -663,6 +626,64 @@
     \end{alertblock}
 \end{frame}
 
+% Slide 15: The Leap—From CNNs to GNNs
+\begin{frame}{From CNNs to GNNs: A New Paradigm}
+    \begin{columns}
+        \begin{column}{0.54\textwidth}
+            \textbf{CNNs}: Grids of pixels/voxels \\
+            \hspace{0.5em} $\Rightarrow$ Convolutions aggregate over local neighborhoods\\
+            \vspace{0.8em}
+            \textbf{BUT:}\\
+            \begin{itemize}
+                \item Real organoids = collections of \textbf{cells}, not voxels
+                \item \textbf{Spatial relations} matter (who's next to whom)
+                \item Grids ignore true biological topology
+            \end{itemize}
+            \vspace{1em}
+            \textbf{GNNs}: Process data as \textbf{graphs}
+            \begin{itemize}
+                \item \textbf{Nodes}: Cells\\
+                \item \textbf{Edges}: Physical contact or spatial proximity\\
+                \item \textbf{Features}: Position, volume, etc.
+            \end{itemize}
+            \vspace{1em}
+            \textbf{Key Takeaway:} \\
+            \textcolor{inriaBlue}{Graphs model the \textit{relational structure} of real organoids.}
+        \end{column}
+        \begin{column}{0.46\textwidth}
+            \begin{center}
+
+                % Schematic: CNN grid vs GNN
+                \begin{tikzpicture}[scale=0.6, every node/.style={font=\small}]
+                    % CNN grid
+                    \foreach \x in {0,...,2} {
+                        \foreach \y in {0,...,2} {
+                            \fill[gray!20] (\x, \y) rectangle ++(0.8, 0.8);
+                            \draw[gray] (\x, \y) rectangle ++(0.8, 0.8);
+                        }
+                    }
+                    \node at (1.2, -0.6) {\scriptsize CNN (grid)};
+
+                    % Arrow
+                    \draw[->, thick] (3.2, 1.3) -- (5, 1.3);
+
+                    % GNN
+                    \foreach \i/\x/\y in {A/6.3/2.4, B/7.4/2.0, C/5.8/1.0, D/7.0/0.7, E/6.0/1.7} {
+                        \node[circle, draw, fill=cysticGreen!45, minimum size=0.65cm, inner sep=0pt] (\i) at (\x, \y) {};
+                    }
+                    % Edges
+                    \foreach \i/\j in {A/B, A/E, B/E, E/C, E/D, C/D} {
+                        \draw[inriaBlue, thick] (\i) -- (\j);
+                    }
+                    \node at (6.8, -0.6) {\scriptsize GNN (graph)};
+                \end{tikzpicture}\\[1em]
+                {\footnotesize \textit{CNN: voxels \hspace{3em} GNN: cells + relations}}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
 % Slide 17: Message Passing
 \begin{frame}{GNNs: Message Passing Paradigm}
     \begin{columns}
@@ -696,7 +717,6 @@
                     \draw[->, thick, inriaRed, decorate, decoration={snake, amplitude=1pt}] (D) -- (A);
                 \end{tikzpicture}\\
                 {\footnotesize Messages flow to central node}\\[0.3em]
-                {\tiny \faPlayCircle\ \texttt{message\_passing.gif}}
             \end{center}
         \end{column}
     \end{columns}
@@ -855,23 +875,28 @@
         \end{column}
         \begin{column}{0.5\textwidth}
             \begin{center}
-                \begin{tikzpicture}[scale=0.65]
-                    \draw[thick, fill=inriaBlue!20] (0,1.5) circle (0.8);
-                    \fill[cauliflowerOrange] (0.3,1.8) circle (0.15);
-                    \fill[cauliflowerOrange] (-0.2,1.2) circle (0.12);
+                \begin{tikzpicture}[scale=0.75]
+                    % Original object
+                    \draw[thick, fill=inriaBlue!20] (0,1.5) circle (0.8); % Main outline
+                    \foreach \angle/\rad in {30/0.15, 210/0.12, 80/0.1} {
+                        \fill[cauliflowerOrange] ({0+0.45*cos(\angle)}, {1.5+0.45*sin(\angle)}) circle (\rad);
+                    }
                     \node[below] at (0,0.5) {\small Original};
-                    
-                    \draw[thick, fill=inriaBlue!20] (3.5,1.5) circle (0.8);
-                    \fill[cauliflowerOrange] (3.2,1.2) circle (0.15);
-                    \fill[cauliflowerOrange] (3.8,1.9) circle (0.12);
-                    \node[below] at (3.5,0.5) {\small Rotated};
-                    
-                    \draw[->, thick, decorate, decoration={snake, amplitude=2pt}] (1,1.5) -- (2.3,1.5);
-                    \node[above] at (1.65,1.7) {\tiny rotate};
-                    
-                    \node[draw, rounded corners, fill=cysticGreen!30, font=\small\bfseries] at (1.75,-0.3) {Same class!};
-                \end{tikzpicture}\\
-                {\footnotesize \faPlayCircle\ \texttt{rotation\_invariance.gif}}
+
+                    % Rotated object (rotating the positions by +80 degrees visually)
+                    \draw[thick, fill=inriaBlue!20] (4,1.5) circle (0.8);
+                    \foreach \angle/\rad in {110/0.15, 290/0.12, 160/0.1} {
+                        \fill[cauliflowerOrange] ({4+0.45*cos(\angle)}, {1.5+0.45*sin(\angle)}) circle (\rad);
+                    }
+                    \node[below] at (4,0.5) {\small Rotated};
+
+                    % Rotation arrow
+                    \draw[->, thick, decorate, decoration={snake, amplitude=2pt}] (1.1,1.5) -- (2.9,1.5);
+                    \node[above, font=\scriptsize] at (2,1.75) {rotation};
+
+                    % Same class box/message
+                    \node[draw, rounded corners=2pt, fill=cysticGreen!30, font=\small\bfseries, inner sep=2pt] at (2,-0.3) {Same class!};
+                \end{tikzpicture}
             \end{center}
         \end{column}
     \end{columns}
@@ -983,6 +1008,7 @@
     \end{itemize}
 \end{frame}
 
+
 % Slide 24: Part II Summary
 \begin{frame}{Part II Summary: GNN Theory}
     \begin{enumerate}
@@ -1033,8 +1059,7 @@
             \begin{itemize}
                 \item 1,311 imaged samples
                 \item 2,272 extracted organoids
-                \item \textbf{500 well-differentiated} selected
-                \item $\sim$250 per class
+                \item \textbf{500 well-differentiated} selected for training
             \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
@@ -1049,6 +1074,44 @@
     \begin{block}{Challenge}
         How to transform 2 GB 3D images into graphs for GNN processing?
     \end{block}
+\end{frame}
+% Slide: Acquisition Protocol
+\begin{frame}{Standardized Acquisition Protocol}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Culture Conditions:}
+            \begin{itemize}
+                \item Analysis at day 7 (J7)
+                \item Nuclear + specific markers
+                \item 3D suspension culture
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Imaging Parameters:}
+            \begin{itemize}
+                \item Confocal microscopy
+                \item 20× or 40× magnification
+                \item 8-bit TIFF format
+                \item Resolution: 2048×2048×(100-300)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Cell Statistics:}
+            \begin{itemize}
+                \item Min: $\sim$20 cells/organoid
+                \item Max: $\sim$5,000 cells/organoid
+                \item \textbf{Mean: $\sim$250 cells}
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Storage:}
+            \begin{itemize}
+                \item Raw images: $\sim$1 TB
+                \item Compressed graphs: $\sim$200 MB
+                \item \textbf{5000× compression!}
+            \end{itemize}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % Slide 27: Pipeline Overview
@@ -1085,90 +1148,405 @@
             {\footnotesize (dominated by segmentation)}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \textbf{Compression:} 2 GB $\rightarrow$ 10 MB\\
+            \textbf{Compression:} GB $\rightarrow$ MB\\
             {\footnotesize (\textbf{1000× reduction})}
         \end{column}
     \end{columns}
 \end{frame}
 
-% Slide 28: Segmentation
-\begin{frame}{Faster Cellpose: Segmentation Bottleneck}
-    \textbf{Problem:} Cellpose is slow
-    \begin{itemize}
-        \item 30 sec/slice × 200 slices × 1000 organoids = \textbf{2,500 hours}
-    \end{itemize}
-    
-    \vspace{0.5em}
-    \textbf{Our Solution: Faster Cellpose}
-    \begin{enumerate}
-        \item \textbf{Knowledge Distillation:} Smaller student network ($-$50\% params)
-        \item \textbf{Weight Pruning:} Remove 30\% low-magnitude weights
-        \item \textbf{Mixed Precision:} FP16 inference
-    \end{enumerate}
-    
-    \vspace{0.5em}
-    \begin{table}
-        \centering
-        \footnotesize
-        \begin{tabular}{lccc}
-            \toprule
-            \textbf{Method} & \textbf{F1} & \textbf{Time/Slice} & \textbf{Speed-up} \\
-            \midrule
-            Geometric (ellipses) & 0.88 & 3 sec & 10× \\
-            \textbf{Faster Cellpose} & \textbf{0.95} & \textbf{6 sec} & \textbf{5×} \\
-            Original Cellpose & 0.98 & 30 sec & 1× \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-\end{frame}
 
-% Slide 29: Graph Construction
-\begin{frame}{Graph Construction from Segmented Cells}
+% Slide: Segmentation Bottleneck Problem
+\begin{frame}{The Segmentation Bottleneck}
     \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \textbf{Node Features (4D):}
+        \begin{column}{0.55\textwidth}
+            \textbf{Cellpose = State of the Art}
             \begin{itemize}
-                \item 3D centroid: $(x, y, z)$
-                \item Cell volume
-                \item Normalized (centered, scaled)
+                \item Best accuracy: F1 = 0.98
+                \item Robust to size/shape variations
+                \item Pre-trained models available
             \end{itemize}
             
             \vspace{0.5em}
-            \textbf{Edge Construction:}
+            \textbf{But Prohibitively Slow:}
             \begin{itemize}
-                \item K-nearest neighbors ($K=10$)
-                \item Euclidean distance
-                \item Symmetrized + radial cutoff
+                \item 30 sec/slice (GPU)
+                \item 300 slices/organoid $\approx$ \textbf{2.5 hours}
+                \item 1,000 organoids $\Rightarrow$ \textbf{2,500 hours}
+                \item Full dataset (2,272 org.) $\Rightarrow$ \textbf{237 days!}
             \end{itemize}
             
-            \vspace{0.3em}
-            {\footnotesize \faPlayCircle\ \texttt{graph\_construction.gif}}
+            \vspace{0.5em}
+            \begin{alertblock}{Need for Optimization}
+                Even with 10 GPUs: \textbf{3+ weeks} of compute!
+            \end{alertblock}
         \end{column}
-        \begin{column}{0.5\textwidth}
+        \begin{column}{0.45\textwidth}
+            \vspace{0.3em}
+            \textbf{Our Two Contributions:}
+            \begin{enumerate}
+                \item Geometric ellipse fitting
+                \item Faster Cellpose
+            \end{enumerate}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+
+% Slide: Contribution 1 - Geometric Ellipse Fitting
+\begin{frame}{Contribution: Geometric Ellipse Fitting}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Idea:} Model nuclei as ellipses\\
+            {\footnotesize (No deep learning, inspired by marked point processes)}
+            
+            \vspace{0.5em}
+            \textbf{2D Detection Algorithm:}
+            \begin{enumerate}
+                \item Gaussian blur + Black-Hat morphology
+                \item Detect local maxima (candidate centers)
+                \item Test bank of elliptic filters:\\
+                      {\footnotesize Angles $\theta$, axes $a$, aspect ratios $r$}
+                \item Select ellipse maximizing response:
+                      \[R = \frac{(K * I)(x,y)}{|\epsilon|}\]
+                \item Adaptive threshold (70\% of max)
+                \item Handle overlaps by shrinking
+            \end{enumerate}
+        \end{column}
+        \begin{column}{0.45\textwidth}
             \begin{center}
-                \includegraphics[width=\textwidth]{animations/graph_construction_pipeline1.png}\\
-                {\footnotesize From segmentation to graph}
+                \begin{tikzpicture}[scale=0.55]
+                    % Ellipse bank illustration
+                    \draw[thick, fill=gray!10] (0,0) rectangle (4.5,4.5);
+                    
+                    % Different ellipse orientations
+                    \draw[inriaBlue, thick, rotate around={0:(1,3.5)}] (1,3.5) ellipse (0.4 and 0.25);
+                    \draw[inriaBlue, thick, rotate around={30:(2.5,3.5)}] (2.5,3.5) ellipse (0.5 and 0.2);
+                    \draw[inriaBlue, thick, rotate around={60:(3.8,3.5)}] (3.8,3.5) ellipse (0.35 and 0.2);
+                    
+                    \draw[cauliflowerOrange, thick, rotate around={45:(1,2)}] (1,2) ellipse (0.45 and 0.3);
+                    \draw[cauliflowerOrange, thick, rotate around={-20:(2.5,2)}] (2.5,2) ellipse (0.5 and 0.25);
+                    \draw[cauliflowerOrange, thick, rotate around={80:(3.8,2)}] (3.8,2) ellipse (0.3 and 0.15);
+                    
+                    \draw[cysticGreen, thick] (1,0.7) ellipse (0.3 and 0.3);
+                    \draw[cysticGreen, thick, rotate around={15:(2.5,0.7)}] (2.5,0.7) ellipse (0.55 and 0.2);
+                    \draw[cysticGreen, thick, rotate around={-45:(3.8,0.7)}] (3.8,0.7) ellipse (0.4 and 0.25);
+                    
+                    \node[font=\footnotesize] at (2.25,-0.3) {Bank of elliptic filters};
+                \end{tikzpicture}
+                
+                \vspace{0.5em}
+                \textbf{Filter Bank Parameters:}\\
+                {\footnotesize
+                \begin{tabular}{ll}
+                    Angles: & $\theta_i = i\pi/I$ \\
+                    Small axis: & 3--25 px \\
+                    Aspect ratio: & 1.0 to 3.0
+                \end{tabular}
+                }
             \end{center}
         \end{column}
     \end{columns}
 \end{frame}
 
+% Slide: Ellipse 3D Reconstruction
+\begin{frame}{Ellipse Method: 3D Reconstruction}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{3D Matching Algorithm:}
+            \begin{enumerate}
+                \item For each ellipse $\epsilon_n$ in slice $z$
+                \item Find candidates in slice $z+1$
+                \item Compute combined distance:
+                \item Match if distance small enough
+                \item Merge into 3D objects
+            \end{enumerate}
+            
+            \vspace{0.5em}
+            \textbf{Key Properties:}
+            \begin{itemize}
+                \item \textcolor{cysticGreen}{\faCheck} Deterministic (no training)
+                \item \textcolor{cysticGreen}{\faCheck} No GPU required
+                \item \textcolor{cysticGreen}{\faCheck} 10× faster than Cellpose
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \includegraphics[width=\textwidth]{img/3Dreco.png}\\
+                {\footnotesize 3D reconstruction from stacked ellipses\\
+                Each color = one matched cell}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide: Cellpose Principle (State of the Art)
+\begin{frame}{Cellpose: How It Works (State of the Art)}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Principle:}
+            \begin{itemize}
+                \item Predicts a \textbf{gradient field}
+                \item Each pixel "points" toward its cell center
+                \item \textbf{Flow tracking} groups pixels into instances
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Why Instance Segmentation?}\\
+            Graphs require \textbf{discrete nodes}\\
+            $\Rightarrow$ Each cell = unique label
+
+            \vspace{1em}
+            \textbf{Performance:}
+            \begin{itemize}
+                \item F1 = 0.98 (best accuracy)
+                \item But: 30 sec/slice
+                \item $\Rightarrow$ Need optimization!
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Architecture:}
+            \begin{itemize}
+                \item U-Net encoder-decoder
+                \item ResNet backbone
+                \item Two output branches: X, Y, Z gradients
+            \end{itemize}
+            \vspace{1em}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide: Contribution 2 - Faster Cellpose
+\begin{frame}{Contribution: Faster Cellpose}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Goal:} Match Cellpose accuracy, much faster
+            
+            \vspace{0.8em}
+            \textbf{How:} Our "Faster Cellpose" combines three optimizations:
+            \begin{itemize}
+                \item \textbf{Smaller model:} Reduced layers and channels to cut compute and memory, while retaining key U-Net structure.
+                \item \textbf{Weight pruning:} Remove redundant weights (prune to 50\% sparsity) to speed up inference and shrink the model size.
+                \item \textbf{Mixed-precision:} Use float16 instead of float32 for faster computation on modern GPUs, with little accuracy loss.
+            \end{itemize}
+            
+            \vspace{0.8em}
+            \textbf{Result:} 5× faster, small F1 drop (0.98 $\rightarrow$ 0.95)
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[
+                    node distance=0.6cm,
+                    box/.style={rectangle, draw, fill=inriaBlue!20, minimum width=2cm, minimum height=0.6cm, font=\footnotesize}
+                ]
+                    \node[box, fill=red!20] (cp) {Cellpose};
+                    \node[box, below=of cp] (fc) {Faster CP};
+                    \draw[->, thick] (cp) -- (fc);
+                \end{tikzpicture}
+            \end{center}
+            
+            \vspace{0.5em}
+            \begin{tabular}{ll}
+                Speed-up: & \textbf{5×} \\
+                F1: & 0.95 \\
+            \end{tabular}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide: Segmentation Methods—Key Comparison
+\begin{frame}{Segmentation: Key Performance Trade-offs}
+    \begin{columns}
+        \begin{column}{0.53\textwidth}
+            \footnotesize
+            \begin{tabular}{lccc}
+                \toprule
+                \textbf{Method} & \textbf{F1} & \textbf{sec/slice} & \textbf{GPU} \\
+                \midrule
+                Cellpose        & 0.98 & 30  & Yes \\
+                \textbf{Faster CP}  & \textbf{0.95} & \textbf{6} & Yes \\
+                Ellipses (ours) & 0.88 & 3 & No \\
+                StarDist        & 0.85 & 5   & Yes \\
+                \bottomrule
+            \end{tabular}
+
+            \vspace{1em}
+            \textbf{Choice:} \textbf{Faster CP} \\
+            {\footnotesize Best speed/accuracy, GPU-friendly}
+        \end{column}
+        \begin{column}{0.47\textwidth}
+            \begin{center}
+                \includegraphics[width=0.8\textwidth]{img/Comp.png}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide: Impact of Segmentation on Graph Structure
+\begin{frame}{Impact of Segmentation on Graph Construction}
+    \begin{columns}
+        \begin{column}{0.54\textwidth}
+            \textbf{Downstream Impact:}\\
+            Segmentation quality directly affects the reconstructed cellular graph.\\[0.5em]
+            \begin{itemize}
+                \item \textbf{Accurate segmentation} $\rightarrow$ correct cell count, positions, and connectivity.
+                \item \textbf{Over/under-segmentation} leads to spurious or missing nodes and edges.
+                \item Structural graph features (\textit{e.g.}, degree, clustering) can be severely distorted.
+                \item Error propagation: graph-based phenotyping/modeling relies on initial accuracy.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.46\textwidth}
+            \begin{center}
+                \includegraphics[width=0.98\textwidth]{img/graph_comparison.png}\\
+                {\footnotesize \textit{Example: segmentation quality modulates resulting organoid graph}}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+% Slide: DBSCAN Organoid Separation
+\begin{frame}{DBSCAN: Separating Multiple Organoids}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            \textbf{Problem:}\\
+            Each image may contain \textbf{multiple organoids}\\
+            ($\sim$1.7 organoids/image on average)
+            
+            \vspace{0.5em}
+            \textbf{Solution: DBSCAN Clustering}
+            \begin{itemize}
+                \item Density-based spatial clustering
+                \item \textcolor{cysticGreen}{\faCheck} No need to specify \# clusters
+                \item \textcolor{cysticGreen}{\faCheck} Handles irregular shapes
+                \item \textcolor{cysticGreen}{\faCheck} Identifies noise/debris
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Filtering Criteria:}
+            \begin{itemize}
+                \item Min: 20 cells (exclude debris)
+                \item Max: 5,000 cells (exclude aberrant aggregates)
+                \item Reject border-touching organoids
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{center}
+                \begin{tikzpicture}[scale=0.6]
+                    % Background
+                    \draw[thick, fill=gray!10] (0,0) rectangle (5,5);
+                    
+                    % Organoid 1 (cluster)
+                    \foreach \i in {1,...,15} {
+                        \pgfmathsetmacro{\x}{1.2+rand*0.6}
+                        \pgfmathsetmacro{\y}{3.5+rand*0.6}
+                        \fill[cysticGreen] (\x,\y) circle (0.08);
+                    }
+                    \draw[cysticGreen, thick, dashed] (1.2,3.5) circle (0.8);
+                    \node[cysticGreen, font=\tiny] at (1.2,2.5) {Org. 1};
+                    
+                    % Organoid 2 (cluster)
+                    \foreach \i in {1,...,20} {
+                        \pgfmathsetmacro{\x}{3.5+rand*0.8}
+                        \pgfmathsetmacro{\y}{1.5+rand*0.8}
+                        \fill[cauliflowerOrange] (\x,\y) circle (0.08);
+                    }
+                    \draw[cauliflowerOrange, thick, dashed] (3.5,1.5) circle (1);
+                    \node[cauliflowerOrange, font=\tiny] at (3.5,0.3) {Org. 2};
+                    
+                    % Noise points
+                    \fill[red!50] (0.5,1) circle (0.06);
+                    \fill[red!50] (4.5,4) circle (0.06);
+                    \fill[red!50] (2.5,2.5) circle (0.06);
+                    \node[red!50, font=\tiny] at (2.5,2) {noise};
+                \end{tikzpicture}\\
+                {\footnotesize DBSCAN separates organoids}
+            \end{center}
+            
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide 29: Graph Construction
+\begin{frame}{Graph Construction from Segmented Cells}
+    \begin{center}
+        \includegraphics[width=1\textwidth]{C:/Users/Alexandre/Documents/manuscrit/img/graph_construction_pipeline1.png}
+    \end{center}
+\end{frame}
+
+% Slide: Pipeline Timing Breakdown
+\begin{frame}{Pipeline Performance: Timing Breakdown}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Per-Organoid Processing:}
+            \begin{table}
+                \footnotesize
+                \begin{tabular}{lc}
+                    \toprule
+                    \textbf{Step} & \textbf{Time} \\
+                    \midrule
+                    Preprocessing & $<$ 1 sec \\
+                    \textbf{Faster Cellpose} & \textbf{$\sim$20 min} \\
+                    Feature extraction & $<$ 1 sec \\
+                    Graph construction & $<$ 1 sec \\
+                    GNN inference & $<$ 0.1 sec \\
+                    \midrule
+                    \textbf{Total} & \textbf{$\sim$20 min} \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
+            
+            {\footnotesize Segmentation dominates ($>$99\%)}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Scalability:}
+            \begin{itemize}
+                \item Each organoid: independent unit
+                \item Trivial parallelization
+                \item Batch GNN inference on GPU
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{1000 Organoids:}
+            \begin{itemize}
+                \item Sequential (1 GPU): 330h ($\sim$14 days)
+                \item Parallel (20 GPUs): 17h
+            \end{itemize}
+            
+            \vspace{0.5em}
+            \textbf{Hardware:}\\
+            CPU: Intel Core i7\\
+            GPU: NVIDIA RTX 3080
+        \end{column}
+    \end{columns}
+\end{frame}
+
 % Slide 30: Part III Summary
-\begin{frame}{Part III Summary: Pipeline}
+\begin{frame}{Part III Summary: Real Data Pipeline}
     \begin{enumerate}
         \item \textbf{Real dataset:} 500 well-differentiated organoids (22 months)
+        \begin{itemize}
+            \item Cystic vs Cauliflower phenotypes
+            \item Standardized acquisition protocol
+        \end{itemize}
     
-    \vspace{0.5em}
-        \item \textbf{Faster Cellpose:} 5× speedup while maintaining F1 = 0.95
+    \vspace{0.3em}
+        \item \textbf{Preprocessing:} Percentile normalization + denoising
     
-    \vspace{0.5em}
-        \item \textbf{Graph construction:} 1000× compression preserving structure
-            
-            \vspace{0.5em}
-        \item \textbf{Complete pipeline:} 3D image $\rightarrow$ graph $\rightarrow$ prediction
+    \vspace{0.3em}
+        \item \textbf{Faster Cellpose:} 5× speedup (F1 = 0.95)
+        \begin{itemize}
+            \item Knowledge distillation + pruning + FP16
+        \end{itemize}
+    
+    \vspace{0.3em}
+        \item \textbf{DBSCAN:} Separates multiple organoids per image
+    
+    \vspace{0.3em}
+        \item \textbf{Hybrid K-NN graphs:} 1000× compression, 4D features
     \end{enumerate}
             
-            \vspace{0.5em}
+    \vspace{0.3em}
     \begin{alertblock}{Next}
         Transfer learning: can synthetic pre-training help with real data?
     \end{alertblock}
@@ -1251,7 +1629,7 @@
     \textbf{Key findings:}
     \begin{itemize}
         \item GAT wins: attention learns which neighbors matter
-        \item EGNN: equivariance divides MSE by \textbf{2.8×}
+        \item EGNN: great results with equivariance
     \end{itemize}
 \end{frame}
 
@@ -1281,12 +1659,6 @@
                 \item But: guaranteed equivariance
             \end{itemize}
             
-            \vspace{0.5em}
-            \begin{block}{Equivariance Benefit}
-                Without equivariance: MSE = 0.38\\
-                With EGNN: MSE = 0.137\\[0.3em]
-                $\Rightarrow$ \textbf{2.8× improvement}
-            \end{block}
         \end{column}
     \end{columns}
 \end{frame}
@@ -1321,53 +1693,9 @@
     \end{columns}
     
     \vspace{0.5em}
-    {\small Main confusion: Low-deformation cauliflowers $\rightarrow$ quasi-spherical}
+    {\small Main confusion: Low-deformation cauliflowers}
 \end{frame}
 
-% Slide: Confusion Matrix
-\begin{frame}{Confusion Matrix Analysis}
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \begin{center}
-                \begin{tikzpicture}[scale=1.3]
-                    \draw[thick] (0,0) rectangle (2,2);
-                    \draw[thick] (1,0) -- (1,2);
-                    \draw[thick] (0,1) -- (2,1);
-                    
-                    \node[fill=cysticGreen!40] at (0.5,1.5) {\Large\textbf{28}};
-                    \node[fill=red!20] at (1.5,1.5) {\Large 10};
-                    \node[fill=red!10] at (0.5,0.5) {\Large 2};
-                    \node[fill=cysticGreen!40] at (1.5,0.5) {\Large\textbf{35}};
-                    
-                    \node[rotate=90] at (-0.4,1.5) {\small Cauliflower};
-                    \node[rotate=90] at (-0.4,0.5) {\small Cystic};
-                    \node at (0.5,2.3) {\small Pred. Caul.};
-                    \node at (1.5,2.3) {\small Pred. Cyst.};
-                \end{tikzpicture}
-            \end{center}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-            \textbf{Results:}
-            \begin{itemize}
-                \item 63/75 correct = \textbf{84\%}
-                \item TP Cauliflower: 28
-                \item TP Cystic: 35
-            \end{itemize}
-            
-            \vspace{0.5em}
-            \textbf{Main Error Pattern:}\\
-            Cauliflower $\rightarrow$ Cystic (10 cases)
-            
-            \vspace{0.5em}
-            \textbf{Interpretation:}
-            \begin{itemize}
-                \item Low-deformation cauliflowers
-                \item Quasi-spherical appearance
-                \item Possible transitional phenotypes
-            \end{itemize}
-        \end{column}
-    \end{columns}
-\end{frame}
 
 % Slide 35: Transfer Learning Impact
 \begin{frame}{Transfer Learning Impact}
@@ -1396,73 +1724,9 @@
     
             $\Rightarrow$ \textbf{4× fewer annotations needed!}
         \end{column}
-        \begin{column}{0.5\textwidth}
-            \begin{center}
-                \includegraphics[width=\textwidth]{img/distrib2.png}\\
-                {\footnotesize Data efficiency comparison}
-            \end{center}
-            
-            \vspace{0.3em}
-            \textbf{Convergence:} 3× faster
-        \end{column}
     \end{columns}
 \end{frame}
 
-% Slide 36: Final Architecture
-\begin{frame}{Final Architecture}
-    \begin{center}
-        \begin{tikzpicture}[
-            node distance=0.5cm,
-            block/.style={rectangle, rounded corners, draw, minimum height=0.7cm, align=center, font=\footnotesize},
-            arrow/.style={->, thick}
-        ]
-            \node[block, fill=gray!20, minimum width=1.2cm] (input) {Input\\$4D$};
-            \node[block, fill=inriaBlue!30, minimum width=1.8cm, right=of input] (gat) {GAT\\5 layers};
-            \node[block, fill=inriaBlue!20, minimum width=1.5cm, right=of gat] (pool) {Pool\\mean+max};
-            \node[block, fill=cauliflowerOrange!30, minimum width=1.5cm, right=of pool] (mlp) {MLP\\256$\rightarrow$128};
-            \node[block, fill=cysticGreen!40, minimum width=1.2cm, right=of mlp] (out) {Output\\2 classes};
-            
-            \draw[arrow] (input) -- (gat);
-            \draw[arrow] (gat) -- (pool);
-            \draw[arrow] (pool) -- (mlp);
-            \draw[arrow] (mlp) -- (out);
-            
-            \node[font=\tiny, text=gray] at (2.7,-0.8) {256 hidden dim};
-        \end{tikzpicture}
-    \end{center}
-    
-    \vspace{0.3em}
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \begin{table}
-                \footnotesize
-                \begin{tabular}{ll}
-                    \toprule
-                    \multicolumn{2}{c}{\textbf{Training}} \\
-                    \midrule
-                    Optimizer & AdamW \\
-                    LR (pre-train) & $10^{-3}$ \\
-                    LR (fine-tune) & $10^{-4}$ \\
-                    \bottomrule
-                \end{tabular}
-            \end{table}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-            \begin{table}
-                \footnotesize
-                \begin{tabular}{ll}
-                    \toprule
-                    \multicolumn{2}{c}{\textbf{Inference}} \\
-                    \midrule
-                    Speed & 200+ org/min \\
-                    Memory & $\sim$8 GB GPU \\
-                    Hardware & RTX 3080 \\
-                    \bottomrule
-                \end{tabular}
-            \end{table}
-        \end{column}
-    \end{columns}
-\end{frame}
 
 % Slide: Learning Curves Detail
 \begin{frame}{Learning Curves: Detailed Analysis}
@@ -1639,8 +1903,8 @@
         \begin{column}{0.5\textwidth}
             \begin{center}
                 \begin{tikzpicture}[scale=0.6]
-                    \node[rectangle, draw, fill=red!20, minimum width=2cm, minimum height=1cm] (img) at (0,2) {2 GB};
-                    \node[rectangle, draw, fill=cysticGreen!30, minimum width=1cm, minimum height=0.5cm] (graph) at (0,0) {2 MB};
+                    \node[rectangle, draw, fill=red!20, minimum width=2cm, minimum height=1cm] (img) at (0,2) {GB};
+                    \node[rectangle, draw, fill=cysticGreen!30, minimum width=1cm, minimum height=0.5cm] (graph) at (0,0) {MB};
                     \draw[->, very thick] (img) -- (graph);
                     \node[right] at (0.5,1) {\small $\times 1000$};
                 \end{tikzpicture}
@@ -1785,11 +2049,6 @@
             \end{itemize}
         \end{column}
     \end{columns}
-    
-    \vspace{0.5em}
-    \begin{center}
-        \textbf{Code available:} \url{github.com/morpheme-inria/organoid-gnn}
-    \end{center}
 \end{frame}
 
 % Slide: Short-term Perspectives
@@ -1835,9 +2094,7 @@
             \vspace{0.5em}
             \textbf{Generative Graph Models:}
             \begin{itemize}
-                \item In silico organoid design
-                \item Optimize culture protocols
-                \item Computational biology
+                \item Use GNN-based generative models (e.g. GraphVAEs, diffusion models) to simulate realistic 3D organoid architectures
             \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
@@ -1877,112 +2134,9 @@
         \end{tikzpicture}
         
         \vspace{1em}
-        \textbf{Open-source code} available for the community
-        
-        \vspace{1em}
         {\Large Thank you for your attention.}\\
         {\large I am happy to take your questions.}
     \end{center}
-\end{frame}
-
-% =============================================================================
-% BACKUP SLIDES
-% =============================================================================
-\appendix
-
-\begin{frame}
-    \begin{center}
-        {\Huge Backup Slides}
-    \end{center}
-\end{frame}
-
-\begin{frame}{Confusion Matrix (Detail)}
-    \begin{center}
-        \begin{tikzpicture}[scale=1.5]
-            \draw[thick] (0,0) rectangle (2,2);
-            \draw[thick] (1,0) -- (1,2);
-            \draw[thick] (0,1) -- (2,1);
-            
-            \node at (0.5,1.5) {\Large\textbf{28}};
-            \node at (1.5,1.5) {\Large 10};
-            \node at (0.5,0.5) {\Large 2};
-            \node at (1.5,0.5) {\Large\textbf{35}};
-            
-            \node[rotate=90] at (-0.5,1.5) {Cauliflower};
-            \node[rotate=90] at (-0.5,0.5) {Cystic};
-            \node at (0.5,2.3) {Pred. Caul.};
-            \node at (1.5,2.3) {Pred. Cyst.};
-            
-            \node at (3.5,1.5) {\textbf{63/75 correct}};
-            \node at (3.5,1) {\textbf{= 84\% accuracy}};
-        \end{tikzpicture}
-    \end{center}
-\end{frame}
-
-\begin{frame}{Anticipated Questions}
-    \begin{enumerate}
-        \item \textbf{Why GAT over EGNN?}\\
-        Trade-off: GAT wins on accuracy; EGNN wins on guarantees
-        
-        \vspace{0.5em}
-        \item \textbf{Synthetic data validation?}\\
-        Empirical gains (+8\%) demonstrate practical utility
-        
-        \vspace{0.5em}
-        \item \textbf{Generalization to other organoids?}\\
-        Principles transferable; requires fine-tuning Cellpose
-        
-        \vspace{0.5em}
-        \item \textbf{Why only 500 organoids?}\\
-        Quality over quantity — ensuring label-morphology consistency
-        
-        \vspace{0.5em}
-        \item \textbf{Clinical deployment?}\\
-        Would require regulatory validation (IVDR/FDA)
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}{EGNN Formulas (Detail)}
-    \textbf{Message computation} (invariant):
-    \begin{equation*}
-        m_{ij} = \phi_m\left(h_i, h_j, \|x_i - x_j\|^2\right)
-    \end{equation*}
-    
-    \textbf{Coordinate update} (equivariant):
-    \begin{equation*}
-        x_i^{(l+1)} = x_i^{(l)} + \sum_{j \neq i} (x_i - x_j) \cdot \phi_x(m_{ij})
-    \end{equation*}
-    
-    \textbf{Feature update}:
-    \begin{equation*}
-        h_i^{(l+1)} = \phi_h\left(h_i^{(l)}, \sum_{j \in \mathcal{N}(i)} m_{ij}\right)
-    \end{equation*}
-    
-    \begin{block}{Property}
-        Invariant messages + Equivariant coordinate updates = E(3)-equivariant network
-    \end{block}
-\end{frame}
-
-\begin{frame}{Timing Checkpoints}
-    \begin{table}
-        \centering
-        \begin{tabular}{lc}
-            \toprule
-            \textbf{Section} & \textbf{Target Time} \\
-            \midrule
-            After Introduction (Slide 6) & $\sim$5 min \\
-            After Part I - Justification (Slide 14) & $\sim$15 min \\
-            After Part II - GNN Theory (Slide 24) & $\sim$25 min \\
-            After Part III - Pipeline (Slide 30) & $\sim$32 min \\
-            After Part IV - Results (Slide 38) & $\sim$42 min \\
-            End & $\sim$45 min \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-    
-    \vspace{1em}
-    \textbf{If running long:} Abbreviate EGNN details\\
-    \textbf{If running short:} Expand perspectives and limitations
 \end{frame}
 
 \end{document}
